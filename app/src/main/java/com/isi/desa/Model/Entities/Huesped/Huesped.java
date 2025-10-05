@@ -6,10 +6,10 @@ import com.isi.desa.Model.Entities.Direccion.Direccion;
 import java.time.LocalDate;
 
 public class Huesped {
+    private String numDoc;
     private String nombre;
     private String apellido;
     private TipoDocumento tipoDocumento;
-    private String numDoc;
     private String posicionIva;
     private String cuit;
     private LocalDate fechaNacimiento;

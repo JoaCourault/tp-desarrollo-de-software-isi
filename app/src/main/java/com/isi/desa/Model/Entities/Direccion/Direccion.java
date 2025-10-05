@@ -1,6 +1,7 @@
 package com.isi.desa.Model.Entities.Direccion;
 
 public class Direccion {
+    private String idDireccion;
     private String calle;
     private Integer numero;
     private String departamento;
