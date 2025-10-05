@@ -1,25 +1,26 @@
 package com.isi.desa.Model.Entities.Reserva;
 
 import com.isi.desa.Model.Entities.Huesped.Huesped;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 public class Reserva {
-    private Huesped TitularReserva;
-    private Date FechaIngreso;
-    private Date FechaEgreso;
+    private Huesped titularReserva;
+    private LocalDateTime fechaIngreso;
+    private LocalDateTime fechaEgreso;
 
     public Reserva() {}
 
-    public Reserva(Huesped TitularReserva, Date FechaIngreso, Date FechaEgreso) {
-        this.TitularReserva = TitularReserva;
-        this.FechaIngreso = FechaIngreso;
-        this.FechaEgreso = FechaEgreso;
+    public Reserva(Huesped titularReserva, LocalDateTime fechaIngreso, LocalDateTime fechaEgreso) {
+        this.titularReserva = titularReserva;
+        this.fechaIngreso = fechaIngreso;
+        this.fechaEgreso = fechaEgreso;
     }
 
-    public Huesped GetTitularReserva() { return TitularReserva; }
-    public void SetTitularReserva(Huesped TitularReserva) { this.TitularReserva = TitularReserva; }
-    public Date GetFechaIngreso() { return FechaIngreso; }
-    public void SetFechaIngreso(Date FechaIngreso) { this.FechaIngreso = FechaIngreso; }
-    public Date GetFechaEgreso() { return FechaEgreso; }
-    public void SetFechaEgreso(Date FechaEgreso) { this.FechaEgreso = FechaEgreso; }
+    public Huesped getTitularReserva() { return this.titularReserva; }
+    public void setTitularReserva(Huesped titularReserva) { this.titularReserva = titularReserva; }
+    public LocalDateTime getFechaIngreso() { return fechaIngreso; }
+    public void setFechaIngreso(LocalDateTime fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+    public LocalDateTime getFechaEgreso() { return fechaEgreso; }
+    public void setFechaEgreso(LocalDateTime fechaEgreso) { this.fechaEgreso = fechaEgreso; }
 }

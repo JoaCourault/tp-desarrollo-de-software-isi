@@ -1,21 +1,18 @@
 package com.isi.desa.Service.Implementations.Validators;
 
-import com.isi.desa.Dto.HuespedDTO;
+import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
+import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
 
-import org.springframework.stereotype.Service;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 //@Service //Descomentar para correr con Spring Boot
 public class HuespedValidator {
-    private final DireccionValidator direccionValidator;
+    private final IDireccionValidator direccionValidator;
 
     public HuespedValidator() {
         this.direccionValidator = new DireccionValidator();
@@ -28,12 +25,7 @@ public class HuespedValidator {
         }
         Direccion direccion = this.direccionValidator.create(huespedDTO.direccion);
         TipoDocumento tipoDocumento = new TipoDocumento(huespedDTO.tipoDocumento);
-        Date fechaNacimiento = null;
-        try {
-            fechaNacimiento = (huespedDTO.fechaNacimiento != null && !huespedDTO.fechaNacimiento.isEmpty()) ? new SimpleDateFormat("yyyy-MM-dd").parse(huespedDTO.fechaNacimiento) : null;
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("Fecha de nacimiento inválida. Formato esperado: yyyy-MM-dd");
-        }
+        LocalDate fechaNacimiento = huespedDTO.fechaNacimiento;
         return new Huesped(
                 huespedDTO.nombre,
                 huespedDTO.apellido,
@@ -95,15 +87,7 @@ public class HuespedValidator {
         }
         return null;
     }
-    public String validateFechaNacimiento(String fechaNacimiento) {
-        if (fechaNacimiento == null || fechaNacimiento.trim().isEmpty()) {
-            return "La fecha de nacimiento es un campo obligatorio";
-        }
-        try {
-            new SimpleDateFormat("yyyy-MM-dd").parse(fechaNacimiento);
-            return null;
-        } catch (ParseException e) {
-            return "Fecha de nacimiento inválida. Formato esperado: yyyy-MM-dd";
-        }
+    public String validateFechaNacimiento(LocalDate fechaNacimiento) {
+        return (fechaNacimiento == null) ? "La fecha de nacimiento es un campo obligatorio" : null;
     }
 }

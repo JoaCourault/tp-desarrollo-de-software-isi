@@ -3,29 +3,30 @@ package com.isi.desa.Model.Entities.Pago;
 import com.isi.desa.Model.Entities.MetodoDePago.MetodoDePago;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class Pago {
-    private BigDecimal Valor;
-    private Date Fecha;
-    private List<MetodoDePago> MetodosDePago;
+    private BigDecimal valor;
+    private LocalDateTime fecha;
+    private List<MetodoDePago> metodosDePago;
 
     public Pago() {}
-    public Pago(BigDecimal Valor, Date Fecha, ArrayList<MetodoDePago> MetodosDePago) {
-        this.Valor = Valor;
-        this.Fecha = Fecha;
-        this.MetodosDePago = MetodosDePago;
+    public Pago(BigDecimal valor, LocalDateTime fecha, ArrayList<MetodoDePago> metodosDePago) {
+        this.valor = valor;
+        this.fecha = fecha;
+        this.metodosDePago = metodosDePago;
     }
 
-    public BigDecimal GetValor() { return this.Valor; }
-    public void SetValor(BigDecimal Valor) { this.Valor = Valor; }
+    public BigDecimal getValor() { return this.valor; }
+    public void setValor(BigDecimal valor) { this.valor = valor; }
 
-    public Date GetFecha() { return this.Fecha; }
-    public void SetFecha(Date Fecha) { this.Fecha = Fecha; }
+    public LocalDateTime getFecha() { return this.fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
 
-    public List<MetodoDePago> GetMetodosDePago() { return this.MetodosDePago; }
-    public void SetMetodosDePago(List<MetodoDePago> MetodosDePago) { this.MetodosDePago = MetodosDePago; }
-    public void AgregarMetodoDePago(MetodoDePago MetodoDePago) { this.MetodosDePago.add(MetodoDePago); }
+    public List<MetodoDePago> getMetodosDePago() { return this.metodosDePago; }
+    public void setMetodosDePago(List<MetodoDePago> metodosDePago) { this.metodosDePago = metodosDePago; }
+    public void agregarMetodoDePago(MetodoDePago metodoDePago) { this.metodosDePago.add(metodoDePago); }
 }

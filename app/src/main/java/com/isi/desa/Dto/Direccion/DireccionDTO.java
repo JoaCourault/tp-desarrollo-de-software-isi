@@ -1,4 +1,4 @@
-package com.isi.desa.Dto;
+package com.isi.desa.Dto.Direccion;
 
 public class DireccionDTO {
     public String pais;

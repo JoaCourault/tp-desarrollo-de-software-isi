@@ -1,11 +1,10 @@
 package com.isi.desa.Controller;
 
-import com.isi.desa.Dto.UsuarioDTO;
+import com.isi.desa.Dto.Usuario.UsuarioDTO;
 import com.isi.desa.Model.Entities.Usuario.Usuario;
 import com.isi.desa.Service.Implementations.UsuarioService;
 import com.isi.desa.Service.Implementations.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+
 import java.util.Optional;
 
 //@Controller//Descomentar para correr con Spring Boot

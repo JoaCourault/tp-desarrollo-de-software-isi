@@ -1,6 +1,6 @@
 package com.isi.desa.Service.Interfaces.Validators;
 
-import com.isi.desa.Dto.HuespedDTO;
+import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import java.util.List;
 

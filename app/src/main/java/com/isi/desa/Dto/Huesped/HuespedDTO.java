@@ -1,4 +1,8 @@
-package com.isi.desa.Dto;
+package com.isi.desa.Dto.Huesped;
+
+import com.isi.desa.Dto.Direccion.DireccionDTO;
+
+import java.time.LocalDate;
 
 public class HuespedDTO {
     public String idHuesped;
@@ -8,7 +12,7 @@ public class HuespedDTO {
     public String numDoc;
     public String posicionIva;
     public String cuit;
-    public String fechaNacimiento;
+    public LocalDate fechaNacimiento;
     public String telefono;
     public String email;
     public String ocupacion;

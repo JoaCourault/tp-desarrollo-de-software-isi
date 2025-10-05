@@ -2,7 +2,8 @@ package com.isi.desa.Model.Entities.Huesped;
 
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 public class Huesped {
     private String nombre;
@@ -11,7 +12,7 @@ public class Huesped {
     private String numDoc;
     private String posicionIva;
     private String cuit;
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
     private String telefono;
     private String email;
     private String ocupacion;
@@ -20,7 +21,7 @@ public class Huesped {
 
     public Huesped() {}
 
-    public Huesped(String nombre, String apellido, TipoDocumento tipoDocumento, String numDoc, String posicionIva, String cuit, Date fechaNacimiento, String telefono, String email, String ocupacion, String nacionalidad, Direccion direccion) {
+    public Huesped(String nombre, String apellido, TipoDocumento tipoDocumento, String numDoc, String posicionIva, String cuit, LocalDate fechaNacimiento, String telefono, String email, String ocupacion, String nacionalidad, Direccion direccion) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.tipoDocumento = tipoDocumento;
@@ -53,8 +54,8 @@ public class Huesped {
     public String getCuit() { return cuit; }
     public void setCuit(String cuit) { this.cuit = cuit; }
 
-    public Date getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(Date fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }

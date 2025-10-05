@@ -1,11 +1,10 @@
 package com.isi.desa.Service.Implementations;
 
-import com.isi.desa.Dto.UsuarioDTO;
+import com.isi.desa.Dto.Usuario.UsuarioDTO;
 import com.isi.desa.Model.Entities.Usuario.Usuario;
 import com.isi.desa.Service.Implementations.Validators.UsuarioValidator;
+import com.isi.desa.Service.Interfaces.ILogger;
 import com.isi.desa.Service.Interfaces.IUsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
@@ -14,7 +13,7 @@ public class UsuarioService implements IUsuarioService {
     //@Autowired //Descomentar para correr con Spring Boot
     private UsuarioValidator validator;
     //@Autowired //Descomentar para correr con Spring Boot
-    private Logger logger;
+    private ILogger logger;
 
     // Constructor para inyección de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
     public UsuarioService() {

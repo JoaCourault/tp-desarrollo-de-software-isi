@@ -1,6 +1,6 @@
 package com.isi.desa.Service.Implementations.Validators;
 
-import com.isi.desa.Dto.DireccionDTO;
+import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
 import java.util.ArrayList;

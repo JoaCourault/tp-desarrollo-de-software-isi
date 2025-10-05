@@ -1,4 +1,4 @@
-package com.isi.desa.Dto;
+package com.isi.desa.Dto.Usuario;
 
 public class UsuarioDTO {
     public String idUsuario;

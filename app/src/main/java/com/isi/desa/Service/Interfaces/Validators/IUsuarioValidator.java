@@ -1,10 +1,8 @@
 package com.isi.desa.Service.Interfaces.Validators;
 
-import com.isi.desa.Dto.UsuarioDTO;
+import com.isi.desa.Dto.Usuario.UsuarioDTO;
 import com.isi.desa.Model.Entities.Usuario.Usuario;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface IUsuarioValidator {

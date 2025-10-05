@@ -1,6 +1,6 @@
 package com.isi.desa.Model.Entities.MetodoDePago;
 
-import java.util.Date;
+import java.time.LocalDate;
 import com.isi.desa.Model.Enums.EmisorTarjeta;
 
 public class TarjetaDeDebito extends MetodoDePago {
@@ -8,13 +8,13 @@ public class TarjetaDeDebito extends MetodoDePago {
     private String titular;
     private Integer dniTitular;
     private Integer numeroTarj;
-    private Date caducidad;
+    private LocalDate caducidad;
     private Integer codigoCVV;
     private String correo;
 
     public TarjetaDeDebito() {}
 
-    public TarjetaDeDebito(EmisorTarjeta emisor, String titular, Integer dniTitular, Integer numeroTarj, Date caducidad, Integer codigoCVV, String correo) {
+    public TarjetaDeDebito(EmisorTarjeta emisor, String titular, Integer dniTitular, Integer numeroTarj, LocalDate caducidad, Integer codigoCVV, String correo) {
         this.emisor = emisor;
         this.titular = titular;
         this.dniTitular = dniTitular;
@@ -36,8 +36,8 @@ public class TarjetaDeDebito extends MetodoDePago {
     public Integer getNumeroTarj() { return numeroTarj; }
     public void setNumeroTarj(Integer numeroTarj) { this.numeroTarj = numeroTarj; }
 
-    public Date getCaducidad() { return caducidad; }
-    public void setCaducidad(Date caducidad) { this.caducidad = caducidad; }
+    public LocalDate getCaducidad() { return caducidad; }
+    public void setCaducidad(LocalDate caducidad) { this.caducidad = caducidad; }
 
     public Integer getCodigoCVV() { return codigoCVV; }
     public void setCodigoCVV(Integer codigoCVV) { this.codigoCVV = codigoCVV; }
