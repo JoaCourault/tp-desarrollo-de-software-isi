@@ -10,7 +10,7 @@ public class Huesped {
     private TipoDocumento tipoDocumento;
     private String numDoc;
     private String posicionIva;
-    private Integer cuit;
+    private String cuit;
     private Date fechaNacimiento;
     private String telefono;
     private String email;
@@ -20,7 +20,7 @@ public class Huesped {
 
     public Huesped() {}
 
-    public Huesped(String nombre, String apellido, TipoDocumento tipoDocumento, String numDoc, String posicionIva, Integer cuit, Date fechaNacimiento, String telefono, String email, String ocupacion, String nacionalidad, Direccion direccion) {
+    public Huesped(String nombre, String apellido, TipoDocumento tipoDocumento, String numDoc, String posicionIva, String cuit, Date fechaNacimiento, String telefono, String email, String ocupacion, String nacionalidad, Direccion direccion) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.tipoDocumento = tipoDocumento;
@@ -50,8 +50,8 @@ public class Huesped {
     public String getPosicionIva() { return posicionIva; }
     public void setPosicionIva(String posicionIva) { this.posicionIva = posicionIva; }
 
-    public Integer getCuit() { return cuit; }
-    public void setCuit(Integer cuit) { this.cuit = cuit; }
+    public String getCuit() { return cuit; }
+    public void setCuit(String cuit) { this.cuit = cuit; }
 
     public Date getFechaNacimiento() { return fechaNacimiento; }
     public void setFechaNacimiento(Date fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }

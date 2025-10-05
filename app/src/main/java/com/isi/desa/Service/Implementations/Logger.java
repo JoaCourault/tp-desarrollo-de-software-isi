@@ -1,7 +1,9 @@
 package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Service.Interfaces.ILogger;
+import org.springframework.stereotype.Service;
 
+// @Service // Descomentar para correr con Spring Boot
 public class Logger implements ILogger {
     private void log(String message, boolean error, Throwable throwable) {
         // Persistir en el futuro

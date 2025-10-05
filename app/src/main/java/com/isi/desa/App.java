@@ -3,8 +3,26 @@
  */
 package com.isi.desa;
 
+import com.isi.desa.Controller.UsuarioController;
+import com.isi.desa.Dto.DireccionDTO;
+import com.isi.desa.Dto.HuespedDTO;
+import com.isi.desa.Dto.UsuarioDTO;
+import com.isi.desa.Service.Implementations.Logger;
+import com.isi.desa.Service.Implementations.Validators.HuespedValidator;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+import java.util.Date;
+import java.util.List;
+
+//@SpringBootApplication //Descomentar para correr con Spring Boot
 public class App {
     public static void main(String[] args) {
+        /*
+        // Descomentar para correr con Spring Boot
+        ApplicationContext context = SpringApplication.run(App.class, args);
+        */
         System.out.println("Hello World!");
     }
 }
