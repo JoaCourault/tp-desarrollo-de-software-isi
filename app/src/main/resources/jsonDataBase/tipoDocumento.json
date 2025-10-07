@@ -1,18 +1,18 @@
 [
   {
-    "id": 1,
+    "id": "TD-01",
     "descripcion": "DNI"
   },
   {
-    "id": 2,
+    "id": "TD-02",
     "descripcion": "LE"
   },
   {
-    "id": 3,
+    "id": "TD-03",
     "descripcion": "LC"
   },
   {
-    "id": 4,
+    "id": "TD-04",
     "descripcion": "Pasaporte"
   }
 ]
