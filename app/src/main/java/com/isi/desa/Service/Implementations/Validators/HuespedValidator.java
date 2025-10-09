@@ -38,7 +38,8 @@ public class HuespedValidator {
                 huespedDTO.email,
                 huespedDTO.ocupacion,
                 huespedDTO.nacionalidad,
-                direccion
+                direccion,
+                huespedDTO.idHuesped
         );
     }
 

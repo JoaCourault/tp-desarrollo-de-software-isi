@@ -14,6 +14,7 @@ public class DireccionValidator implements IDireccionValidator {
             throw new IllegalArgumentException(String.join(", ", errores));
         }
         return new Direccion(
+                direccionDTO.id,
                 direccionDTO.calle,
                 direccionDTO.numero,
                 direccionDTO.departamento,

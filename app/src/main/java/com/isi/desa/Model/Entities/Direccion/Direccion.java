@@ -1,7 +1,10 @@
 package com.isi.desa.Model.Entities.Direccion;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Direccion {
+    @JsonProperty("id")
     private String idDireccion;
+
     private String calle;
     private Integer numero;
     private String departamento;
@@ -13,7 +16,12 @@ public class Direccion {
 
     public Direccion() {}
 
-    public Direccion(String calle, Integer numero, String departamento, Integer piso, Integer cp, String localidad, String provincia, String pais) {
+    public Direccion(String idDireccion) {
+        this.idDireccion = idDireccion;
+    }
+
+    public Direccion(String id,String calle, Integer numero, String departamento, Integer piso, Integer cp, String localidad, String provincia, String pais) {
+        this.idDireccion = id;
         this.calle = calle;
         this.numero = numero;
         this.departamento = departamento;
@@ -47,4 +55,12 @@ public class Direccion {
 
     public String getPais() { return pais; }
     public void setPais(String pais) { this.pais = pais; }
+
+    public String getIdDireccion() {
+        return idDireccion;
+    }
+
+    public void setIdDireccion(String idDireccion) {
+        this.idDireccion = idDireccion;
+    }
 }

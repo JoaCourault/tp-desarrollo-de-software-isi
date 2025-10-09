@@ -1,6 +1,7 @@
 package com.isi.desa.Dto.Direccion;
 
 public class DireccionDTO {
+    public String id;
     public String pais;
     public String provincia;
     public String localidad;

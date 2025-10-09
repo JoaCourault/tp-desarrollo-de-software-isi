@@ -8,4 +8,9 @@
   "contrasenia" : "hotel1234",
   "nombre" : "Juan",
   "apellido" : "Pérez"
+}, {
+  "idUsuario" : "tester",
+  "contrasenia" : "claveNueva456",
+  "nombre" : "Agus",
+  "apellido" : "Actualizado"
 } ]

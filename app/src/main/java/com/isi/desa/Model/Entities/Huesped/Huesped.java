@@ -1,15 +1,17 @@
 package com.isi.desa.Model.Entities.Huesped;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
-
 import java.time.LocalDate;
 
 public class Huesped {
-    private String numDoc;
+    @JsonProperty("id")
+    private String idHuesped;
     private String nombre;
     private String apellido;
     private TipoDocumento tipoDocumento;
+    private String numDoc;
     private String posicionIva;
     private String cuit;
     private LocalDate fechaNacimiento;
@@ -21,7 +23,9 @@ public class Huesped {
 
     public Huesped() {}
 
-    public Huesped(String nombre, String apellido, TipoDocumento tipoDocumento, String numDoc, String posicionIva, String cuit, LocalDate fechaNacimiento, String telefono, String email, String ocupacion, String nacionalidad, Direccion direccion) {
+    public Huesped(String nombre, String apellido, TipoDocumento tipoDocumento, String numDoc, String posicionIva, String cuit,
+                   LocalDate fechaNacimiento, String telefono, String email, String ocupacion, String nacionalidad,
+                   Direccion direccion, String idHuesped) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.tipoDocumento = tipoDocumento;
@@ -34,7 +38,12 @@ public class Huesped {
         this.ocupacion = ocupacion;
         this.nacionalidad = nacionalidad;
         this.direccion = direccion;
+        this.idHuesped = idHuesped;
     }
+
+    // === Getters & Setters ===
+    public String getIdHuesped() { return idHuesped; }
+    public void setIdHuesped(String idHuesped) { this.idHuesped = idHuesped; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -71,4 +80,27 @@ public class Huesped {
 
     public Direccion getDireccion() { return direccion; }
     public void setDireccion(Direccion direccion) { this.direccion = direccion; }
+
+    // === Mapeo con IDs del JSON ===
+    @JsonProperty("idTipoDocumento")
+    public void setIdTipoDocumento(String idTipoDocumento) {
+        this.tipoDocumento = new TipoDocumento();
+        this.tipoDocumento.setTipoDocumento(idTipoDocumento);
+    }
+
+    @JsonProperty("idDireccion")
+    public void setIdDireccion(String idDireccion) {
+        this.direccion = new Direccion();
+        this.direccion.setIdDireccion(idDireccion);
+    }
+
+    @JsonProperty("idTipoDocumento")
+    public String getIdTipoDocumento() {
+        return (tipoDocumento != null) ? tipoDocumento.getTipoDocumento() : null;
+    }
+
+    @JsonProperty("idDireccion")
+    public String getIdDireccion() {
+        return (direccion != null) ? direccion.getIdDireccion() : null;
+    }
 }
