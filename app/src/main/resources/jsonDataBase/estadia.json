@@ -1,0 +1,74 @@
+[
+  {
+    "idEstadia": "ES-001",
+    "idHuesped": "HU-001",
+    "valorTotalEstadia": 72000.00,
+    "checkIn": "2025-09-15T14:00:00",
+    "checkOut": "2025-09-18T10:00:00",
+    "cantNoches": 3,
+    "idHabitacion": "DE-101"
+  },
+  {
+    "idEstadia": "ES-002",
+    "idHuesped": "HU-002",
+    "valorTotalEstadia": 124000.00,
+    "checkIn": "2025-10-01T13:30:00",
+    "checkOut": "2025-10-06T10:00:00",
+    "cantNoches": 5,
+    "idHabitacion": "DS-204"
+  },
+  {
+    "idEstadia": "ES-003",
+    "idHuesped": "HU-004",
+    "valorTotalEstadia": 56000.00,
+    "checkIn": "2025-08-10T14:00:00",
+    "checkOut": "2025-08-13T10:00:00",
+    "cantNoches": 3,
+    "idHabitacion": "IE-304"
+  },
+  {
+    "idEstadia": "ES-004",
+    "idHuesped": "HU-005",
+    "valorTotalEstadia": 85000.00,
+    "checkIn": "2025-07-20T15:00:00",
+    "checkOut": "2025-07-24T11:00:00",
+    "cantNoches": 4,
+    "idHabitacion": "DE-107"
+  },
+  {
+    "idEstadia": "ES-005",
+    "idHuesped": "HU-006",
+    "valorTotalEstadia": 96000.00,
+    "checkIn": "2025-09-01T13:00:00",
+    "checkOut": "2025-09-05T10:00:00",
+    "cantNoches": 4,
+    "idHabitacion": "SFP-501"
+  },
+  {
+    "idEstadia": "ES-006",
+    "idHuesped": "HU-007",
+    "valorTotalEstadia": 195000.00,
+    "checkIn": "2025-10-03T14:30:00",
+    "checkOut": "2025-10-10T10:00:00",
+    "cantNoches": 7,
+    "idHabitacion": "SD-401"
+  },
+  {
+    "idEstadia": "ES-007",
+    "idHuesped": "HU-009",
+    "valorTotalEstadia": 68000.00,
+    "checkIn": "2025-06-15T13:00:00",
+    "checkOut": "2025-06-18T10:00:00",
+    "cantNoches": 3,
+    "idHabitacion": "DE-103"
+  },
+  {
+    "idEstadia": "ES-008",
+    "idHuesped": "HU-010",
+    "valorTotalEstadia": 104000.00,
+    "checkIn": "2025-08-25T15:00:00",
+    "checkOut": "2025-08-29T10:30:00",
+    "cantNoches": 4,
+    "idHabitacion": "DS-209"
+  }
+]
