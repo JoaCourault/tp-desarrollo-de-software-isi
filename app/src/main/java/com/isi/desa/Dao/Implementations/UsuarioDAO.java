@@ -24,7 +24,7 @@ public class UsuarioDAO implements IUsuarioDAO {
     private List<Usuario> leerUsuarios() {
         File file = new File(JSON_PATH);
         if (!file.exists()) {
-            System.out.println("⚠️ El archivo usuario.json no existe, creando nuevo...");
+            System.out.println("El archivo usuario.json no existe, creando nuevo...");
             return new ArrayList<>();
         }
 
@@ -34,9 +34,9 @@ public class UsuarioDAO implements IUsuarioDAO {
             }
             return mapper.readValue(file, new TypeReference<List<Usuario>>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("⚠️ El archivo usuario.json está corrupto o tiene formato inválido.", e);
+            throw new RuntimeException("El archivo usuario.json está corrupto o tiene formato inválido.", e);
         } catch (IOException e) {
-            throw new RuntimeException("💥 Error al leer usuario.json.", e);
+            throw new RuntimeException("Error al leer usuario.json.", e);
         }
     }
 
@@ -47,7 +47,7 @@ public class UsuarioDAO implements IUsuarioDAO {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File(JSON_PATH), usuarios);
         } catch (IOException e) {
-            throw new RuntimeException("💥 Error al guardar usuario.json.", e);
+            throw new RuntimeException("Error al guardar usuario.json.", e);
         }
     }
 
@@ -66,7 +66,7 @@ public class UsuarioDAO implements IUsuarioDAO {
                 .anyMatch(u -> u.getIdUsuario().equals(dto.idUsuario));
 
         if (existe) {
-            throw new RuntimeException("⚠️ Ya existe un usuario con ID " + dto.idUsuario);
+            throw new RuntimeException("Ya existe un usuario con ID " + dto.idUsuario);
         }
 
         Usuario nuevo = dtoToEntity(dto);
@@ -84,7 +84,7 @@ public class UsuarioDAO implements IUsuarioDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("❌ No se encontró usuario con ID: " + dto.idUsuario);
+            throw new RuntimeException("No se encontró usuario con ID: " + dto.idUsuario);
         }
 
         Usuario actualizado = existente.get();
@@ -105,7 +105,7 @@ public class UsuarioDAO implements IUsuarioDAO {
         return usuarios.stream()
                 .filter(u -> u.getIdUsuario().equals(idUsuario))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("❌ No se encontró usuario con ID: " + idUsuario));
+                .orElseThrow(() -> new RuntimeException("No se encontró usuario con ID: " + idUsuario));
     }
 
     @Override
@@ -117,11 +117,21 @@ public class UsuarioDAO implements IUsuarioDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("⚠️ No se encontró usuario para eliminar: " + dto.idUsuario);
+            throw new RuntimeException("No se encontró usuario para eliminar: " + dto.idUsuario);
         }
 
         usuarios.remove(existente.get());
         guardarUsuarios(usuarios);
         return existente.get();
+    }
+
+    @Override
+    public Usuario login(String nombre, String apellido, String contrasenia) {
+        return leerUsuarios().stream()
+                .filter(u -> u.getNombre().equalsIgnoreCase(nombre)
+                        && u.getApellido().equalsIgnoreCase(apellido)
+                        && u.getContrasenia().equals(contrasenia))
+                .findFirst()
+                .orElse(null);
     }
 }

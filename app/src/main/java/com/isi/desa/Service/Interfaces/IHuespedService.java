@@ -3,7 +3,7 @@ package com.isi.desa.Service.Interfaces;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import java.util.List;
 
-public interface IHuesped{
+public interface IHuespedService {
 
     HuespedDTO crear(HuespedDTO huespedDTO);
 

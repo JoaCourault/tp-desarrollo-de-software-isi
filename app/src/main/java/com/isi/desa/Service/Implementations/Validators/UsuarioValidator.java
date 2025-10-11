@@ -1,13 +1,26 @@
 package com.isi.desa.Service.Implementations.Validators;
 
+import com.isi.desa.Dao.Implementations.UsuarioDAO;
+import com.isi.desa.Dao.Interfaces.IUsuarioDAO;
 import com.isi.desa.Dto.Usuario.UsuarioDTO;
 import com.isi.desa.Model.Entities.Usuario.Usuario;
+import com.isi.desa.Service.Interfaces.Validators.IUsuarioValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //@Service //Descomentar para correr con Spring Boot
-public class UsuarioValidator {
+public class UsuarioValidator implements IUsuarioValidator {
+    //@Autowired //Descomentar para correr con Spring Boot
+    IUsuarioDAO usuarioDAO;
+
+    // Constructor para inyección de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
+    public UsuarioValidator() {
+        this.usuarioDAO = new UsuarioDAO();
+    }
+
+
     public Usuario create(UsuarioDTO usuarioDTO) {
         List<String> errores = validateCreate(usuarioDTO);
         if (errores != null && !errores.isEmpty()) {

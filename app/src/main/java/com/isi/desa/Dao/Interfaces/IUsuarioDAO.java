@@ -8,4 +8,5 @@ public interface IUsuarioDAO {
     Usuario modificar(UsuarioDTO dto);
     Usuario obtener(String idUsuario);
     Usuario eliminar(UsuarioDTO dto);
+    Usuario login(String nombre, String apellido, String contrasenia);
 }

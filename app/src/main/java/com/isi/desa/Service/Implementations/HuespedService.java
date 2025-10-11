@@ -3,29 +3,26 @@ package com.isi.desa.Service.Implementations;
 import com.isi.desa.Dao.Implementations.HuespedDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
-import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
-import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
-import com.isi.desa.Service.Interfaces.IHuesped;
+import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Implementations.Validators.HuespedValidator;
-import com.isi.desa.Dao.Interfaces.IDireccionDAO;
-import com.isi.desa.Utils.Mappers.DireccionMapper;
+import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.isi.desa.Utils.Mappers.HuespedMapper;
-
 //@Service //Descomentar para Spring Boot
-public class HuespedService implements IHuesped {
-
-    private final HuespedValidator validator;
+public class HuespedService implements IHuespedService {
+    //@Autowired //Descomentar para Spring Boot
+    private final IHuespedValidator validator;
+    //@Autowired //Descomentar para Spring Boot
     private final IHuespedDAO dao;
 
-    // Constructor con inyección del DAO existente
-    public HuespedService(IHuespedDAO dao) {
-        this.dao = dao;
+    // Constructor para inyección de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
+    public HuespedService() {
+        this.dao = new HuespedDAO();
         this.validator = new HuespedValidator();
     }
 

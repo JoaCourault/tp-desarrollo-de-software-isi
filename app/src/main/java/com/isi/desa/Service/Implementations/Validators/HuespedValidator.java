@@ -7,13 +7,14 @@ import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
+import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 //@Service //Descomentar para correr con Spring Boot
-public class HuespedValidator {
+public class HuespedValidator implements IHuespedValidator {
     private final IDireccionValidator direccionValidator;
 
     public HuespedValidator() {
@@ -73,6 +74,11 @@ public class HuespedValidator {
         return (apellido == null || apellido.trim().isEmpty()) ? "El apellido es obligatorio" : null;
     }
 
+    @Override
+    public String validateTipoDocumento(String tipoDocumento) {
+        return (tipoDocumento == null || tipoDocumento.trim().isEmpty()) ? "El tipo de documento es obligatorio" : null;
+    }
+
     public String validateTipoDocumento(TipoDocumentoDTO tipoDocumentoDTO) {
         TipoDocumentoDAO dao = new TipoDocumentoDAO();
         if (tipoDocumentoDTO == null) {
@@ -95,6 +101,12 @@ public class HuespedValidator {
     public String validateNumDoc(String numDoc) {
         return (numDoc == null || numDoc.trim().isEmpty()) ? "El número de documento es obligatorio" : null;
     }
+
+    @Override
+    public String validateCuit(Integer cuit) {
+        return (cuit == null) ? "El CUIT es un campo obligatorio" : null;
+    }
+
     public String validateCuit(String cuit) {
         if (cuit == null || cuit.trim().isEmpty()) return "El CUIT es obligatorio";
 
