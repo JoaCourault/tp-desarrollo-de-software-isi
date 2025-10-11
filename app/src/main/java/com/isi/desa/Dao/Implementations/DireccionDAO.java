@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.isi.desa.Utils.Mappers.DireccionMapper.dtoToEntity;
+
 public class DireccionDAO implements IDireccionDAO {
 
     // 📌 Ruta del archivo JSON
@@ -51,48 +53,15 @@ public class DireccionDAO implements IDireccionDAO {
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File(JSON_PATH), direcciones);
         } catch (IOException e) {
             if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
-                throw new RuntimeException("💾 Espacio insuficiente en disco para guardar direcciones.", e);
+                throw new RuntimeException("Espacio insuficiente en disco para guardar direcciones.", e);
             }
-            throw new RuntimeException("💥 Error al guardar direcciones en el archivo JSON.", e);
+            throw new RuntimeException(" Error al guardar direcciones en el archivo JSON.", e);
         }
     }
 
-    /**
-     * Convierte un DTO en una entidad Direccion.
-     */
-    private Direccion dtoToEntity(DireccionDTO dto) {
-        Direccion d = new Direccion();
-        d.setIdDireccion(dto.id);
-        d.setPais(dto.pais);
-        d.setProvincia(dto.provincia);
-        d.setLocalidad(dto.localidad);
-        d.setCp(dto.codigoPostal);
-        d.setCalle(dto.calle);
-        d.setNumero(dto.numero);
-        d.setDepartamento(dto.departamento);
-        d.setPiso(dto.piso);
-        return d;
-    }
-
-    /**
-     * Convierte una entidad en un DTO (opcional si necesitás devolver DTOs en el futuro).
-     */
-    private DireccionDTO entityToDto(Direccion d) {
-        DireccionDTO dto = new DireccionDTO();
-        dto.id = d.getIdDireccion();
-        dto.pais = d.getPais();
-        dto.provincia = d.getProvincia();
-        dto.localidad = d.getLocalidad();
-        dto.codigoPostal = d.getCp();
-        dto.calle = d.getCalle();
-        dto.numero = d.getNumero();
-        dto.departamento = d.getDepartamento();
-        dto.piso = d.getPiso();
-        return dto;
-    }
 
     // ============================================================
-    // 📦 Implementación de la interfaz IDireccionDAO
+    //  Implementación de la interfaz IDireccionDAO
     // ============================================================
 
     @Override
@@ -103,7 +72,7 @@ public class DireccionDAO implements IDireccionDAO {
                 .anyMatch(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id));
 
         if (existe) {
-            throw new RuntimeException("⚠️ Ya existe una dirección con el ID: " + direccion.id);
+            throw new RuntimeException(" Ya existe una dirección con el ID: " + direccion.id);
         }
 
         Direccion nueva = dtoToEntity(direccion);
@@ -121,7 +90,7 @@ public class DireccionDAO implements IDireccionDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("❌ No se encontró la dirección con ID: " + direccion.id);
+            throw new RuntimeException(" No se encontró la dirección con ID: " + direccion.id);
         }
 
         Direccion actualizada = dtoToEntity(direccion);
@@ -137,7 +106,7 @@ public class DireccionDAO implements IDireccionDAO {
         boolean eliminado = direcciones.removeIf(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id));
 
         if (!eliminado) {
-            throw new RuntimeException("⚠️ No se encontró la dirección a eliminar: " + direccion.id);
+            throw new RuntimeException(" No se encontró la dirección a eliminar: " + direccion.id);
         }
 
         guardarDirecciones(direcciones);
@@ -151,6 +120,6 @@ public class DireccionDAO implements IDireccionDAO {
         return direcciones.stream()
                 .filter(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("❌ No se encontró dirección con ID: " + direccion.id));
+                .orElseThrow(() -> new RuntimeException(" No se encontró dirección con ID: " + direccion.id));
     }
 }

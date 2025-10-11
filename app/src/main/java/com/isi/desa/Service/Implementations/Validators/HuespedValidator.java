@@ -1,6 +1,8 @@
 package com.isi.desa.Service.Implementations.Validators;
 
+import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
@@ -24,7 +26,7 @@ public class HuespedValidator {
             throw new IllegalArgumentException(String.join(", ", errores));
         }
         Direccion direccion = this.direccionValidator.create(huespedDTO.direccion);
-        TipoDocumento tipoDocumento = new TipoDocumento(huespedDTO.tipoDocumento);
+        TipoDocumento tipoDocumento = new TipoDocumento(huespedDTO.tipoDocumento.tipoDocumento);
         LocalDate fechaNacimiento = huespedDTO.fechaNacimiento;
         return new Huesped(
                 huespedDTO.nombre,
@@ -70,8 +72,25 @@ public class HuespedValidator {
     public String validateApellido(String apellido) {
         return (apellido == null || apellido.trim().isEmpty()) ? "El apellido es obligatorio" : null;
     }
-    public String validateTipoDocumento(String tipoDocumento) {
-        return (tipoDocumento == null || tipoDocumento.trim().isEmpty()) ? "El tipo de documento es obligatorio" : null;
+
+    public String validateTipoDocumento(TipoDocumentoDTO tipoDocumentoDTO) {
+        TipoDocumentoDAO dao = new TipoDocumentoDAO();
+        if (tipoDocumentoDTO == null) {
+            return "El tipo de documento es obligatorio";
+        }
+
+        String tipo = tipoDocumentoDTO.tipoDocumento;
+
+        if (tipo == null || tipo.trim().isEmpty()) {
+            return "El nombre del tipo de documento es obligatorio";
+        }
+
+        TipoDocumento tipodocumentoencontrado = dao.obtener(tipo);
+        if(tipodocumentoencontrado == null) {
+            return "El tipo de documento ingresado no existe";
+        }
+
+        return null;
     }
     public String validateNumDoc(String numDoc) {
         return (numDoc == null || numDoc.trim().isEmpty()) ? "El número de documento es obligatorio" : null;

@@ -8,6 +8,8 @@ import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.isi.desa.Utils.Mappers.HuespedMapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,10 +32,10 @@ public class HuespedDAO implements IHuespedDAO {
     /**
      * Lee el archivo JSON completo y devuelve todos los huéspedes.
      */
-    private List<Huesped> leerHuespedes() {
+    public List<Huesped> leerHuespedes() {
         File file = new File(JSON_PATH);
         if (!file.exists()) {
-            System.out.println("⚠️ El archivo de huéspedes no existe, creando nuevo...");
+            System.out.println(" El archivo de huéspedes no existe, creando nuevo...");
             return new ArrayList<>();
         }
 
@@ -43,9 +45,9 @@ public class HuespedDAO implements IHuespedDAO {
             }
             return mapper.readValue(file, new TypeReference<List<Huesped>>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("⚠️ El archivo de huéspedes está corrupto o tiene formato inválido.", e);
+            throw new RuntimeException(" El archivo de huéspedes está corrupto o tiene formato inválido.", e);
         } catch (IOException e) {
-            throw new RuntimeException("💥 Error al leer el archivo de huéspedes.", e);
+            throw new RuntimeException("Error al leer el archivo de huéspedes.", e);
         }
     }
 
@@ -56,7 +58,7 @@ public class HuespedDAO implements IHuespedDAO {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File(JSON_PATH), huespedes);
         } catch (IOException e) {
-            throw new RuntimeException("💥 Error al guardar huéspedes en el archivo JSON.", e);
+            throw new RuntimeException(" Error al guardar huéspedes en el archivo JSON.", e);
         }
     }
 
@@ -81,18 +83,11 @@ public class HuespedDAO implements IHuespedDAO {
 
     @Override
     public Huesped crear(HuespedDTO huesped) {
-        List<Huesped> huespedes = leerHuespedes(); // ✅ se leen todos los huéspedes existentes
-
-        boolean existe = huespedes.stream()
-                .anyMatch(h -> h.getNumDoc().equals(huesped.numDoc));
-
-        if (existe) {
-            throw new RuntimeException("⚠️ Ya existe un huésped con el documento " + huesped.numDoc);
-        }
+        List<Huesped> huespedes = leerHuespedes(); // se leen todos los huéspedes existentes
 
         Huesped nuevo = dtoToEntity(huesped);
-        huespedes.add(nuevo); // ✅ agregamos a la lista existente
-        guardarHuespedes(huespedes); // ✅ sobrescribimos con la lista actualizada
+        huespedes.add(nuevo); //  agregamos a la lista existente
+        guardarHuespedes(huespedes); //  sobrescribimos con la lista actualizada
 
         return nuevo;
     }
@@ -106,7 +101,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("❌ No se encontró huésped con documento: " + huesped.numDoc);
+            throw new RuntimeException("No se encontró huésped con documento: " + huesped.numDoc);
         }
 
         Huesped actualizado = dtoToEntity(huesped);
@@ -126,7 +121,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("⚠️ No se encontró huésped para eliminar: " + huesped.numDoc);
+            throw new RuntimeException(" No se encontró huésped para eliminar: " + huesped.numDoc);
         }
 
         huespedes.remove(existente.get()); // ✅ elimina solo ese huésped
