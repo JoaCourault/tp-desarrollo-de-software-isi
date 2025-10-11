@@ -2,7 +2,10 @@ package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Implementations.HuespedDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
+import com.isi.desa.Dto.Huesped.BuscarHuespedRequestDTO;
+import com.isi.desa.Dto.Huesped.BuscarHuespedResultDTO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Dto.Resultado;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Implementations.Validators.HuespedValidator;
@@ -10,6 +13,7 @@ import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,14 +77,39 @@ public class HuespedService implements IHuespedService {
     }
 
     @Override
-    public List<HuespedDTO> buscarHuesped(HuespedDTO filtros) {
-        return dao.leerHuespedes().stream()
-                .filter(h -> (filtros.nombre == null || h.getNombre().equalsIgnoreCase(filtros.nombre)) &&
-                        (filtros.apellido == null || h.getApellido().equalsIgnoreCase(filtros.apellido)) &&
-                        (filtros.numDoc == null || h.getNumDoc().equals(filtros.numDoc)))
-                .map(HuespedMapper::entitytoDTO)
-                .collect(Collectors.toList());
+    public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO requestDTO) {
+        BuscarHuespedResultDTO resultDTO = new BuscarHuespedResultDTO();
+        resultDTO.resultado = new Resultado();
+        resultDTO.huespedesEncontrados = new ArrayList<>();
+
+        List<HuespedDTO> huespedesEncontrados;
+
+        if (requestDTO == null || requestDTO.huesped == null) {
+            // Si no hay filtros, devolver todos los huéspedes
+            huespedesEncontrados = dao.leerHuespedes().stream()
+                    .map(HuespedMapper::entitytoDTO)
+                    .collect(Collectors.toList());
+        } else {
+            HuespedDTO filtros = requestDTO.huesped;
+
+            huespedesEncontrados = dao.leerHuespedes().stream()
+                    .filter(h -> (filtros.nombre == null || h.getNombre().equalsIgnoreCase(filtros.nombre)) &&
+                            (filtros.apellido == null || h.getApellido().equalsIgnoreCase(filtros.apellido)) &&
+                            (filtros.numDoc == null || h.getNumDoc().equals(filtros.numDoc)))
+                    .map(HuespedMapper::entitytoDTO)
+                    .collect(Collectors.toList());
+        }
+
+        resultDTO.huespedesEncontrados = huespedesEncontrados;
+
+        if (huespedesEncontrados.isEmpty()) {
+            resultDTO.resultado.id = 2; // NoEncontrado (404)
+            resultDTO.resultado.mensaje = "No se encontraron huespedes con los filtros especificados.";
+        } else {
+            resultDTO.resultado.id = 0; // Exito (200)
+            resultDTO.resultado.mensaje = "Busqueda exitosa.";
+        }
+
+        return resultDTO;
     }
-
-
 }

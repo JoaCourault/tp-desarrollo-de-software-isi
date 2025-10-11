@@ -18,27 +18,42 @@ import java.util.Optional;
 
 public class HuespedDAO implements IHuespedDAO {
 
-    private static final String JSON_PATH = "src/main/resources/jsonDataBase/huesped.json";
+    private static final String JSON_RESOURCE = "jsonDataBase/huesped.json";
     private final ObjectMapper mapper;
 
     public HuespedDAO() {
         this.mapper = new ObjectMapper();
-        // ✅ Permitir leer/escribir LocalDate correctamente
+        //Permitir leer/escribir LocalDate correctamente
         mapper.registerModule(new JavaTimeModule());
-        // ✅ Evitar escribir fechas como timestamps (números)
+        //Evitar escribir fechas como timestamps (números)
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
+    private File getJsonFile() {
+        try {
+            java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
+            if (resourceUrl == null) {
+                // Si no existe, lo creamos en la carpeta de recursos de trabajo
+                File file = new File("src/main/resources/" + JSON_RESOURCE);
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+                return file;
+            }
+            return new File(resourceUrl.toURI());
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo acceder al archivo de huéspedes.", e);
+        }
     }
 
     /**
      * Lee el archivo JSON completo y devuelve todos los huéspedes.
      */
     public List<Huesped> leerHuespedes() {
-        File file = new File(JSON_PATH);
+        File file = getJsonFile();
         if (!file.exists()) {
-            System.out.println(" El archivo de huéspedes no existe, creando nuevo...");
+            System.out.println(" El archivo de huespedes no existe, creando nuevo...");
             return new ArrayList<>();
         }
-
         try {
             if (file.length() == 0) {
                 return new ArrayList<>();
@@ -56,7 +71,8 @@ public class HuespedDAO implements IHuespedDAO {
      */
     private void guardarHuespedes(List<Huesped> huespedes) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(JSON_PATH), huespedes);
+            File file = getJsonFile();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, huespedes);
         } catch (IOException e) {
             throw new RuntimeException(" Error al guardar huéspedes en el archivo JSON.", e);
         }
@@ -124,8 +140,8 @@ public class HuespedDAO implements IHuespedDAO {
             throw new RuntimeException(" No se encontró huésped para eliminar: " + huesped.numDoc);
         }
 
-        huespedes.remove(existente.get()); // ✅ elimina solo ese huésped
-        guardarHuespedes(huespedes); // ✅ guarda los demás intactos
+        huespedes.remove(existente.get()); //elimina solo ese huésped
+        guardarHuespedes(huespedes); //guarda los demás intactos
 
         return existente.get();
     }
@@ -136,6 +152,6 @@ public class HuespedDAO implements IHuespedDAO {
         return huespedes.stream()
                 .filter(h -> h.getNumDoc().equals(DNI))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("❌ No se encontró huésped con DNI: " + DNI));
+                .orElseThrow(() -> new RuntimeException("No se encontró huésped con DNI: " + DNI));
     }
 }

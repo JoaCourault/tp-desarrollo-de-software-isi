@@ -17,10 +17,10 @@ import static com.isi.desa.Utils.Mappers.DireccionMapper.dtoToEntity;
 
 public class DireccionDAO implements IDireccionDAO {
 
-    // 📌 Ruta del archivo JSON
+    //Ruta del archivo JSON
     private static final String JSON_PATH = "src/main/resources/jsonDataBase/direccion.json";
 
-    // 🔧 Mapper de Jackson para serializar/deserializar
+    // Mapper de Jackson para serializar/deserializar
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
@@ -30,7 +30,7 @@ public class DireccionDAO implements IDireccionDAO {
         File file = new File(JSON_PATH);
 
         if (!file.exists()) {
-            throw new RuntimeException("❌ No se encontró el archivo de direcciones en la ruta: " + JSON_PATH);
+            throw new RuntimeException("No se encontro el archivo de direcciones en la ruta: " + JSON_PATH);
         }
 
         try {
@@ -39,9 +39,9 @@ public class DireccionDAO implements IDireccionDAO {
             }
             return mapper.readValue(file, new TypeReference<List<Direccion>>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("⚠️ El archivo de direcciones está corrupto o tiene formato inválido.", e);
+            throw new RuntimeException("El archivo de direcciones esta corrupto o tiene formato invalido.", e);
         } catch (IOException e) {
-            throw new RuntimeException("💥 Error al leer el archivo de direcciones.", e);
+            throw new RuntimeException("Error al leer el archivo de direcciones.", e);
         }
     }
 
@@ -55,13 +55,13 @@ public class DireccionDAO implements IDireccionDAO {
             if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 throw new RuntimeException("Espacio insuficiente en disco para guardar direcciones.", e);
             }
-            throw new RuntimeException(" Error al guardar direcciones en el archivo JSON.", e);
+            throw new RuntimeException("Error al guardar direcciones en el archivo JSON.", e);
         }
     }
 
 
     // ============================================================
-    //  Implementación de la interfaz IDireccionDAO
+    //  Implementacion de la interfaz IDireccionDAO
     // ============================================================
 
     @Override
@@ -72,7 +72,7 @@ public class DireccionDAO implements IDireccionDAO {
                 .anyMatch(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id));
 
         if (existe) {
-            throw new RuntimeException(" Ya existe una dirección con el ID: " + direccion.id);
+            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.id);
         }
 
         Direccion nueva = dtoToEntity(direccion);
@@ -90,7 +90,7 @@ public class DireccionDAO implements IDireccionDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException(" No se encontró la dirección con ID: " + direccion.id);
+            throw new RuntimeException("No se encontro la direccion con ID: " + direccion.id);
         }
 
         Direccion actualizada = dtoToEntity(direccion);
@@ -106,7 +106,7 @@ public class DireccionDAO implements IDireccionDAO {
         boolean eliminado = direcciones.removeIf(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id));
 
         if (!eliminado) {
-            throw new RuntimeException(" No se encontró la dirección a eliminar: " + direccion.id);
+            throw new RuntimeException("No se encontro la direccion a eliminar: " + direccion.id);
         }
 
         guardarDirecciones(direcciones);
@@ -120,6 +120,6 @@ public class DireccionDAO implements IDireccionDAO {
         return direcciones.stream()
                 .filter(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException(" No se encontró dirección con ID: " + direccion.id));
+                .orElseThrow(() -> new RuntimeException(" No se encontro direccion con ID: " + direccion.id));
     }
 }

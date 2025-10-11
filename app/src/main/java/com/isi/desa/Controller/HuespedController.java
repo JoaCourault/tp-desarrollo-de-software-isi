@@ -18,7 +18,13 @@ public class HuespedController {
         this.logger = new Logger();
     }
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO requestDTO) {
-        throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-9
+        try{
+            BuscarHuespedResultDTO res = this.service.buscarHuesped(requestDTO);
+            return res;
+        } catch(Exception e){
+            this.logger.error("Error en HuespedController - buscarHuesped: " + e.getMessage(), e);
+            return null;
+        }
     }
     public AltaHuespedResultDTO altaHuesped(AltaHuesperRequestDTO requestDTO) {
         throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-10

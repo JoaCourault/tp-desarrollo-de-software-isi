@@ -1,421 +1,118 @@
-[ {
-  "nombre" : "María",
-  "apellido" : "Gómez",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
+[
+  {
+    "nombre": "María",
+    "apellido": "Gómez",
+    "tipoDocumento": {
+      "tipoDocumento": "TD-01",
+      "descripcion": "DNI"
+    },
+    "numDoc": "35648972",
+    "posicionIva": "Consumidor Final",
+    "cuit": "20356489721",
+    "fechaNacimiento": "1990-07-15",
+    "telefono": "+54 9 11 4567-8910",
+    "email": "maria.gomez@example.com",
+    "ocupacion": "Ingeniera Civil",
+    "nacionalidad": "Argentina",
+    "direccion": {
+      "calle": null,
+      "numero": null,
+      "departamento": null,
+      "piso": null,
+      "cp": null,
+      "localidad": null,
+      "provincia": null,
+      "pais": null,
+      "id": "DI-001"
+    },
+    "id": "HU-001",
+    "idDireccion": "DI-001"
   },
-  "numDoc" : "35648972",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "20356489721",
-  "fechaNacimiento" : "1990-07-15",
-  "telefono" : "+54 9 11 4567-8910",
-  "email" : "maria.gomez@example.com",
-  "ocupacion" : "Ingeniera Civil",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-001"
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "tipoDocumento": {
+      "tipoDocumento": "TD-01",
+      "descripcion": "DNI"
+    },
+    "numDoc": "29456832",
+    "posicionIva": "Monotributista",
+    "cuit": "20294568326",
+    "fechaNacimiento": "1985-02-21",
+    "telefono": "+54 9 351 432-5678",
+    "email": "juan.perez@example.com",
+    "ocupacion": "Contador Público",
+    "nacionalidad": "Argentina",
+    "direccion": {
+      "calle": null,
+      "numero": null,
+      "departamento": null,
+      "piso": null,
+      "cp": null,
+      "localidad": null,
+      "provincia": null,
+      "pais": null,
+      "id": "DI-002"
+    },
+    "id": "HU-002",
+    "idDireccion": "DI-002"
   },
-  "id" : "HU-001",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-001"
-}, {
-  "nombre" : "Juan",
-  "apellido" : "Pérez",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
+  {
+    "nombre": "Lucía",
+    "apellido": "Martínez",
+    "tipoDocumento": {
+      "tipoDocumento": "TD-01",
+      "descripcion": "DNI"
+    },
+    "numDoc": "XK348912",
+    "posicionIva": "Exento",
+    "cuit": "0",
+    "fechaNacimiento": "1992-10-03",
+    "telefono": "+34 600 123 456",
+    "email": "lucia.martinez@example.es",
+    "ocupacion": "Estudiante",
+    "nacionalidad": "Española",
+    "direccion": {
+      "calle": null,
+      "numero": null,
+      "departamento": null,
+      "piso": null,
+      "cp": null,
+      "localidad": null,
+      "provincia": null,
+      "pais": null,
+      "id": "DI-003"
+    },
+    "id": "HU-003",
+    "idDireccion": "DI-003"
   },
-  "numDoc" : "29456832",
-  "posicionIva" : "Monotributista",
-  "cuit" : "20294568326",
-  "fechaNacimiento" : "1985-02-21",
-  "telefono" : "+54 9 351 432-5678",
-  "email" : "juan.perez@example.com",
-  "ocupacion" : "Contador Público",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-002"
-  },
-  "id" : "HU-002",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-002"
-}, {
-  "nombre" : "Lucía",
-  "apellido" : "Martínez",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-04"
-  },
-  "numDoc" : "XK348912",
-  "posicionIva" : "Exento",
-  "cuit" : "0",
-  "fechaNacimiento" : "1992-10-03",
-  "telefono" : "+34 600 123 456",
-  "email" : "lucia.martinez@example.es",
-  "ocupacion" : "Estudiante",
-  "nacionalidad" : "Española",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-003"
-  },
-  "id" : "HU-003",
-  "idTipoDocumento" : "TD-04",
-  "idDireccion" : "DI-003"
-}, {
-  "nombre" : "Carlos",
-  "apellido" : "Fernández",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-02"
-  },
-  "numDoc" : "1548392",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "20154839216",
-  "fechaNacimiento" : "1978-11-11",
-  "telefono" : "+54 9 261 321-7654",
-  "email" : "carlos.fernandez@example.com",
-  "ocupacion" : "Abogado",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-004"
-  },
-  "id" : "HU-004",
-  "idTipoDocumento" : "TD-02",
-  "idDireccion" : "DI-004"
-}, {
-  "nombre" : "Sofía",
-  "apellido" : "López",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
-  },
-  "numDoc" : "40567219",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "27405672194",
-  "fechaNacimiento" : "1996-05-28",
-  "telefono" : "+54 9 11 6789-1234",
-  "email" : "sofia.lopez@example.com",
-  "ocupacion" : "Diseñadora Gráfica",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-005"
-  },
-  "id" : "HU-005",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-005"
-}, {
-  "nombre" : "Andrés",
-  "apellido" : "Silva",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-03"
-  },
-  "numDoc" : "2334219",
-  "posicionIva" : "Monotributista",
-  "cuit" : "20233421977",
-  "fechaNacimiento" : "1982-03-17",
-  "telefono" : "+54 9 381 765-4321",
-  "email" : "andres.silva@example.com",
-  "ocupacion" : "Profesor",
-  "nacionalidad" : "Uruguaya",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-006"
-  },
-  "id" : "HU-006",
-  "idTipoDocumento" : "TD-03",
-  "idDireccion" : "DI-006"
-}, {
-  "nombre" : "Valentina",
-  "apellido" : "Rossi",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-04"
-  },
-  "numDoc" : "IT983742",
-  "posicionIva" : "Exento",
-  "cuit" : "0",
-  "fechaNacimiento" : "1994-01-09",
-  "telefono" : "+39 331 456 7890",
-  "email" : "valentina.rossi@example.it",
-  "ocupacion" : "Arquitecta",
-  "nacionalidad" : "Italiana",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-007"
-  },
-  "id" : "HU-007",
-  "idTipoDocumento" : "TD-04",
-  "idDireccion" : "DI-007"
-}, {
-  "nombre" : "Diego",
-  "apellido" : "Ramírez",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
-  },
-  "numDoc" : "31784562",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "20317845623",
-  "fechaNacimiento" : "1988-12-12",
-  "telefono" : "+54 9 341 222-3344",
-  "email" : "diego.ramirez@example.com",
-  "ocupacion" : "Médico",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-008"
-  },
-  "id" : "HU-008",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-008"
-}, {
-  "nombre" : "Camila",
-  "apellido" : "Torres",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
-  },
-  "numDoc" : "42256381",
-  "posicionIva" : "Monotributista",
-  "cuit" : "27422563816",
-  "fechaNacimiento" : "1997-08-22",
-  "telefono" : "+54 9 261 999-8888",
-  "email" : "camila.torres@example.com",
-  "ocupacion" : "Esteticista",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-009"
-  },
-  "id" : "HU-009",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-009"
-}, {
-  "nombre" : "Tomás",
-  "apellido" : "Navarro",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
-  },
-  "numDoc" : "30845213",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "20308452136",
-  "fechaNacimiento" : "1989-06-30",
-  "telefono" : "+54 9 11 7654-4321",
-  "email" : "tomas.navarro@example.com",
-  "ocupacion" : "Ingeniero en Sistemas",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-010"
-  },
-  "id" : "HU-010",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-010"
-}, {
-  "nombre" : "Fernanda",
-  "apellido" : "Molina",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
-  },
-  "numDoc" : "36298415",
-  "posicionIva" : "Monotributista",
-  "cuit" : "27362984158",
-  "fechaNacimiento" : "1991-04-14",
-  "telefono" : "+54 9 221 654-3210",
-  "email" : "fernanda.molina@example.com",
-  "ocupacion" : "Periodista",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-011"
-  },
-  "id" : "HU-011",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-011"
-}, {
-  "nombre" : "Ricardo",
-  "apellido" : "Suárez",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-02"
-  },
-  "numDoc" : "1987543",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "20198754325",
-  "fechaNacimiento" : "1975-07-07",
-  "telefono" : "+54 9 381 111-2222",
-  "email" : "ricardo.suarez@example.com",
-  "ocupacion" : "Comerciante",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-012"
-  },
-  "id" : "HU-012",
-  "idTipoDocumento" : "TD-02",
-  "idDireccion" : "DI-012"
-}, {
-  "nombre" : "Julieta",
-  "apellido" : "Cabrera",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-01"
-  },
-  "numDoc" : "41856234",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "27418562345",
-  "fechaNacimiento" : "1998-09-05",
-  "telefono" : "+54 9 341 123-4567",
-  "email" : "julieta.cabrera@example.com",
-  "ocupacion" : "Psicóloga",
-  "nacionalidad" : "Argentina",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-013"
-  },
-  "id" : "HU-013",
-  "idTipoDocumento" : "TD-01",
-  "idDireccion" : "DI-013"
-}, {
-  "nombre" : "Mateo",
-  "apellido" : "Hernández",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-03"
-  },
-  "numDoc" : "2674519",
-  "posicionIva" : "Consumidor Final",
-  "cuit" : "20267451984",
-  "fechaNacimiento" : "1983-03-25",
-  "telefono" : "+54 9 261 555-6677",
-  "email" : "mateo.hernandez@example.com",
-  "ocupacion" : "Chef",
-  "nacionalidad" : "Chilena",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-014"
-  },
-  "id" : "HU-014",
-  "idTipoDocumento" : "TD-03",
-  "idDireccion" : "DI-014"
-}, {
-  "nombre" : "Natalia",
-  "apellido" : "Domínguez",
-  "tipoDocumento" : {
-    "tipoDocumento" : "TD-04"
-  },
-  "numDoc" : "US984561",
-  "posicionIva" : "Exento",
-  "cuit" : "0",
-  "fechaNacimiento" : "1993-02-18",
-  "telefono" : "+1 202 555 0199",
-  "email" : "natalia.dominguez@example.com",
-  "ocupacion" : "Fotógrafa",
-  "nacionalidad" : "Estadounidense",
-  "direccion" : {
-    "calle" : null,
-    "numero" : null,
-    "departamento" : null,
-    "piso" : null,
-    "cp" : null,
-    "localidad" : null,
-    "provincia" : null,
-    "pais" : null,
-    "id" : "DI-015"
-  },
-  "id" : "HU-015",
-  "idTipoDocumento" : "TD-04",
-  "idDireccion" : "DI-015"
-} ]
+  {
+    "nombre": "Carlos",
+    "apellido": "Fernández",
+    "tipoDocumento": {
+      "tipoDocumento": "TD-01",
+      "descripcion": "DNI"
+    },
+    "numDoc": "1548392",
+    "posicionIva": "Consumidor Final",
+    "cuit": "20154839216",
+    "fechaNacimiento": "1978-11-11",
+    "telefono": "+54 9 261 321-7654",
+    "email": "carlos.fernandez@example.com",
+    "ocupacion": "Abogado",
+    "nacionalidad": "Argentina",
+    "direccion": {
+      "calle": null,
+      "numero": null,
+      "departamento": null,
+      "piso": null,
+      "cp": null,
+      "localidad": null,
+      "provincia": null,
+      "pais": null,
+      "id": "DI-004"
+    },
+    "id": "HU-004",
+    "idDireccion": "DI-004"
+  }
+]

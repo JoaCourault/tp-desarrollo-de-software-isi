@@ -2,6 +2,7 @@ package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Implementations.UsuarioDAO;
 import com.isi.desa.Dao.Interfaces.IUsuarioDAO;
+import com.isi.desa.Dto.Resultado;
 import com.isi.desa.Dto.Usuario.AutenticarUsuarioRequestDto;
 import com.isi.desa.Dto.Usuario.AutenticarUsuarioResponseDto;
 import com.isi.desa.Dto.Usuario.UsuarioDTO;
