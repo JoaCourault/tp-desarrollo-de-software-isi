@@ -15,33 +15,48 @@ import java.util.Optional;
 
 public class TipoDocumentoDAO implements ITipoDocumentoDAO {
 
-    private static final String JSON_PATH = "src/main/resources/jsonDataBase/tipoDocumento.json";
+    private static final String JSON_RESOURCE = "jsonDataBase/tipoDocumento.json";
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private File getJsonFile() {
+        try {
+            java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
+            if (resourceUrl == null) {
+                File file = new File("src/main/resources/" + JSON_RESOURCE);
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+                return file;
+            }
+            return new File(resourceUrl.toURI());
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo acceder al archivo de tipoDocumento.", e);
+        }
+    }
+
     private List<TipoDocumento> leerTipos() {
-        File file = new File(JSON_PATH);
+        File file = getJsonFile();
         if (!file.exists()) {
-            System.out.println("⚠️ El archivo tipoDocumento.json no existe, creando nuevo...");
+            System.out.println("El archivo tipoDocumento.json no existe, creando nuevo...");
             return new ArrayList<>();
         }
-
         try {
             if (file.length() == 0) {
                 return new ArrayList<>();
             }
             return mapper.readValue(file, new TypeReference<List<TipoDocumento>>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("⚠️ El archivo tipoDocumento.json está corrupto o tiene formato inválido.", e);
+            throw new RuntimeException("El archivo tipoDocumento.json está corrupto o tiene formato inválido.", e);
         } catch (IOException e) {
-            throw new RuntimeException("💥 Error al leer tipoDocumento.json.", e);
+            throw new RuntimeException("Error al leer tipoDocumento.json.", e);
         }
     }
 
     private void guardarTipos(List<TipoDocumento> tipos) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(JSON_PATH), tipos);
+            File file = getJsonFile();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, tipos);
         } catch (IOException e) {
-            throw new RuntimeException("💥 Error al guardar tipoDocumento.json.", e);
+            throw new RuntimeException("Error al guardar tipoDocumento.json.", e);
         }
     }
 
@@ -57,7 +72,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
                 .anyMatch(t -> t.getTipoDocumento().equals(dto.tipoDocumento));
 
         if (existe) {
-            throw new RuntimeException("⚠️ Ya existe un tipo de documento con ID " + dto.tipoDocumento);
+            throw new RuntimeException("Ya existe un tipo de documento con ID " + dto.tipoDocumento);
         }
 
         TipoDocumento nuevo = dtoToEntity(dto);
@@ -72,7 +87,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
         return tipos.stream()
                 .filter(t -> t.getTipoDocumento().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("❌ No se encontró tipo de documento con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("No se encontró tipo de documento con ID: " + id));
     }
 
     @Override
@@ -84,7 +99,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("❌ No se encontró tipo de documento con ID: " + dto.tipoDocumento);
+            throw new RuntimeException("No se encontró tipo de documento con ID: " + dto.tipoDocumento);
         }
 
         // Actualizamos la descripción
@@ -108,7 +123,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("⚠️ No se encontró tipo de documento para eliminar: " + dto.tipoDocumento);
+            throw new RuntimeException("No se encontró tipo de documento para eliminar: " + dto.tipoDocumento);
         }
 
         tipos.remove(existente.get());

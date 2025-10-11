@@ -15,19 +15,33 @@ import java.util.Optional;
 
 public class UsuarioDAO implements IUsuarioDAO {
 
-    private static final String JSON_PATH = "src/main/resources/jsonDataBase/usuario.json";
+    private static final String JSON_RESOURCE = "jsonDataBase/usuario.json";
     private final ObjectMapper mapper = new ObjectMapper();
+
+    private File getJsonFile() {
+        try {
+            java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
+            if (resourceUrl == null) {
+                File file = new File("src/main/resources/" + JSON_RESOURCE);
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+                return file;
+            }
+            return new File(resourceUrl.toURI());
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo acceder al archivo de usuarios.", e);
+        }
+    }
 
     /**
      * Lee todos los usuarios desde el JSON.
      */
     private List<Usuario> leerUsuarios() {
-        File file = new File(JSON_PATH);
+        File file = getJsonFile();
         if (!file.exists()) {
             System.out.println("El archivo usuario.json no existe, creando nuevo...");
             return new ArrayList<>();
         }
-
         try {
             if (file.length() == 0) {
                 return new ArrayList<>();
@@ -45,7 +59,8 @@ public class UsuarioDAO implements IUsuarioDAO {
      */
     private void guardarUsuarios(List<Usuario> usuarios) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(JSON_PATH), usuarios);
+            File file = getJsonFile();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, usuarios);
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar usuario.json.", e);
         }

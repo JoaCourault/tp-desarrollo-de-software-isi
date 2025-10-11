@@ -18,21 +18,32 @@ import static com.isi.desa.Utils.Mappers.DireccionMapper.dtoToEntity;
 public class DireccionDAO implements IDireccionDAO {
 
     //Ruta del archivo JSON
-    private static final String JSON_PATH = "src/main/resources/jsonDataBase/direccion.json";
-
-    // Mapper de Jackson para serializar/deserializar
+    private static final String JSON_RESOURCE = "jsonDataBase/direccion.json";
     private final ObjectMapper mapper = new ObjectMapper();
+
+    private File getJsonFile() {
+        try {
+            java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
+            if (resourceUrl == null) {
+                File file = new File("src/main/resources/" + JSON_RESOURCE);
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+                return file;
+            }
+            return new File(resourceUrl.toURI());
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo acceder al archivo de direcciones.", e);
+        }
+    }
 
     /**
      * Lee todas las direcciones desde el archivo JSON.
      */
     private List<Direccion> leerDirecciones() {
-        File file = new File(JSON_PATH);
-
+        File file = getJsonFile();
         if (!file.exists()) {
-            throw new RuntimeException("No se encontro el archivo de direcciones en la ruta: " + JSON_PATH);
+            throw new RuntimeException("No se encontro el archivo de direcciones en la ruta: " + JSON_RESOURCE);
         }
-
         try {
             if (file.length() == 0) {
                 return new ArrayList<>(); // archivo vacío
@@ -50,7 +61,8 @@ public class DireccionDAO implements IDireccionDAO {
      */
     private void guardarDirecciones(List<Direccion> direcciones) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(JSON_PATH), direcciones);
+            File file = getJsonFile();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, direcciones);
         } catch (IOException e) {
             if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 throw new RuntimeException("Espacio insuficiente en disco para guardar direcciones.", e);
@@ -120,6 +132,6 @@ public class DireccionDAO implements IDireccionDAO {
         return direcciones.stream()
                 .filter(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException(" No se encontro direccion con ID: " + direccion.id));
+                .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.id));
     }
 }
