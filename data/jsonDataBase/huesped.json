@@ -1,0 +1,59 @@
+[ {
+  "nombre" : "ANA",
+  "apellido" : "PRUEBA-SMOKE",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "DNI-9e670310-1030-4a4b-9469-a571c892c2a7",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-12345678-9",
+  "fechaNacimiento" : "1995-01-01",
+  "telefono" : "+54 9 11 5555-5555",
+  "email" : "ana.smoke@example.com",
+  "ocupacion" : "Tester",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-bb87b049-d122-4178-8420-a4287a4dea61"
+  },
+  "id" : "H-2c635c17-b34c-4339-b043-9dfd7c77251d",
+  "idDireccion" : "DI-bb87b049-d122-4178-8420-a4287a4dea61",
+  "idTipoDocumento" : "TD-01"
+}, {
+  "nombre" : "ANA",
+  "apellido" : "PRUEBA-SMOKE",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : "DNI"
+  },
+  "numDoc" : "DNI-9857203f-965f-4b23-9814-ebeb4a76a636",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-12345678-9",
+  "fechaNacimiento" : "1995-01-01",
+  "telefono" : "+54 9 11 5555-5555",
+  "email" : "ana.smoke@example.com",
+  "ocupacion" : "Tester",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : "Mitre",
+    "numero" : 1234,
+    "departamento" : "B",
+    "piso" : 2,
+    "cp" : 1870,
+    "localidad" : "Avellaneda",
+    "provincia" : "Buenos Aires",
+    "pais" : "Argentina",
+    "id" : "DI-2fcda147-8cc1-4838-bee8-ded9b2c05abc"
+  },
+  "id" : "H-5595b95b-8e33-42e6-9f25-9aa71e433e2c",
+  "idDireccion" : "DI-2fcda147-8cc1-4838-bee8-ded9b2c05abc",
+  "idTipoDocumento" : "TD-01"
+} ]

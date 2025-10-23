@@ -1,0 +1,16 @@
+[ {
+  "idUsuario" : "tp-desarrollo",
+  "contrasenia" : "hotel1234",
+  "nombre" : "Grupo",
+  "apellido" : "Tulipán"
+}, {
+  "idUsuario" : "conserje",
+  "contrasenia" : "hotel1234",
+  "nombre" : "Juan",
+  "apellido" : "Pérez"
+}, {
+  "idUsuario" : "tester",
+  "contrasenia" : "claveNueva456",
+  "nombre" : "Agus",
+  "apellido" : "Actualizado"
+} ]

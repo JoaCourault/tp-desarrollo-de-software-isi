@@ -1,0 +1,181 @@
+[ {
+  "calle" : "Av. Siempre Viva",
+  "numero" : 742,
+  "departamento" : "A",
+  "piso" : 3,
+  "cp" : 1001,
+  "localidad" : "Buenos Aires",
+  "provincia" : "Buenos Aires",
+  "pais" : "Argentina",
+  "id" : "DI-001"
+}, {
+  "calle" : "San Martín",
+  "numero" : 1234,
+  "departamento" : "B",
+  "piso" : 5,
+  "cp" : 5000,
+  "localidad" : "Córdoba",
+  "provincia" : "Córdoba",
+  "pais" : "Argentina",
+  "id" : "DI-002"
+}, {
+  "calle" : "Gran Vía",
+  "numero" : 56,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 28013,
+  "localidad" : "Madrid",
+  "provincia" : "Madrid",
+  "pais" : "España",
+  "id" : "DI-003"
+}, {
+  "calle" : "Mitre",
+  "numero" : 876,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 5500,
+  "localidad" : "Mendoza",
+  "provincia" : "Mendoza",
+  "pais" : "Argentina",
+  "id" : "DI-004"
+}, {
+  "calle" : "Rivadavia",
+  "numero" : 2250,
+  "departamento" : "C",
+  "piso" : 7,
+  "cp" : 3000,
+  "localidad" : "Santa Fe de la Vera Cruz",
+  "provincia" : "Santa Fe",
+  "pais" : "Argentina",
+  "id" : "DI-005"
+}, {
+  "calle" : "Artigas",
+  "numero" : 98,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 11300,
+  "localidad" : "Montevideo",
+  "provincia" : "Montevideo",
+  "pais" : "Uruguay",
+  "id" : "DI-006"
+}, {
+  "calle" : "Via Roma",
+  "numero" : 22,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 10121,
+  "localidad" : "Turín",
+  "provincia" : "Piamonte",
+  "pais" : "Italia",
+  "id" : "DI-007"
+}, {
+  "calle" : "San Lorenzo",
+  "numero" : 456,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 2000,
+  "localidad" : "Rosario",
+  "provincia" : "Santa Fe",
+  "pais" : "Argentina",
+  "id" : "DI-008"
+}, {
+  "calle" : "Belgrano",
+  "numero" : 789,
+  "departamento" : "D",
+  "piso" : 10,
+  "cp" : 5500,
+  "localidad" : "Mendoza",
+  "provincia" : "Mendoza",
+  "pais" : "Argentina",
+  "id" : "DI-009"
+}, {
+  "calle" : "Corrientes",
+  "numero" : 1590,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 1043,
+  "localidad" : "Buenos Aires",
+  "provincia" : "Buenos Aires",
+  "pais" : "Argentina",
+  "id" : "DI-010"
+}, {
+  "calle" : "Diagonal 80",
+  "numero" : 450,
+  "departamento" : "E",
+  "piso" : 12,
+  "cp" : 1900,
+  "localidad" : "La Plata",
+  "provincia" : "Buenos Aires",
+  "pais" : "Argentina",
+  "id" : "DI-011"
+}, {
+  "calle" : "25 de Mayo",
+  "numero" : 600,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 4000,
+  "localidad" : "San Miguel de Tucumán",
+  "provincia" : "Tucumán",
+  "pais" : "Argentina",
+  "id" : "DI-012"
+}, {
+  "calle" : "Italia",
+  "numero" : 150,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 2000,
+  "localidad" : "Rosario",
+  "provincia" : "Santa Fe",
+  "pais" : "Argentina",
+  "id" : "DI-013"
+}, {
+  "calle" : "O'Higgins",
+  "numero" : 789,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 8320000,
+  "localidad" : "Santiago",
+  "provincia" : "Región Metropolitana",
+  "pais" : "Chile",
+  "id" : "DI-014"
+}, {
+  "calle" : "5th Avenue",
+  "numero" : 725,
+  "departamento" : "12B",
+  "piso" : 12,
+  "cp" : 10019,
+  "localidad" : "New York",
+  "provincia" : "New York",
+  "pais" : "Estados Unidos",
+  "id" : "DI-015"
+}, {
+  "calle" : "Mitre",
+  "numero" : 1234,
+  "departamento" : "B",
+  "piso" : 2,
+  "cp" : 1870,
+  "localidad" : "Avellaneda",
+  "provincia" : "Buenos Aires",
+  "pais" : "Argentina",
+  "id" : "DI-bb87b049-d122-4178-8420-a4287a4dea61"
+}, {
+  "calle" : "Mitre",
+  "numero" : 1234,
+  "departamento" : "B",
+  "piso" : 2,
+  "cp" : 1870,
+  "localidad" : "Avellaneda",
+  "provincia" : "Buenos Aires",
+  "pais" : "Argentina",
+  "id" : "DI-4b8cc867-5bfe-4e76-8f2a-53eba875a45e"
+}, {
+  "calle" : "Mitre",
+  "numero" : 1234,
+  "departamento" : "B",
+  "piso" : 2,
+  "cp" : 1870,
+  "localidad" : "Avellaneda",
+  "provincia" : "Buenos Aires",
+  "pais" : "Argentina",
+  "id" : "DI-2fcda147-8cc1-4838-bee8-ded9b2c05abc"
+} ]

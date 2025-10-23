@@ -1,0 +1,13 @@
+[ {
+  "tipoDocumento" : "TD-01",
+  "descripcion" : "DNI"
+}, {
+  "tipoDocumento" : "TD-02",
+  "descripcion" : "LE"
+}, {
+  "tipoDocumento" : "TD-03",
+  "descripcion" : "LC"
+}, {
+  "tipoDocumento" : "TD-04",
+  "descripcion" : "Pasaporte"
+} ]

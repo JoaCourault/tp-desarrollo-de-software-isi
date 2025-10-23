@@ -1,75 +1,106 @@
 package com.isi.desa;
 
 import com.isi.desa.Dao.Implementations.HuespedDAO;
+import com.isi.desa.Dao.Interfaces.IHuespedDAO;
+import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HuespedDAOTest {
+class HuespedDAOTest {
+
+    private final IHuespedDAO dao = new HuespedDAO();
+
+    private HuespedDTO buildGuest(String id, String dni) {
+
+        HuespedDTO h = new HuespedDTO();
+        h.idHuesped = id;
+        h.nombre = "Test";
+        h.apellido = "JUnit";
+        h.numDoc = dni;
+        h.posicionIva = "Consumidor Final";
+        h.cuit = "20000000001";
+        h.fechaNacimiento = LocalDate.of(1990, 1, 1);
+        h.telefono = "+54 9 11 0000-0000";
+        h.email = "test@example.com";
+        h.ocupacion = "Tester";
+        h.nacionalidad = "Argentina";
+
+        // *** IMPORTANTE: instanciar TipoDocumentoDTO para evitar NPE ***
+        h.tipoDocumento = new TipoDocumentoDTO();
+        h.tipoDocumento.tipoDocumento = "TD-01"; // existe en tipoDocumento.json
+        h.tipoDocumento.descripcion = "DNI";
+
+        // Dirección opcional: si resolvés por ID, usá uno existente
+        h.direccion = new DireccionDTO();
+        h.direccion.id = "DI-001"; // existe en direccion.json
+
+        return h;
+    }
 
     @Test
     void testCrearHuesped() {
-        HuespedDAO huespedDAO = new HuespedDAO();
+        String id = "HU-" + UUID.randomUUID();
+        String dni = "DNI-" + UUID.randomUUID();
 
-        // ✅ Creamos un nuevo huésped DTO
-        HuespedDTO nuevo = new HuespedDTO();
-        nuevo.idHuesped = "HU-999";
-        nuevo.nombre = "Test";
-        nuevo.apellido = "JUnit";
-        nuevo.tipoDocumento = "TD-01";
-        nuevo.numDoc = "99999999";
-        nuevo.posicionIva = "Consumidor Final";
-        nuevo.cuit = "20999999999";
-        nuevo.fechaNacimiento = java.time.LocalDate.of(1999, 1, 1);
-        nuevo.telefono = "+54 9 11 9999-9999";
-        nuevo.email = "test.junit@example.com";
-        nuevo.ocupacion = "Tester";
-        nuevo.nacionalidad = "Argentina";
+        HuespedDTO nuevo = buildGuest(id, dni);
+        Huesped creado = dao.crear(nuevo);
 
-        // 👉 IMPORTANTE: el campo direccion es un ID referenciado
-        com.isi.desa.Dto.Direccion.DireccionDTO dir = new com.isi.desa.Dto.Direccion.DireccionDTO();
-        dir.id = "DI-001";
-        nuevo.direccion = dir;
+        assertNotNull(creado);
+        assertEquals(dni, creado.getNumDoc());
+        System.out.println("✅ Huésped creado: " + creado.getIdHuesped() + " / " + creado.getNumDoc());
 
-        try {
-            Huesped creado = huespedDAO.crear(nuevo);
-            assertNotNull(creado, "El huésped creado no debe ser nulo");
-            assertEquals("HU-999", creado.getIdHuesped(), "El ID debería coincidir");
-            System.out.println("✅ Huésped creado correctamente: " + creado.getNombre() + " (" + creado.getIdHuesped() + ")");
-        } catch (RuntimeException e) {
-            fail("❌ Error al crear huésped: " + e.getMessage());
-        }
+        // Cleanup: borrar lo creado para no dejar basura
+        HuespedDTO borrar = new HuespedDTO();
+        borrar.numDoc = dni;
+        dao.eliminar(borrar);
     }
 
     @Test
     void testObtenerHuesped() {
-        HuespedDAO huespedDAO = new HuespedDAO();
+        String dni = "DNI-" + UUID.randomUUID();
+        String id  = "HU-" + UUID.randomUUID();
 
-        try {
-            Huesped h = huespedDAO.obtenerHuesped("35648972"); // un DNI existente del JSON
-            assertNotNull(h, "El huésped obtenido no debe ser nulo");
-            System.out.println("✅ Huésped obtenido correctamente: " + h.getNombre() + " " + h.getApellido());
-        } catch (RuntimeException e) {
-            fail("❌ Error al obtener huésped: " + e.getMessage());
-        }
+        // arrange
+        dao.crear(buildGuest(id, dni));
+
+        // act
+        Huesped h = dao.obtenerHuesped(dni);
+
+        // assert
+        assertNotNull(h);
+        assertEquals(dni, h.getNumDoc());
+
+        // cleanup
+        HuespedDTO del = new HuespedDTO(); del.numDoc = dni;
+        dao.eliminar(del);
     }
 
     @Test
     void testEliminarHuesped() {
-        HuespedDAO huespedDAO = new HuespedDAO();
+        // Arrange: crear uno temporal
+        String id = "HU-DEL-" + UUID.randomUUID();
+        String dni = "DNI-" + "UUID.randomUUID()";
+        dao.crear(buildGuest(id, dni));
 
+        // Act: borrar
         HuespedDTO eliminar = new HuespedDTO();
-        eliminar.numDoc = "99999999"; // el mismo que se creó en el primer test
+        eliminar.numDoc = dni;
+        Huesped eliminado = dao.eliminar(eliminar);
 
-        try {
-            Huesped eliminado = huespedDAO.eliminar(eliminar);
-            assertNotNull(eliminado, "El huésped eliminado no debe ser nulo");
-            assertEquals("99999999", eliminado.getNumDoc(), "El DNI eliminado debería coincidir");
-            System.out.println("✅ Huésped eliminado correctamente: " + eliminado.getNombre());
-        } catch (RuntimeException e) {
-            fail("❌ Error al eliminar huésped: " + e.getMessage());
-        }
+        // Assert
+        assertNotNull(eliminado);
+        assertEquals(dni, eliminado.getNumDoc());
+        System.out.println("✅ Huésped eliminado: " + eliminado.getNumDoc());
     }
+
 }

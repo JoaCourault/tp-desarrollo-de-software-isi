@@ -23,18 +23,28 @@ public class DireccionDAO implements IDireccionDAO {
 
     private File getJsonFile() {
         try {
-            java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
-            if (resourceUrl == null) {
-                File file = new File("src/main/resources/" + JSON_RESOURCE);
-                file.getParentFile().mkdirs();
+            String baseDir = System.getProperty("app.dataDir", "data");
+            File file = new File(baseDir, JSON_RESOURCE);
+            file.getParentFile().mkdirs();
+
+            if (!file.exists()) {
                 file.createNewFile();
-                return file;
             }
-            return new File(resourceUrl.toURI());
+
+            if (file.length() == 0) {
+                try (var in = getClass().getClassLoader().getResourceAsStream(JSON_RESOURCE)) {
+                    if (in != null) {
+                        java.nio.file.Files.copy(in, file.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            }
+
+            return file;
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo acceder al archivo de direcciones.", e);
+            throw new RuntimeException("No se pudo acceder al archivo de direcciones: " + JSON_RESOURCE, e);
         }
     }
+
 
     /**
      * Lee todas las direcciones desde el archivo JSON.

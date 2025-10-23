@@ -1,11 +1,12 @@
 package com.isi.desa.Dto.Huesped;
-
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 
 import java.time.LocalDate;
 
 public class HuespedDTO {
+    @JsonAlias("id")
     public String idHuesped;
     public String nombre;
     public String apellido;

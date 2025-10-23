@@ -1,5 +1,5 @@
 package com.isi.desa.Dto.Huesped;
 
-public class AltaHuesperRequestDTO {
+public class AltaHuespedRequestDTO {
     public HuespedDTO huesped;
 }

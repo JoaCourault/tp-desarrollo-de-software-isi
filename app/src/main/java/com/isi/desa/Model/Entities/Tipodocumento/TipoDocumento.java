@@ -1,6 +1,9 @@
 package com.isi.desa.Model.Entities.Tipodocumento;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public class TipoDocumento {
+    @JsonAlias("id")
     private String tipoDocumento;
     private String descripcion; // este se corresponde con "descripcion"
 
