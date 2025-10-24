@@ -15,4 +15,6 @@ public interface IHuespedDAO {
     Huesped obtenerHuesped(String DNI);
 
     List<Huesped> leerHuespedes();
+
+    boolean existePorTipoYNumDocExceptoId(String tipoDocumento, String numDoc, String idHuesped);
 }

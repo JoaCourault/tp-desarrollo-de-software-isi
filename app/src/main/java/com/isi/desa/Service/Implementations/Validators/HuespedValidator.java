@@ -49,27 +49,54 @@ public class HuespedValidator implements IHuespedValidator {
     public List<String> validateCreate(HuespedDTO huespedDTO) {
         List<String> errores = new ArrayList<>();
         String error;
+
         error = validateIdHuesped(huespedDTO.idHuesped); if (error != null) errores.add(error);
         error = validateNombre(huespedDTO.nombre); if (error != null) errores.add(error);
         error = validateApellido(huespedDTO.apellido); if (error != null) errores.add(error);
         error = validateTipoDocumento(huespedDTO.tipoDocumento); if (error != null) errores.add(error);
         error = validateNumDoc(huespedDTO.numDoc); if (error != null) errores.add(error);
-        error = validateCuit(huespedDTO.cuit); if (error != null) errores.add(error);
+
+        // 🔴 Cambio clave: CUIT opcional salvo Responsable Inscripto
+        error = validateCuit(huespedDTO.cuit, huespedDTO.posicionIva); if (error != null) errores.add(error);
+
         if (huespedDTO.direccion != null) {
             errores.addAll(direccionValidator.validate(huespedDTO.direccion));
         } else {
             errores.add("La dirección es obligatoria");
         }
-        // Agrega más validaciones según los campos necesarios
         return errores.isEmpty() ? null : errores;
+    }
+
+    public List<String> validateUpdate(HuespedDTO dto) {
+        List<String> errores = new ArrayList<>();
+        String e;
+
+        if (dto.idHuesped != null) { e = validateIdHuesped(dto.idHuesped); if (e != null) errores.add(e); }
+        if (dto.nombre != null)     { e = validateNombre(dto.nombre);      if (e != null) errores.add(e); }
+        if (dto.apellido != null)   { e = validateApellido(dto.apellido);  if (e != null) errores.add(e); }
+        if (dto.tipoDocumento != null) { e = validateTipoDocumento(dto.tipoDocumento); if (e != null) errores.add(e); }
+        if (dto.numDoc != null)     { e = validateNumDoc(dto.numDoc);      if (e != null) errores.add(e); }
+
+        // Si viene posición IVA o CUIT, aplicar la regla condicional
+        if (dto.posicionIva != null || dto.cuit != null) {
+            String pos = (dto.posicionIva != null) ? dto.posicionIva : "Consumidor Final";
+            e = validateCuit(dto.cuit, pos); if (e != null) errores.add(e);
+        }
+
+        if (dto.direccion != null) {
+            errores.addAll(direccionValidator.validate(dto.direccion));
+        }
+        return errores;
     }
 
     public String validateIdHuesped(String idHuesped) {
         return (idHuesped == null || idHuesped.trim().isEmpty()) ? "El idHuesped es obligatorio" : null;
     }
+
     public String validateNombre(String nombre) {
         return (nombre == null || nombre.trim().isEmpty()) ? "El nombre es obligatorio" : null;
     }
+
     public String validateApellido(String apellido) {
         return (apellido == null || apellido.trim().isEmpty()) ? "El apellido es obligatorio" : null;
     }
@@ -92,50 +119,51 @@ public class HuespedValidator implements IHuespedValidator {
         }
 
         TipoDocumento tipodocumentoencontrado = dao.obtener(tipo);
-        if(tipodocumentoencontrado == null) {
+        if (tipodocumentoencontrado == null) {
             return "El tipo de documento ingresado no existe";
         }
 
         return null;
     }
+
     public String validateNumDoc(String numDoc) {
         return (numDoc == null || numDoc.trim().isEmpty()) ? "El número de documento es obligatorio" : null;
     }
 
-    @Override
-    public String validateCuit(Integer cuit) {
-        return "";
-    }
 
     @Override
     public String validateCuit(String cuit) {
-        return "";
+        // Compat: si no sabemos la posición IVA, tratamos CUIT como opcional,
+        // pero si viene informado, validamos formato.
+        if (cuit == null || cuit.trim().isEmpty()) return null;
+        String regex = "\\d{2}-\\d{8}-\\d";
+        if (!cuit.matches(regex)) return "El CUIT debe tener el formato XX-XXXXXXXX-X";
+        return null;
     }
 
+    // --- Nueva validación con IVA (regla del CU) ---
     public String validateCuit(String cuit, String posicionIva) {
-        // 1) Si es Responsable Inscripto → OBLIGATORIO
-        if (posicionIva != null &&
-                posicionIva.equalsIgnoreCase("Responsable Inscripto")) {
-
+        // 1) Responsable Inscripto → obligatorio con formato
+        if (posicionIva != null && posicionIva.equalsIgnoreCase("Responsable Inscripto")) {
             if (cuit == null || cuit.trim().isEmpty())
                 return "El CUIT es obligatorio para Responsable Inscripto";
-
             String regex = "\\d{2}-\\d{8}-\\d";
             if (!cuit.matches(regex))
                 return "El CUIT debe tener el formato XX-XXXXXXXX-X";
-
             return null;
         }
 
-        // 2) Si NO es Responsable Inscripto → opcional
-        if (cuit == null || cuit.trim().isEmpty())
-            return null; // OK, no obligatorio
-
-        // Pero si lo ingresa igual → validarlo
+        // 2) Resto (p.ej. Consumidor Final) → opcional, pero si viene debe validar formato
+        if (cuit == null || cuit.trim().isEmpty()) return null;
         String regex = "\\d{2}-\\d{8}-\\d";
-        if (!cuit.matches(regex))
-            return "El CUIT debe tener el formato XX-XXXXXXXX-X";
-
+        if (!cuit.matches(regex)) return "El CUIT debe tener el formato XX-XXXXXXXX-X";
         return null;
     }
+
+    public String validateFechaNacimiento(LocalDate fechaNacimiento) {
+        return (fechaNacimiento == null) ? "La fecha de nacimiento es un campo obligatorio" : null;
+    }
+
+
+
 }

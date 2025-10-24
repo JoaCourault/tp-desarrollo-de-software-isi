@@ -84,6 +84,17 @@ public class HuespedDAO implements IHuespedDAO {
         }
     }
 
+    @Override
+    public boolean existePorTipoYNumDocExceptoId(String tipoDoc, String numDoc, String idHuesped) {
+        return leerHuespedes().stream()
+                .anyMatch(h ->
+                        h.getTipoDocumento().getTipoDocumento().equalsIgnoreCase(tipoDoc) &&
+                                h.getNumDoc().equalsIgnoreCase(numDoc) &&
+                                !h.getIdHuesped().equalsIgnoreCase(idHuesped) // <– excluye a sí mismo
+                );
+    }
+
+
     /**
      * Guarda toda la lista de huéspedes en el archivo JSON.
      */

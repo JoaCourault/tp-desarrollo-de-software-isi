@@ -32,7 +32,7 @@
   "apellido" : "Pérez",
   "tipoDocumento" : {
     "tipoDocumento" : "TD-01",
-    "descripcion" : "DNI"
+    "descripcion" : null
   },
   "numDoc" : "29456832",
   "posicionIva" : "Monotributista",
@@ -61,7 +61,7 @@
   "apellido" : "Martínez",
   "tipoDocumento" : {
     "tipoDocumento" : "TD-01",
-    "descripcion" : "DNI"
+    "descripcion" : null
   },
   "numDoc" : "XK348912",
   "posicionIva" : "Exento",
@@ -90,7 +90,7 @@
   "apellido" : "Fernández",
   "tipoDocumento" : {
     "tipoDocumento" : "TD-01",
-    "descripcion" : "DNI"
+    "descripcion" : null
   },
   "numDoc" : "1548392",
   "posicionIva" : "Consumidor Final",
@@ -113,5 +113,34 @@
   },
   "id" : "HU-004",
   "idDireccion" : "DI-004",
+  "idTipoDocumento" : "TD-01"
+}, {
+  "nombre" : "ANA",
+  "apellido" : "PRUEBA-SMOKE",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "DNI-ede15cd6-2c99-40f0-b62c-76367d1440a9",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-12345678-9",
+  "fechaNacimiento" : "1995-01-01",
+  "telefono" : "+54 9 11 5555-5555",
+  "email" : "ana.smoke@example.com",
+  "ocupacion" : "Tester",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-ca19e563-8dc4-4a7c-9642-a6cad725b3ff"
+  },
+  "id" : "H-fc4827b3-ff3b-464a-9160-c790aa34a166",
+  "idDireccion" : "DI-ca19e563-8dc4-4a7c-9642-a6cad725b3ff",
   "idTipoDocumento" : "TD-01"
 } ]

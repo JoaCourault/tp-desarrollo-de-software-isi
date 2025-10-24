@@ -12,8 +12,9 @@ public interface IHuespedValidator {
     String validateApellido(String apellido);
     String validateTipoDocumento(String tipoDocumento);
     String validateNumDoc(String numDoc);
-    String validateCuit(Integer cuit);
-
     String validateCuit(String cuit);
+    default List<String> validateUpdate(HuespedDTO dto) {
+        return java.util.Collections.emptyList();
+    }
 }
 
