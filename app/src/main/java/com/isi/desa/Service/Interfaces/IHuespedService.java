@@ -5,7 +5,7 @@ import com.isi.desa.Dto.Huesped.BuscarHuespedResultDTO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import java.util.List;
 
-public interface IHuespedService {
+public interface IHuespedService{
 
     HuespedDTO crear(HuespedDTO huespedDTO);
 
