@@ -13,5 +13,7 @@ public interface IHuespedValidator {
     String validateTipoDocumento(String tipoDocumento);
     String validateNumDoc(String numDoc);
     String validateCuit(Integer cuit);
+
+    String validateCuit(String cuit);
 }
 

@@ -104,22 +104,38 @@ public class HuespedValidator implements IHuespedValidator {
 
     @Override
     public String validateCuit(Integer cuit) {
-        return (cuit == null) ? "El CUIT es un campo obligatorio" : null;
+        return "";
     }
 
+    @Override
     public String validateCuit(String cuit) {
-        if (cuit == null || cuit.trim().isEmpty()) return "El CUIT es obligatorio";
-
-        // validar formato CUIT: XX-XXXXXXXX-X
-        if (cuit != null && !cuit.trim().isEmpty()) {
-            String regex = "\\d{2}-\\d{8}-\\d{1}";
-            if (!cuit.matches(regex)) {
-                return "El CUIT debe tener el formato XX-XXXXXXXX-X";
-            }
-        }
-        return null;
+        return "";
     }
-    public String validateFechaNacimiento(LocalDate fechaNacimiento) {
-        return (fechaNacimiento == null) ? "La fecha de nacimiento es un campo obligatorio" : null;
+
+    public String validateCuit(String cuit, String posicionIva) {
+        // 1) Si es Responsable Inscripto → OBLIGATORIO
+        if (posicionIva != null &&
+                posicionIva.equalsIgnoreCase("Responsable Inscripto")) {
+
+            if (cuit == null || cuit.trim().isEmpty())
+                return "El CUIT es obligatorio para Responsable Inscripto";
+
+            String regex = "\\d{2}-\\d{8}-\\d";
+            if (!cuit.matches(regex))
+                return "El CUIT debe tener el formato XX-XXXXXXXX-X";
+
+            return null;
+        }
+
+        // 2) Si NO es Responsable Inscripto → opcional
+        if (cuit == null || cuit.trim().isEmpty())
+            return null; // OK, no obligatorio
+
+        // Pero si lo ingresa igual → validarlo
+        String regex = "\\d{2}-\\d{8}-\\d";
+        if (!cuit.matches(regex))
+            return "El CUIT debe tener el formato XX-XXXXXXXX-X";
+
+        return null;
     }
 }

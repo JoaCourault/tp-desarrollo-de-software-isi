@@ -49,7 +49,32 @@ public class HuespedController {
     }
 
     public ModificarHuespedResultDTO modificarHuesped(ModificarHuespedRequestDTO requestDTO) {
-        throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-11
+        ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
+        res.resultado = new com.isi.desa.Dto.Resultado();
+        try {
+            if (requestDTO == null || requestDTO.huesped == null) {
+                res.resultado.id = 1;
+                res.resultado.mensaje = "Solicitud inválida: falta el huésped.";
+                return res;
+            }
+            if (requestDTO.huesped.numDoc == null || requestDTO.huesped.numDoc.trim().isEmpty()) {
+                res.resultado.id = 1;
+                res.resultado.mensaje = "Solicitud inválida: falta el número de documento (numDoc).";
+                return res;
+            }
+
+            // Llama al service (valida y persiste en JSON)
+            HuespedDTO actualizado = this.service.modificar(requestDTO.huesped);
+
+            res.resultado.id = 0;
+            res.resultado.mensaje = "Huésped modificado. DNI: " + actualizado.numDoc;
+            return res;
+        } catch (Exception e) {
+            this.logger.error("Error en HuespedController - modificarHuesped: " + e.getMessage(), e);
+            res.resultado.id = 1;
+            res.resultado.mensaje = "No se pudo modificar el huésped: " + e.getMessage();
+            return res;
+        }
     }
 
 
