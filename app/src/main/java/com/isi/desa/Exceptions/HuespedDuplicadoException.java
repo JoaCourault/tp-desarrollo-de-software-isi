@@ -1,0 +1,7 @@
+package com.isi.desa.Exceptions;
+
+public class HuespedDuplicadoException extends Exception {
+    public HuespedDuplicadoException(String mensaje) {
+        super(mensaje);
+    }
+}
