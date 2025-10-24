@@ -7,6 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DireccionValidator implements IDireccionValidator {
+    // Instancia única (eager singleton)
+    private static final DireccionValidator INSTANCE = new DireccionValidator();
+
+    // Constructor privado
+    private DireccionValidator() {}
+
+    // Método público para obtener la instancia
+    public static DireccionValidator getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public Direccion create(DireccionDTO direccionDTO) {
         List<String> errores = validate(direccionDTO);

@@ -13,12 +13,21 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Service //Descomentar para correr con Spring Boot
+// @Service //Descomentar para correr con Spring Boot
 public class HuespedValidator implements IHuespedValidator {
     private final IDireccionValidator direccionValidator;
 
-    public HuespedValidator() {
-        this.direccionValidator = new DireccionValidator();
+    // Instancia única (eager singleton)
+    private static final HuespedValidator INSTANCE = new HuespedValidator();
+
+    // Constructor privado
+    private HuespedValidator() {
+        this.direccionValidator = DireccionValidator.getInstance();
+    }
+
+    // Método público para obtener la instancia
+    public static HuespedValidator getInstance() {
+        return INSTANCE;
     }
 
     public Huesped create(HuespedDTO huespedDTO) {

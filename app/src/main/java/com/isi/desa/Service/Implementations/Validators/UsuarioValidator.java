@@ -13,13 +13,20 @@ import java.util.List;
 //@Service //Descomentar para correr con Spring Boot
 public class UsuarioValidator implements IUsuarioValidator {
     //@Autowired //Descomentar para correr con Spring Boot
-    IUsuarioDAO usuarioDAO;
+    private final IUsuarioDAO usuarioDAO;
 
-    // Constructor para inyección de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
-    public UsuarioValidator() {
+    // Instancia única (eager singleton)
+    private static final UsuarioValidator INSTANCE = new UsuarioValidator();
+
+    // Constructor privado para inyección de dependencias manual
+    private UsuarioValidator() {
         this.usuarioDAO = new UsuarioDAO();
     }
 
+    // Método público para obtener la instancia
+    public static UsuarioValidator getInstance() {
+        return INSTANCE;
+    }
 
     public Usuario create(UsuarioDTO usuarioDTO) {
         List<String> errores = validateCreate(usuarioDTO);

@@ -18,11 +18,18 @@ public class UsuarioController {
     //@Autowired //Descomentar para correr con Spring Boot
     private ILogger logger;
 
+    // Constructor privado para singleton y evitar instanciación directa
+    private UsuarioController() {
+        this.service = UsuarioService.getInstance();
+        this.logger = Logger.getInstance();
+    }
 
-    // Constructor para inyección de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
-    public UsuarioController() {
-        this.service = new  UsuarioService();
-        this.logger = new  Logger();
+    // Instancia única (eager singleton)
+    private static final UsuarioController INSTANCE = new UsuarioController();
+
+    // Método público para obtener la instancia
+    public static UsuarioController getInstance() {
+        return INSTANCE;
     }
 
     public void crearUsuario (UsuarioDTO usuarioDTO) {

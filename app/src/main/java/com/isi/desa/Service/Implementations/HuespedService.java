@@ -24,10 +24,18 @@ public class HuespedService implements IHuespedService {
     //@Autowired //Descomentar para Spring Boot
     private final IHuespedDAO dao;
 
-    // Constructor para inyección de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
-    public HuespedService() {
+    // Instancia única (eager singleton)
+    private static final HuespedService INSTANCE = new HuespedService();
+
+    // Constructor privado para inyección manual
+    private HuespedService() {
         this.dao = new HuespedDAO();
-        this.validator = new HuespedValidator();
+        this.validator = HuespedValidator.getInstance();
+    }
+
+    // Método público para obtener la instancia
+    public static HuespedService getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -46,13 +54,6 @@ public class HuespedService implements IHuespedService {
             // Aquí deberías loguear o lanzar una excepción más específica.
             throw new RuntimeException("Error al crear huésped: " + e.getMessage(), e);
         }
-       /* try {
-            validator.create(huespedDTO);           // Validación
-            Huesped creado = dao.crear(huespedDTO); // DAO devuelve entidad
-            return Optional.of(toDTO(creado));      // Convertir a DTO
-        } catch (Exception e) {
-            return Optional.empty();
-        }*/
     }
 
     @Override

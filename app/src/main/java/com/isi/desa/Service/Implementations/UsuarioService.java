@@ -14,7 +14,7 @@ import com.isi.desa.Service.Interfaces.Validators.IUsuarioValidator;
 
 import java.util.Optional;
 
-//@Service //Descomentar para correr con Spring Boot
+// @Service //Descomentar para correr con Spring Boot
 public class UsuarioService implements IUsuarioService {
     //@Autowired //Descomentar para correr con Spring Boot
     private IUsuarioValidator validator;
@@ -24,11 +24,19 @@ public class UsuarioService implements IUsuarioService {
     //@Autowired //Descomentar para correr con Spring Boot
     private IUsuarioDAO usuarioDAO;
 
-    // Constructor para inyeccion de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
-    public UsuarioService() {
-        this.validator = new UsuarioValidator();
-        this.logger = new Logger();
+    // Instancia única (eager singleton)
+    private static final UsuarioService INSTANCE = new UsuarioService();
+
+    // Constructor privado para inyección de dependencias manual
+    private UsuarioService() {
+        this.validator = UsuarioValidator.getInstance();
+        this.logger = Logger.getInstance();
         this.usuarioDAO = new UsuarioDAO();
+    }
+
+    // Método público para obtener la instancia
+    public static UsuarioService getInstance() {
+        return INSTANCE;
     }
 
     @Override

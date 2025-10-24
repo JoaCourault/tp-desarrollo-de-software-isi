@@ -8,19 +8,28 @@ import com.isi.desa.Service.Interfaces.ILogger;
 //@Controller //Descomentar para correr con Spring Boot
 public class HuespedController {
     //@Autowired //Descomentar para correr con Spring Boot
-    private IHuespedService service;
+    private final IHuespedService service;
     //@Autowired //Descomentar para correr con Spring Boot
-    private ILogger logger;
+    private final ILogger logger;
 
-    // Constructor para inyección de dependencias manual (sin Spring Boot, borrar cuando se use Spring)
-    public HuespedController() {
-        this.service = new HuespedService();
-        this.logger = new Logger();
+    // Constructor privado para singleton y para evitar instanciación directa
+    private HuespedController() {
+        // Usar singletons de implementación (se asume que existen getInstance())
+        this.service = HuespedService.getInstance();
+        this.logger = Logger.getInstance();
     }
+
+    // Instancia única (eager singleton)
+    private static final HuespedController INSTANCE = new HuespedController();
+
+    // Método público para obtener la instancia
+    public static HuespedController getInstance() {
+        return INSTANCE;
+    }
+
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO requestDTO) {
         try{
-            BuscarHuespedResultDTO res = this.service.buscarHuesped(requestDTO);
-            return res;
+            return this.service.buscarHuesped(requestDTO);
         } catch(Exception e){
             this.logger.error("Error en HuespedController - buscarHuesped: " + e.getMessage(), e);
             return null;
