@@ -3,20 +3,14 @@
  */
 package com.isi.desa;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-
-import java.util.Date;
-import java.util.List;
+import com.isi.desa.UI.UI;
 
 //@SpringBootApplication //Descomentar para correr con Spring Boot
 public class App {
     public static void main(String[] args) {
-        /*
         // Descomentar para correr con Spring Boot
-        ApplicationContext context = SpringApplication.run(App.class, args);
-        */
-        System.out.println("Hello World!");
+        // ApplicationContext context = SpringApplication.run(App.class, args);
+
+        UI.run();
     }
 }

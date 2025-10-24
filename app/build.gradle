@@ -28,3 +28,17 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
+// Forzar UTF-8 en compilación y ejecución de tests/bootRun
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs = ['-Dfile.encoding=UTF-8']
+}
+
+// Si usás Spring Boot: asegurar que la ejecución con bootRun use UTF-8
+bootRun {
+    jvmArgs = ['-Dfile.encoding=UTF-8']
+}

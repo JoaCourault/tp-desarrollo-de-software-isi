@@ -11,6 +11,7 @@ import com.isi.desa.Service.Implementations.Validators.UsuarioValidator;
 import com.isi.desa.Service.Interfaces.ILogger;
 import com.isi.desa.Service.Interfaces.IUsuarioService;
 import com.isi.desa.Service.Interfaces.Validators.IUsuarioValidator;
+import com.isi.desa.Utils.Mappers.UsuarioMapper;
 
 import java.util.Optional;
 
@@ -54,6 +55,9 @@ public class UsuarioService implements IUsuarioService {
         AutenticarUsuarioResponseDto res = new AutenticarUsuarioResponseDto();
         res.resultado.id = 2; // Por defecto, no encontrado (404)
         res.resultado.mensaje = "El usuario no existe. O la contraseña incorrecta.";
+
+        logger.info("Intento de login para: " + requestDto.nombre + " " + requestDto.apellido);
+
         Usuario u = this.usuarioDAO.login(
                 requestDto.nombre,
                 requestDto.apellido,
@@ -62,6 +66,10 @@ public class UsuarioService implements IUsuarioService {
         if (u != null) {
             res.resultado.id = 0;
             res.resultado.mensaje = "Login exitoso.";
+            res.usuario = UsuarioMapper.entityToDTO(u);
+            logger.info("Login exitoso para: " + u.getNombre() + " " + u.getApellido());
+        } else {
+            logger.warn("Login fallido para: " + requestDto.nombre + " " + requestDto.apellido);
         }
         return res;
     }
