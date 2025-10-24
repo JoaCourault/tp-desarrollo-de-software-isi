@@ -28,11 +28,11 @@ public class Menu implements MenuComponent {
             }
             System.out.println("0) Volver/Salir");
 
-            System.out.print("Seleccione una opción: ");
-            // Si no hay entrada disponible (por ejemplo cuando stdin está cerrado), salir limpiamente
+            System.out.print("Seleccione una opcion: ");
+            // Si no hay entrada disponible (por ejemplo cuando stdin esta cerrado), salir limpiamente
             if (!scanner.hasNextLine()) {
                 System.out.println();
-                System.out.println("Entrada cerrada. Saliendo del menú.");
+                System.out.println("Entrada cerrada. Saliendo del menu.");
                 return;
             }
 
@@ -41,7 +41,7 @@ public class Menu implements MenuComponent {
             try {
                 opt = Integer.parseInt(line.trim());
             } catch (Exception e) {
-                System.out.println("Opción inválida");
+                System.out.println("Opcion invalida");
                 continue;
             }
 
@@ -49,7 +49,7 @@ public class Menu implements MenuComponent {
                 return;
             }
             if (opt < 0 || opt > children.size()) {
-                System.out.println("Opción inválida");
+                System.out.println("Opcion invalida");
                 continue;
             }
 
@@ -58,13 +58,13 @@ public class Menu implements MenuComponent {
                 selected.execute(scanner);
             } catch (MenuNavigationException mne) {
                 if (mne.getType() == MenuNavigationException.Type.BACK_TO_ROOT) {
-                    // Volver al menú raíz
+                    // Volver al menu raiz
                     return;
                 } else {
-                    System.out.println("Navegación: " + mne.getType());
+                    System.out.println("Navegacion: " + mne.getType());
                 }
             } catch (Exception e) {
-                System.out.println("Ocurrió un error: " + e.getMessage());
+                System.out.println("Ocurrio un error: " + e.getMessage());
             }
         }
     }

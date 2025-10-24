@@ -24,16 +24,16 @@ public class HuespedService implements IHuespedService {
     //@Autowired //Descomentar para Spring Boot
     private final IHuespedDAO dao;
 
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final HuespedService INSTANCE = new HuespedService();
 
-    // Constructor privado para inyección manual
+    // Constructor privado para inyeccion manual
     private HuespedService() {
         this.dao = new HuespedDAO();
         this.validator = HuespedValidator.getInstance();
     }
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static HuespedService getInstance() {
         return INSTANCE;
     }
@@ -41,8 +41,8 @@ public class HuespedService implements IHuespedService {
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) {
         try {
-            // 1. Validar y convertir a Entidad (si es necesario para la validación)
-            // Asumo que el validator lanza excepción si hay error
+            // 1. Validar y convertir a Entidad (si es necesario para la validacion)
+            // Asumo que el validator lanza excepcion si hay error
             Huesped entidadValidada = validator.create(huespedDTO);
 
             // 2. DAO devuelve la Entidad creada
@@ -51,8 +51,8 @@ public class HuespedService implements IHuespedService {
             // 3. Convertir a DTO para devolver
             return HuespedMapper.entitytoDTO(creado);
         } catch (Exception e) {
-            // Aquí deberías loguear o lanzar una excepción más específica.
-            throw new RuntimeException("Error al crear huésped: " + e.getMessage(), e);
+            // Aqui deberias loguear o lanzar una excepcion mas especifica.
+            throw new RuntimeException("Error al crear huesped: " + e.getMessage(), e);
         }
     }
 
@@ -63,7 +63,7 @@ public class HuespedService implements IHuespedService {
             Huesped modificado = dao.modificar(huespedDTO);
             return HuespedMapper.entitytoDTO(modificado);
         } catch (Exception e) {
-            throw new RuntimeException("Error al modificar huésped: " + e.getMessage(), e);
+            throw new RuntimeException("Error al modificar huesped: " + e.getMessage(), e);
         }
     }
 
@@ -73,7 +73,7 @@ public class HuespedService implements IHuespedService {
             Huesped eliminado = dao.eliminar(huespedDTO);
             return HuespedMapper.entitytoDTO(eliminado);
         } catch (Exception e) {
-            throw new RuntimeException("Error al eliminar huésped: " + e.getMessage(), e);
+            throw new RuntimeException("Error al eliminar huesped: " + e.getMessage(), e);
         }
     }
 
@@ -86,7 +86,7 @@ public class HuespedService implements IHuespedService {
         List<HuespedDTO> huespedesEncontrados;
 
         if (requestDTO == null || requestDTO.huesped == null) {
-            // Si no hay filtros, devolver todos los huéspedes
+            // Si no hay filtros, devolver todos los huespedes
             huespedesEncontrados = dao.leerHuespedes().stream()
                     .map(HuespedMapper::entitytoDTO)
                     .collect(Collectors.toList());

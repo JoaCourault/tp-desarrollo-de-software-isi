@@ -28,7 +28,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         this.mapper = new ObjectMapper();
         //Permitir leer/escribir LocalDate correctamente
         mapper.registerModule(new JavaTimeModule());
-        //Evitar escribir fechas como timestamps (números)
+        //Evitar escribir fechas como timestamps (numeros)
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
@@ -44,13 +44,13 @@ public class EstadiaDAO implements IEstadiaDAO {
             }
             return new File(resourceUrl.toURI());
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo acceder al archivo de estadías.", e);
+            throw new RuntimeException("No se pudo acceder al archivo de estadias.", e);
         }
     }
 
 
     /**
-     * Lee todas las estadías desde el archivo JSON.
+     * Lee todas las estadias desde el archivo JSON.
      */
 
     public List<Estadia> leerEstadias() {
@@ -66,14 +66,14 @@ public class EstadiaDAO implements IEstadiaDAO {
             return mapper.readValue(file, new TypeReference<List<Estadia>>() {
             });
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(" El archivo de estadias está corrupto o tiene formato inválido.", e);
+            throw new RuntimeException(" El archivo de estadias esta corrupto o tiene formato invalido.", e);
         } catch (IOException e) {
             throw new RuntimeException("Error al leer el archivo de estadias.", e);
         }
     }
 
     /**
-     * Guarda la lista de estadías en el archivo JSON.
+     * Guarda la lista de estadias en el archivo JSON.
      */
 
     private void guardarEstadias(List<Estadia> estadias) {
@@ -106,7 +106,7 @@ public class EstadiaDAO implements IEstadiaDAO {
                 .anyMatch(e -> e.getIdEstadia().equalsIgnoreCase(estadia.idEstadia));
 
         if (existe) {
-            throw new RuntimeException("Ya existe una estadía con el ID: " + estadia.idEstadia);
+            throw new RuntimeException("Ya existe una estadia con el ID: " + estadia.idEstadia);
         }
 
         Estadia nueva = dtoToEntity(estadia);
@@ -124,7 +124,7 @@ public class EstadiaDAO implements IEstadiaDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontró la estadía con ID: " + estadia.idEstadia);
+            throw new RuntimeException("No se encontro la estadia con ID: " + estadia.idEstadia);
         }
 
         Estadia actualizada = dtoToEntity(estadia);
@@ -140,7 +140,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         boolean eliminado = estadias.removeIf(e -> e.getIdEstadia().equalsIgnoreCase(estadia.idEstadia));
 
         if (!eliminado) {
-            throw new RuntimeException("No se encontró la estadía a eliminar: " + estadia.idEstadia);
+            throw new RuntimeException("No se encontro la estadia a eliminar: " + estadia.idEstadia);
         }
 
         guardarEstadias(estadias);
@@ -154,13 +154,13 @@ public class EstadiaDAO implements IEstadiaDAO {
         return estadias.stream()
                 .filter(e -> e.getIdEstadia().equalsIgnoreCase(estadia.idEstadia))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No se encontró estadía con ID: " + estadia.idEstadia));
+                .orElseThrow(() -> new RuntimeException("No se encontro estadia con ID: " + estadia.idEstadia));
     }
 
     /**
-     * Verifica si un huésped ha tenido alguna estadía.
-     * Supone que EstadiaDTO o Estadia tiene una lista de huéspedes asociados.
-     * Si aún no existe esa relación en la entidad, este metodo se actualizará cuando la agregues.
+     * Verifica si un huesped ha tenido alguna estadia.
+     * Supone que EstadiaDTO o Estadia tiene una lista de huespedes asociados.
+     * Si aun no existe esa relacion en la entidad, este metodo se actualizara cuando la agregues.
      */
     @Override
     public List<String> obtenerIdsHuespedesConEstadias(String idHuesped) {
@@ -186,10 +186,10 @@ public class EstadiaDAO implements IEstadiaDAO {
                 }
 
             } catch (NoSuchFieldException nf) {
-                // Si aún no existe la relación explícita, continuar
+                // Si aun no existe la relacion explicita, continuar
                 continue;
             } catch (Exception ex) {
-                // Cualquier otro error, continuar con la siguiente estadía
+                // Cualquier otro error, continuar con la siguiente estadia
                 continue;
             }
         }

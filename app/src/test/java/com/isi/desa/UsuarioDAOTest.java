@@ -16,7 +16,7 @@ public class UsuarioDAOTest {
         UsuarioDTO dto = new UsuarioDTO();
         dto.idUsuario = "tester";
         dto.contrasenia = "clave123";
-        dto.nombre = "Agustín";
+        dto.nombre = "Agustin";
         dto.apellido = "Prueba";
 
         try {

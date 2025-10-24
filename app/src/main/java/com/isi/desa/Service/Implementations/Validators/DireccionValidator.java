@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DireccionValidator implements IDireccionValidator {
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final DireccionValidator INSTANCE = new DireccionValidator();
 
     // Constructor privado
     private DireccionValidator() {}
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static DireccionValidator getInstance() {
         return INSTANCE;
     }
@@ -51,7 +51,7 @@ public class DireccionValidator implements IDireccionValidator {
     }
     @Override
     public String validatePais(String pais) {
-        return (pais == null || pais.trim().isEmpty()) ? "El país es obligatorio" : null;
+        return (pais == null || pais.trim().isEmpty()) ? "El pais es obligatorio" : null;
     }
     @Override
     public String validateProvincia(String provincia) {
@@ -63,7 +63,7 @@ public class DireccionValidator implements IDireccionValidator {
     }
     @Override
     public String validateCodigoPostal(Integer codigoPostal) {
-        return (codigoPostal == null || codigoPostal <= 0) ? "El código postal es obligatorio y debe ser positivo" : null;
+        return (codigoPostal == null || codigoPostal <= 0) ? "El codigo postal es obligatorio y debe ser positivo" : null;
     }
     @Override
     public String validateCalle(String calle) {
@@ -71,6 +71,6 @@ public class DireccionValidator implements IDireccionValidator {
     }
     @Override
     public String validateNumero(Integer numero) {
-        return (numero == null || numero <= 0) ? "El número es obligatorio y debe ser positivo" : null;
+        return (numero == null || numero <= 0) ? "El numero es obligatorio y debe ser positivo" : null;
     }
 }

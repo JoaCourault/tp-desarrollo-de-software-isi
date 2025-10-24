@@ -2,12 +2,12 @@
   "idUsuario" : "tp-desarrollo",
   "contrasenia" : "hotel1234",
   "nombre" : "Grupo",
-  "apellido" : "Tulipán"
+  "apellido" : "Tulipan"
 }, {
   "idUsuario" : "conserje",
   "contrasenia" : "hotel1234",
   "nombre" : "Juan",
-  "apellido" : "Pérez"
+  "apellido" : "Perez"
 }, {
   "idUsuario" : "root",
   "contrasenia" : "r",

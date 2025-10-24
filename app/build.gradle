@@ -29,7 +29,7 @@ java {
     }
 }
 
-// Forzar UTF-8 en compilación y ejecución de tests/bootRun
+// Forzar UTF-8 en compilacion y ejecucion de tests/bootRun
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
@@ -38,7 +38,17 @@ tasks.withType(Test).configureEach {
     jvmArgs = ['-Dfile.encoding=UTF-8']
 }
 
-// Si usás Spring Boot: asegurar que la ejecución con bootRun use UTF-8
+// Si usas Spring Boot: asegurar que la ejecucion con bootRun use UTF-8
 bootRun {
     jvmArgs = ['-Dfile.encoding=UTF-8']
+}
+
+tasks.register('runConsole', JavaExec) {
+    group = 'application'
+    description = 'Ejecuta la aplicacion en modo consola (sin Spring Boot)'
+    mainClass = 'com.isi.desa.App'
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    jvmArgs = ['-Dfile.encoding=UTF-8']
+    environment "JAVA_TOOL_OPTIONS", "-Dfile.encoding=UTF-8"
 }

@@ -15,15 +15,15 @@ public class UsuarioValidator implements IUsuarioValidator {
     //@Autowired //Descomentar para correr con Spring Boot
     private final IUsuarioDAO usuarioDAO;
 
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final UsuarioValidator INSTANCE = new UsuarioValidator();
 
-    // Constructor privado para inyección de dependencias manual
+    // Constructor privado para inyeccion de dependencias manual
     private UsuarioValidator() {
         this.usuarioDAO = new UsuarioDAO();
     }
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static UsuarioValidator getInstance() {
         return INSTANCE;
     }
@@ -51,8 +51,8 @@ public class UsuarioValidator implements IUsuarioValidator {
         return null;
     }
     public String validateContrasenia(String contrasenia) {
-        if (contrasenia == null || contrasenia.trim().isEmpty()) return "La contraseña es obligatoria";
-        if (contrasenia.length() < 6) return "La contraseña debe tener al menos 6 caracteres";
+        if (contrasenia == null || contrasenia.trim().isEmpty()) return "La contrasenia es obligatoria";
+        if (contrasenia.length() < 6) return "La contrasenia debe tener al menos 6 caracteres";
         return null;
     }
     public String validateNombre(String nombre) {

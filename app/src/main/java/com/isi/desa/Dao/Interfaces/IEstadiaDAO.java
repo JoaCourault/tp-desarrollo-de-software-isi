@@ -12,7 +12,7 @@ public interface IEstadiaDAO {
 
     List<Estadia> leerEstadias();
 
-    /*Verifica si el huésped con el ID especificado se ha alojado alguna vez.*/
+    /*Verifica si el huesped con el ID especificado se ha alojado alguna vez.*/
 
     List<String> obtenerIdsHuespedesConEstadias(String idHuesped);
 }

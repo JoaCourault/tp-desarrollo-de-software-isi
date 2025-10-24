@@ -33,12 +33,12 @@ public class TipoDocumentoDAOTest {
 
         TipoDocumentoDTO dto = new TipoDocumentoDTO();
         dto.tipoDocumento = "TD-99"; // ya debe existir por el test anterior
-        dto.descripcion = "Descripción actualizada";
+        dto.descripcion = "Descripcion actualizada";
 
         try {
             TipoDocumento modificado = dao.modificar(dto);
             assertNotNull(modificado);
-            assertEquals("Descripción actualizada", modificado.getDescripcion());
+            assertEquals("Descripcion actualizada", modificado.getDescripcion());
             System.out.println("✅ Modificado correctamente: " + modificado.getTipoDocumento() + " - " + modificado.getDescripcion());
         } catch (RuntimeException e) {
             fail("❌ Error al modificar: " + e.getMessage());

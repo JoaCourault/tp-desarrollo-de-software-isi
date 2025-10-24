@@ -17,7 +17,7 @@ import java.util.List;
 public class HuespedValidator implements IHuespedValidator {
     private final IDireccionValidator direccionValidator;
 
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final HuespedValidator INSTANCE = new HuespedValidator();
 
     // Constructor privado
@@ -25,7 +25,7 @@ public class HuespedValidator implements IHuespedValidator {
         this.direccionValidator = DireccionValidator.getInstance();
     }
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static HuespedValidator getInstance() {
         return INSTANCE;
     }
@@ -67,9 +67,9 @@ public class HuespedValidator implements IHuespedValidator {
         if (huespedDTO.direccion != null) {
             errores.addAll(direccionValidator.validate(huespedDTO.direccion));
         } else {
-            errores.add("La dirección es obligatoria");
+            errores.add("La direccion es obligatoria");
         }
-        // Agrega más validaciones según los campos necesarios
+        // Agrega mas validaciones segun los campos necesarios
         return errores.isEmpty() ? null : errores;
     }
 
@@ -108,7 +108,7 @@ public class HuespedValidator implements IHuespedValidator {
         return null;
     }
     public String validateNumDoc(String numDoc) {
-        return (numDoc == null || numDoc.trim().isEmpty()) ? "El número de documento es obligatorio" : null;
+        return (numDoc == null || numDoc.trim().isEmpty()) ? "El numero de documento es obligatorio" : null;
     }
 
     @Override

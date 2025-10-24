@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 
 // @Service // Descomentar para correr con Spring Boot
 public class Logger implements ILogger {
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final Logger INSTANCE = new Logger();
 
-    // Constructor privado para evitar instanciación externa
+    // Constructor privado para evitar instanciacion externa
     private Logger() {}
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static Logger getInstance() {
         return INSTANCE;
     }

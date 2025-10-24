@@ -12,17 +12,17 @@ public class HuespedController {
     //@Autowired //Descomentar para correr con Spring Boot
     private final ILogger logger;
 
-    // Constructor privado para singleton y para evitar instanciación directa
+    // Constructor privado para singleton y para evitar instanciacion directa
     private HuespedController() {
-        // Usar singletons de implementación (se asume que existen getInstance())
+        // Usar singletons de implementacion (se asume que existen getInstance())
         this.service = HuespedService.getInstance();
         this.logger = Logger.getInstance();
     }
 
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final HuespedController INSTANCE = new HuespedController();
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static HuespedController getInstance() {
         return INSTANCE;
     }

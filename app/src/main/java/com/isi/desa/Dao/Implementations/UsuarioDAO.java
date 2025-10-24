@@ -48,7 +48,7 @@ public class UsuarioDAO implements IUsuarioDAO {
             }
             return mapper.readValue(file, new TypeReference<List<Usuario>>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("El archivo usuario.json está corrupto o tiene formato inválido.", e);
+            throw new RuntimeException("El archivo usuario.json esta corrupto o tiene formato invalido.", e);
         } catch (IOException e) {
             throw new RuntimeException("Error al leer usuario.json.", e);
         }
@@ -99,7 +99,7 @@ public class UsuarioDAO implements IUsuarioDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontró usuario con ID: " + dto.idUsuario);
+            throw new RuntimeException("No se encontro usuario con ID: " + dto.idUsuario);
         }
 
         Usuario actualizado = existente.get();
@@ -120,7 +120,7 @@ public class UsuarioDAO implements IUsuarioDAO {
         return usuarios.stream()
                 .filter(u -> u.getIdUsuario().equals(idUsuario))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No se encontró usuario con ID: " + idUsuario));
+                .orElseThrow(() -> new RuntimeException("No se encontro usuario con ID: " + idUsuario));
     }
 
     @Override
@@ -132,7 +132,7 @@ public class UsuarioDAO implements IUsuarioDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontró usuario para eliminar: " + dto.idUsuario);
+            throw new RuntimeException("No se encontro usuario para eliminar: " + dto.idUsuario);
         }
 
         usuarios.remove(existente.get());

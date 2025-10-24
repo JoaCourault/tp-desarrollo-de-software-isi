@@ -25,17 +25,17 @@ public class UsuarioService implements IUsuarioService {
     //@Autowired //Descomentar para correr con Spring Boot
     private IUsuarioDAO usuarioDAO;
 
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final UsuarioService INSTANCE = new UsuarioService();
 
-    // Constructor privado para inyección de dependencias manual
+    // Constructor privado para inyeccion de dependencias manual
     private UsuarioService() {
         this.validator = UsuarioValidator.getInstance();
         this.logger = Logger.getInstance();
         this.usuarioDAO = new UsuarioDAO();
     }
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static UsuarioService getInstance() {
         return INSTANCE;
     }
@@ -54,7 +54,7 @@ public class UsuarioService implements IUsuarioService {
     public AutenticarUsuarioResponseDto login(AutenticarUsuarioRequestDto requestDto) {
         AutenticarUsuarioResponseDto res = new AutenticarUsuarioResponseDto();
         res.resultado.id = 2; // Por defecto, no encontrado (404)
-        res.resultado.mensaje = "El usuario no existe. O la contraseña incorrecta.";
+        res.resultado.mensaje = "El usuario no existe. O la contrasenia incorrecta.";
 
         logger.info("Intento de login para: " + requestDto.nombre + " " + requestDto.apellido);
 

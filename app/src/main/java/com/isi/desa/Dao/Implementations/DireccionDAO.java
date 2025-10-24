@@ -46,7 +46,7 @@ public class DireccionDAO implements IDireccionDAO {
         }
         try {
             if (file.length() == 0) {
-                return new ArrayList<>(); // archivo vacío
+                return new ArrayList<>(); // archivo vacio
             }
             return mapper.readValue(file, new TypeReference<List<Direccion>>() {});
         } catch (JsonProcessingException e) {

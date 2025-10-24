@@ -1,7 +1,7 @@
 [
   {
-    "nombre": "María",
-    "apellido": "Gómez",
+    "nombre": "Maria",
+    "apellido": "Gomez",
     "tipoDocumento": {
       "tipoDocumento": "TD-01",
       "descripcion": "DNI"
@@ -30,7 +30,7 @@
   },
   {
     "nombre": "Juan",
-    "apellido": "Pérez",
+    "apellido": "Perez",
     "tipoDocumento": {
       "tipoDocumento": "TD-01",
       "descripcion": "DNI"
@@ -41,7 +41,7 @@
     "fechaNacimiento": "1985-02-21",
     "telefono": "+54 9 351 432-5678",
     "email": "juan.perez@example.com",
-    "ocupacion": "Contador Público",
+    "ocupacion": "Contador Publico",
     "nacionalidad": "Argentina",
     "direccion": {
       "calle": null,
@@ -58,8 +58,8 @@
     "idDireccion": "DI-002"
   },
   {
-    "nombre": "Lucía",
-    "apellido": "Martínez",
+    "nombre": "Lucia",
+    "apellido": "Martinez",
     "tipoDocumento": {
       "tipoDocumento": "TD-01",
       "descripcion": "DNI"
@@ -71,7 +71,7 @@
     "telefono": "+34 600 123 456",
     "email": "lucia.martinez@example.es",
     "ocupacion": "Estudiante",
-    "nacionalidad": "Española",
+    "nacionalidad": "Espaniola",
     "direccion": {
       "calle": null,
       "numero": null,
@@ -88,7 +88,7 @@
   },
   {
     "nombre": "Carlos",
-    "apellido": "Fernández",
+    "apellido": "Fernandez",
     "tipoDocumento": {
       "tipoDocumento": "TD-01",
       "descripcion": "DNI"

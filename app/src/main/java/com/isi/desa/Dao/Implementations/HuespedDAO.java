@@ -25,7 +25,7 @@ public class HuespedDAO implements IHuespedDAO {
         this.mapper = new ObjectMapper();
         //Permitir leer/escribir LocalDate correctamente
         mapper.registerModule(new JavaTimeModule());
-        //Evitar escribir fechas como timestamps (números)
+        //Evitar escribir fechas como timestamps (numeros)
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
@@ -41,12 +41,12 @@ public class HuespedDAO implements IHuespedDAO {
             }
             return new File(resourceUrl.toURI());
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo acceder al archivo de huéspedes.", e);
+            throw new RuntimeException("No se pudo acceder al archivo de huespedes.", e);
         }
     }
 
     /**
-     * Lee el archivo JSON completo y devuelve todos los huéspedes.
+     * Lee el archivo JSON completo y devuelve todos los huespedes.
      */
     public List<Huesped> leerHuespedes() {
         File file = getJsonFile();
@@ -60,21 +60,21 @@ public class HuespedDAO implements IHuespedDAO {
             }
             return mapper.readValue(file, new TypeReference<List<Huesped>>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(" El archivo de huéspedes está corrupto o tiene formato inválido.", e);
+            throw new RuntimeException(" El archivo de huespedes esta corrupto o tiene formato invalido.", e);
         } catch (IOException e) {
-            throw new RuntimeException("Error al leer el archivo de huéspedes.", e);
+            throw new RuntimeException("Error al leer el archivo de huespedes.", e);
         }
     }
 
     /**
-     * Guarda toda la lista de huéspedes en el archivo JSON.
+     * Guarda toda la lista de huespedes en el archivo JSON.
      */
     private void guardarHuespedes(List<Huesped> huespedes) {
         try {
             File file = getJsonFile();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, huespedes);
         } catch (IOException e) {
-            throw new RuntimeException(" Error al guardar huéspedes en el archivo JSON.", e);
+            throw new RuntimeException(" Error al guardar huespedes en el archivo JSON.", e);
         }
     }
 
@@ -99,7 +99,7 @@ public class HuespedDAO implements IHuespedDAO {
 
     @Override
     public Huesped crear(HuespedDTO huesped) {
-        List<Huesped> huespedes = leerHuespedes(); // se leen todos los huéspedes existentes
+        List<Huesped> huespedes = leerHuespedes(); // se leen todos los huespedes existentes
 
         Huesped nuevo = dtoToEntity(huesped);
         huespedes.add(nuevo); //  agregamos a la lista existente
@@ -117,7 +117,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontró huésped con documento: " + huesped.numDoc);
+            throw new RuntimeException("No se encontro huesped con documento: " + huesped.numDoc);
         }
 
         Huesped actualizado = dtoToEntity(huesped);
@@ -137,11 +137,11 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException(" No se encontró huésped para eliminar: " + huesped.numDoc);
+            throw new RuntimeException(" No se encontro huesped para eliminar: " + huesped.numDoc);
         }
 
-        huespedes.remove(existente.get()); //elimina solo ese huésped
-        guardarHuespedes(huespedes); //guarda los demás intactos
+        huespedes.remove(existente.get()); //elimina solo ese huesped
+        guardarHuespedes(huespedes); //guarda los demas intactos
 
         return existente.get();
     }
@@ -152,6 +152,6 @@ public class HuespedDAO implements IHuespedDAO {
         return huespedes.stream()
                 .filter(h -> h.getNumDoc().equals(DNI))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No se encontró huésped con DNI: " + DNI));
+                .orElseThrow(() -> new RuntimeException("No se encontro huesped con DNI: " + DNI));
     }
 }

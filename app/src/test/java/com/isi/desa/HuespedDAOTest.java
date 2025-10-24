@@ -13,7 +13,7 @@ public class HuespedDAOTest {
     void testCrearHuesped() {
         HuespedDAO huespedDAO = new HuespedDAO();
 
-        // ✅ Creamos un nuevo huésped DTO
+        // Creamos un nuevo huesped DTO
         HuespedDTO nuevo = new HuespedDTO();
         nuevo.idHuesped = "HU-999";
         nuevo.nombre = "Test";
@@ -35,11 +35,11 @@ public class HuespedDAOTest {
 
         try {
             Huesped creado = huespedDAO.crear(nuevo);
-            assertNotNull(creado, "El huésped creado no debe ser nulo");
-            assertEquals("HU-999", creado.getIdHuesped(), "El ID debería coincidir");
-            System.out.println("✅ Huésped creado correctamente: " + creado.getNombre() + " (" + creado.getIdHuesped() + ")");
+            assertNotNull(creado, "El huesped creado no debe ser nulo");
+            assertEquals("HU-999", creado.getIdHuesped(), "El ID deberia coincidir");
+            System.out.println("Huesped creado correctamente: " + creado.getNombre() + " (" + creado.getIdHuesped() + ")");
         } catch (RuntimeException e) {
-            fail("❌ Error al crear huésped: " + e.getMessage());
+            fail("Error al crear huesped: " + e.getMessage());
         }
     }
 
@@ -49,10 +49,10 @@ public class HuespedDAOTest {
 
         try {
             Huesped h = huespedDAO.obtenerHuesped("35648972"); // un DNI existente del JSON
-            assertNotNull(h, "El huésped obtenido no debe ser nulo");
-            System.out.println("✅ Huésped obtenido correctamente: " + h.getNombre() + " " + h.getApellido());
+            assertNotNull(h, "El huesped obtenido no debe ser nulo");
+            System.out.println("Huesped obtenido correctamente: " + h.getNombre() + " " + h.getApellido());
         } catch (RuntimeException e) {
-            fail("❌ Error al obtener huésped: " + e.getMessage());
+            fail("Error al obtener huesped: " + e.getMessage());
         }
     }
 
@@ -61,15 +61,15 @@ public class HuespedDAOTest {
         HuespedDAO huespedDAO = new HuespedDAO();
 
         HuespedDTO eliminar = new HuespedDTO();
-        eliminar.numDoc = "99999999"; // el mismo que se creó en el primer test
+        eliminar.numDoc = "99999999"; // el mismo que se creo en el primer test
 
         try {
             Huesped eliminado = huespedDAO.eliminar(eliminar);
-            assertNotNull(eliminado, "El huésped eliminado no debe ser nulo");
-            assertEquals("99999999", eliminado.getNumDoc(), "El DNI eliminado debería coincidir");
-            System.out.println("✅ Huésped eliminado correctamente: " + eliminado.getNombre());
+            assertNotNull(eliminado, "El huesped eliminado no debe ser nulo");
+            assertEquals("99999999", eliminado.getNumDoc(), "El DNI eliminado deberia coincidir");
+            System.out.println("Huesped eliminado correctamente: " + eliminado.getNombre());
         } catch (RuntimeException e) {
-            fail("❌ Error al eliminar huésped: " + e.getMessage());
+            fail("Error al eliminar huesped: " + e.getMessage());
         }
     }
 }
