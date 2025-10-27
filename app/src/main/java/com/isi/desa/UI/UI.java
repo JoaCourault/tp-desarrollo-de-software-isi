@@ -54,7 +54,6 @@ public class UI {
                 loggedIn.set(true);
                 UsuarioDTO u = res.usuario;
                 String msg = "Usuario autenticado: " + u.nombre + " " + u.apellido + " (ID: " + u.idUsuario + ")";
-                System.out.println(msg);
                 logger.info(msg);
                 // Volver al menú inicial
                 throw new MenuNavigationException(MenuNavigationException.Type.BACK_TO_ROOT);
@@ -86,13 +85,11 @@ public class UI {
                             UsuarioController.getInstance().crearUsuario(dto);
                             System.out.println("Solicitud de creación enviada.");
                         } catch (Exception e) {
-                            System.out.println("Error creando usuario: " + e.getMessage());
                             logger.error("Error UI - crear usuario: " + e.getMessage(), e);
                         }
                     }
                 } else {
                     String msg = "Autenticación fallida para: " + nombre + " " + apellido;
-                    System.out.println("Autenticación fallida.");
                     logger.warn(msg);
                 }
             }
@@ -101,7 +98,6 @@ public class UI {
         usuariosMenu.add(new MenuItem("Cerrar sesión", (Scanner scanner) -> {
             if (!loggedIn.get()) { System.out.println("No hay sesión iniciada."); return; }
             loggedIn.set(false);
-            System.out.println("Sesión cerrada.");
             logger.info("Usuario cerró sesión.");
         }));
 
@@ -113,15 +109,12 @@ public class UI {
             req.huesped = null; // sin filtros => listar todos
             BuscarHuespedResultDTO res = HuespedController.getInstance().buscarHuesped(req);
             if (res == null || res.huespedesEncontrados == null || res.huespedesEncontrados.isEmpty()) {
-                System.out.println("No se encontraron huéspedes.");
-                logger.info("Listado huéspedes: 0 encontrados");
+                logger.info("No se encontraron huéspedes.");
             } else {
                 List<HuespedDTO> lista = res.huespedesEncontrados;
-                System.out.println("Huéspedes encontrados: " + lista.size());
                 logger.info("Listado huéspedes: " + lista.size() + " encontrados");
                 for (HuespedDTO h : lista) {
                     String line = "- " + h.nombre + " " + h.apellido + " (" + h.numDoc + ")";
-                    System.out.println(line);
                     logger.info(line);
                 }
             }
@@ -156,14 +149,11 @@ public class UI {
                     try {
                         AltaHuespedResultDTO altaRes = HuespedController.getInstance().altaHuesped(altaReq);
                         if (altaRes != null && altaRes.resultado != null && altaRes.resultado.id == 0) {
-                            System.out.println("Huésped creado correctamente.");
                             logger.info("Huésped creado desde UI: " + nuevo.nombre + " " + nuevo.apellido);
                         } else {
-                            System.out.println("No se pudo crear el huésped: " + (altaRes != null && altaRes.resultado!=null? altaRes.resultado.mensaje : "error desconocido"));
                             logger.warn("Fallo creación huésped desde UI.");
                         }
                     } catch(Exception e) {
-                        System.out.println("Error al crear huésped: " + e.getMessage());
                         logger.error("Error UI crear huésped: " + e.getMessage(), e);
                     }
                 }
@@ -228,10 +218,10 @@ public class UI {
         // Eliminar huesped
         huespedMenu.add(new MenuItem("Eliminar huésped (simple)", (Scanner scanner) -> {
             if (!loggedIn.get()) { System.out.println("Debe autenticarse primero para usar esta opción."); return; }
-            System.out.print("Ingrese número de documento del huésped a eliminar: ");
-            String numDoc = scanner.nextLine().trim();
+            System.out.print("Ingrese el id del huesped que desea eliminar: ");
+            String idHuesped = scanner.nextLine().trim();
             com.isi.desa.Dto.Huesped.BajaHuespedRequestDTO br = new com.isi.desa.Dto.Huesped.BajaHuespedRequestDTO();
-            com.isi.desa.Dto.Huesped.HuespedDTO h = new com.isi.desa.Dto.Huesped.HuespedDTO(); h.numDoc = numDoc; br.idHuesped = h.idHuesped;
+            br.idHuesped = idHuesped;
             try {
                 com.isi.desa.Dto.Huesped.BajaHuespedResultDTO r = HuespedController.getInstance().bajaHuesped(br);
                 System.out.println("Resultado: " + (r!=null && r.resultado!=null? r.resultado.mensaje : "sin respuesta"));

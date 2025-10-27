@@ -1,8 +1,7 @@
 package com.isi.desa.Service.Interfaces;
 
-import com.isi.desa.Dto.Huesped.BuscarHuespedRequestDTO;
-import com.isi.desa.Dto.Huesped.BuscarHuespedResultDTO;
-import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Dto.Huesped.*;
+
 import java.util.List;
 
 public interface IHuespedService{
@@ -11,7 +10,7 @@ public interface IHuespedService{
 
     HuespedDTO modificar(HuespedDTO huespedDTO);
 
-    HuespedDTO eliminar(HuespedDTO huespedDTO);
+    BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO huespedDTO);
 
     BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO requestDTO);
 }

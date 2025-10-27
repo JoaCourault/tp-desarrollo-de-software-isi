@@ -16,7 +16,8 @@
     "nacionalidad": "Argentina",
     "id": "HU-001",
     "idDireccion": "DI-001",
-    "idsEstadias": ["ES-001", "ES-004"]
+    "idsEstadias": ["ES-001", "ES-004"],
+    "eliminado": false
   },
   {
     "nombre": "Juan",
@@ -35,7 +36,8 @@
     "nacionalidad": "Argentina",
     "id": "HU-002",
     "idDireccion": "DI-002",
-    "idsEstadias": ["ES-002", "ES-003"]
+    "idsEstadias": ["ES-002", "ES-003"],
+    "eliminado": false
   },
   {
     "nombre": "Lucía",
@@ -54,7 +56,8 @@
     "nacionalidad": "Española",
     "id": "HU-003",
     "idDireccion": "DI-003",
-    "idsEstadias": []
+    "idsEstadias": [],
+    "eliminado": false
   },
   {
     "nombre": "Carlos",
@@ -73,6 +76,7 @@
     "nacionalidad": "Argentina",
     "id": "HU-004",
     "idDireccion": "DI-004",
-    "idsEstadias": ["ES-005"]
+    "idsEstadias": ["ES-005"],
+    "eliminado": false
   }
 ]

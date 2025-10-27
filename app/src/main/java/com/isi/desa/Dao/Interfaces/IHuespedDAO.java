@@ -11,9 +11,11 @@ public interface IHuespedDAO {
 
     Huesped modificar(HuespedDTO huesped);
 
-    Huesped eliminar(HuespedDTO huesped) throws HuespedConEstadiaAsociadasException;
+    Huesped eliminar(String idHuesped);
 
     Huesped obtenerHuesped(String DNI);
 
     List<Huesped> leerHuespedes();
+
+    Huesped getById(String id);
 }

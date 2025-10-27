@@ -23,6 +23,7 @@ public class Huesped {
     private String nacionalidad;
     private Direccion direccion;
     private List<String> idsEstadias;
+    private boolean eliminado = false;
 
     public Huesped() {}
 
@@ -89,6 +90,9 @@ public class Huesped {
     public void setIdsEstadias(List<String> idsEstadias) {
         this.idsEstadias = (idsEstadias != null) ? idsEstadias : new ArrayList<>();
     }
+
+    public boolean isEliminado() { return eliminado; }
+    public void setEliminado(boolean eliminado) { this.eliminado = eliminado; }
 
     public void agregarEstadia(String idEstadia) {
         if (idEstadia != null && !idsEstadias.contains(idEstadia)) {

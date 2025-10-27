@@ -83,13 +83,15 @@ public class HuespedDAO implements IHuespedDAO {
         List<Huesped> huespedes = leerHuespedes();
 
         boolean existe = huespedes.stream()
-                .anyMatch(h -> h.getNumDoc().equalsIgnoreCase(huesped.numDoc));
+                .filter(h -> !h.isEliminado())
+                .anyMatch(h -> h.getNumDoc() != null && h.getNumDoc().equalsIgnoreCase(huesped.numDoc));
 
         if (existe) {
             throw new RuntimeException("Ya existe un huésped con el documento: " + huesped.numDoc);
         }
 
         Huesped nuevo = HuespedMapper.dtoToEntity(huesped);
+        nuevo.setEliminado(false);
         huespedes.add(nuevo);
         guardarHuespedes(huespedes);
         return nuevo;
@@ -100,7 +102,8 @@ public class HuespedDAO implements IHuespedDAO {
         List<Huesped> huespedes = leerHuespedes();
 
         Optional<Huesped> existente = huespedes.stream()
-                .filter(h -> h.getNumDoc().equalsIgnoreCase(huesped.numDoc))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getNumDoc() != null && h.getNumDoc().equalsIgnoreCase(huesped.numDoc))
                 .findFirst();
 
         if (existente.isEmpty()) {
@@ -108,7 +111,9 @@ public class HuespedDAO implements IHuespedDAO {
         }
 
         Huesped actualizado = HuespedMapper.dtoToEntity(huesped);
-        actualizado.setIdsEstadias(existente.get().getIdsEstadias()); // mantener historial de estadías
+        // mantener historial de estadías y estado eliminado
+        actualizado.setIdsEstadias(existente.get().getIdsEstadias());
+        actualizado.setEliminado(existente.get().isEliminado());
         int index = huespedes.indexOf(existente.get());
         huespedes.set(index, actualizado);
 
@@ -117,28 +122,30 @@ public class HuespedDAO implements IHuespedDAO {
     }
 
     @Override
-    public Huesped eliminar(HuespedDTO huesped) throws HuespedConEstadiaAsociadasException {
+    public Huesped eliminar(String idHuesped) {
         List<Huesped> huespedes = leerHuespedes();
 
         Optional<Huesped> existente = huespedes.stream()
-                .filter(h -> h.getNumDoc().equalsIgnoreCase(huesped.numDoc))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new HuespedNotFoundException("No se encontró huésped para eliminar: " + huesped.numDoc);
-        }
-        Huesped encontrado = existente.get();
-        //Verifica si tiene estadías asociadas
-        if (encontrado.getIdsEstadias() != null && !encontrado.getIdsEstadias().isEmpty()) {
-            throw new HuespedConEstadiaAsociadasException("No se puede eliminar el huésped "
-                    + encontrado.getNombre() + " " + encontrado.getApellido()
-                    + " porque tiene estadías asociadas (" + encontrado.getIdsEstadias().size() + ").");
+            throw new RuntimeException("No se encontró huésped con ID: " + idHuesped);
         }
 
-        huespedes.remove(existente.get());
+        Huesped h = existente.get();
+        // si tiene estadías activas podríamos lanzar excepción según la lógica del negocio
+        if (h.getIdsEstadias() != null && !h.getIdsEstadias().isEmpty()) {
+            throw new HuespedConEstadiaAsociadasException("El huésped tiene estadías asociadas y no puede eliminarse.");
+        }
+
+        h.setEliminado(true);
+        int index = huespedes.indexOf(h);
+        huespedes.set(index, h);
         guardarHuespedes(huespedes);
 
-        return existente.get();
+        return h;
     }
 
 
@@ -146,7 +153,8 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped obtenerHuesped(String DNI) {
         List<Huesped> huespedes = leerHuespedes();
         return huespedes.stream()
-                .filter(h -> h.getNumDoc().equals(DNI))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getNumDoc() != null && h.getNumDoc().equals(DNI))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No se encontró huésped con DNI: " + DNI));
     }
@@ -156,7 +164,8 @@ public class HuespedDAO implements IHuespedDAO {
         List<Huesped> huespedes = leerHuespedes();
 
         Optional<Huesped> existente = huespedes.stream()
-                .filter(h -> h.getIdHuesped().equalsIgnoreCase(idHuesped))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
                 .findFirst();
 
         if (existente.isEmpty()) {
@@ -172,7 +181,8 @@ public class HuespedDAO implements IHuespedDAO {
         List<Huesped> huespedes = leerHuespedes();
 
         Optional<Huesped> existente = huespedes.stream()
-                .filter(h -> h.getIdHuesped().equalsIgnoreCase(idHuesped))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
                 .findFirst();
 
         if (existente.isEmpty()) {
@@ -189,9 +199,21 @@ public class HuespedDAO implements IHuespedDAO {
      */
     public List<String> obtenerIdsEstadiasDeHuesped(String idHuesped) {
         return leerHuespedes().stream()
-                .filter(h -> h.getIdHuesped().equalsIgnoreCase(idHuesped))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
                 .findFirst()
                 .map(Huesped::getIdsEstadias)
                 .orElse(Collections.emptyList());
+    }
+
+    @Override
+    public Huesped getById(String id) {
+        List<Huesped> huespedes = leerHuespedes();
+
+        return huespedes.stream()
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(id))
+                .findFirst()
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + id));
     }
 }

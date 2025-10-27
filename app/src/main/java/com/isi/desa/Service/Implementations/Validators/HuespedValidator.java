@@ -1,8 +1,12 @@
 package com.isi.desa.Service.Implementations.Validators;
 
+import com.isi.desa.Dao.Implementations.HuespedDAO;
 import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
+import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
+import com.isi.desa.Exceptions.HuespedConEstadiaAsociadasException;
+import com.isi.desa.Exceptions.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
@@ -16,12 +20,14 @@ import java.util.List;
 // @Service //Descomentar para correr con Spring Boot
 public class HuespedValidator implements IHuespedValidator {
     private final IDireccionValidator direccionValidator;
+    private final IHuespedDAO dao;
 
     // Instancia única (eager singleton)
     private static final HuespedValidator INSTANCE = new HuespedValidator();
 
     // Constructor privado
     private HuespedValidator() {
+        this.dao = new HuespedDAO();
         this.direccionValidator = DireccionValidator.getInstance();
     }
 
@@ -114,6 +120,34 @@ public class HuespedValidator implements IHuespedValidator {
     @Override
     public String validateCuit(Integer cuit) {
         return (cuit == null) ? "El CUIT es un campo obligatorio" : null;
+    }
+
+    @Override
+    public RuntimeException validateDelete(String idHuesped) {
+        RuntimeException huespedNoExistente = this.validateExists(idHuesped);
+        if(huespedNoExistente != null) {
+            return huespedNoExistente;
+        }
+        Huesped huesperAEliminar = this.dao.getById(idHuesped);
+        if (huesperAEliminar == null) {
+            return new HuespedNotFoundException("No existe un huesped con el idHuesped proporcionado");
+        }
+        if (!huesperAEliminar.getIdsEstadias().isEmpty()) {
+            return new HuespedConEstadiaAsociadasException("No se puede eliminar el huesped porque tiene estadias asociadas");
+        }
+
+        return null;
+    }
+
+    @Override
+    public RuntimeException validateExists(String idHuesped) {
+        if (idHuesped == null || idHuesped.trim().isEmpty()) {
+            return new RuntimeException("El idHuesped es obligatorio para verificar existencia");
+        }
+        if(this.dao.getById(idHuesped) == null) {
+            return new HuespedNotFoundException("No existe un huesped con el idHuesped proporcionado");
+        }
+        return null;
     }
 
     public String validateCuit(String cuit) {

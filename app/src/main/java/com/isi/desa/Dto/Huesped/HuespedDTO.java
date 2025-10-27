@@ -22,4 +22,5 @@ public class HuespedDTO {
     public String nacionalidad;
     public DireccionDTO direccion;
     public List<String> idsEstadias;
+    public boolean eliminado = false;
 }

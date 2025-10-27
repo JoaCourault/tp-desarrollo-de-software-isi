@@ -36,6 +36,7 @@ public class HuespedMapper {
         dto.idsEstadias = (h.getIdsEstadias() != null)
                 ? new ArrayList<>(h.getIdsEstadias())
                 : new ArrayList<>();
+        dto.eliminado = h.isEliminado();
 
         return dto;
     }
@@ -61,6 +62,7 @@ public class HuespedMapper {
         h.setIdsEstadias(
                 dto.idsEstadias != null ? new ArrayList<>(dto.idsEstadias) : new ArrayList<>()
         );
+        h.setEliminado(dto.eliminado);
 
         return h;
     }

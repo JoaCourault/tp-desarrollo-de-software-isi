@@ -2,16 +2,13 @@ package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Implementations.HuespedDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
-import com.isi.desa.Dto.Huesped.BuscarHuespedRequestDTO;
-import com.isi.desa.Dto.Huesped.BuscarHuespedResultDTO;
-import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Dto.Huesped.*;
 import com.isi.desa.Dto.Resultado;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Implementations.Validators.HuespedValidator;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +40,7 @@ public class HuespedService implements IHuespedService {
         try {
             // 1. Validar y convertir a Entidad (si es necesario para la validación)
             // Asumo que el validator lanza excepción si hay error
-            Huesped entidadValidada = validator.create(huespedDTO);
+            validator.create(huespedDTO);
 
             // 2. DAO devuelve la Entidad creada
             Huesped creado = dao.crear(huespedDTO);
@@ -68,13 +65,28 @@ public class HuespedService implements IHuespedService {
     }
 
     @Override
-    public HuespedDTO eliminar(HuespedDTO huespedDTO) {
-        try {
-            Huesped eliminado = dao.eliminar(huespedDTO);
-            return HuespedMapper.entityToDTO(eliminado);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al eliminar huésped: " + e.getMessage(), e);
+    public BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO requestDTO) {
+        BajaHuespedResultDTO res = new BajaHuespedResultDTO();
+
+        res.resultado.id = 0; // Exito
+        res.resultado.mensaje = "Huesped eliminado exitosamente.";
+
+        RuntimeException validation = this.validator.validateDelete(requestDTO.idHuesped);
+        if (validation != null) {
+            res.resultado.id = 2; // Error de validacion
+            res.resultado.mensaje = validation.getMessage();
+            return res;
         }
+
+        Huesped eliminado = dao.eliminar(requestDTO.idHuesped);
+        if (eliminado == null) {
+            res.resultado.id = 1; // Error interno
+            res.resultado.mensaje = "No se pudo eliminar el huesped.";
+            return res;
+        }
+
+        res.huesped = HuespedMapper.entityToDTO(eliminado);
+        return res;
     }
 
     @Override
@@ -86,17 +98,19 @@ public class HuespedService implements IHuespedService {
         List<HuespedDTO> huespedesEncontrados;
 
         if (requestDTO == null || requestDTO.huesped == null) {
-            // Si no hay filtros, devolver todos los huéspedes
+            // Si no hay filtros, devolver todos los huéspedes NO eliminados
             huespedesEncontrados = dao.leerHuespedes().stream()
+                    .filter(h -> h != null && !h.isEliminado())
                     .map(HuespedMapper::entityToDTO)
                     .collect(Collectors.toList());
         } else {
             HuespedDTO filtros = requestDTO.huesped;
 
             huespedesEncontrados = dao.leerHuespedes().stream()
-                    .filter(h -> (filtros.nombre == null || h.getNombre().equalsIgnoreCase(filtros.nombre)) &&
-                            (filtros.apellido == null || h.getApellido().equalsIgnoreCase(filtros.apellido)) &&
-                            (filtros.numDoc == null || h.getNumDoc().equals(filtros.numDoc)))
+                    .filter(h -> h != null && !h.isEliminado())
+                    .filter(h -> (filtros.nombre == null || (h.getNombre() != null && h.getNombre().equalsIgnoreCase(filtros.nombre))) &&
+                            (filtros.apellido == null || (h.getApellido() != null && h.getApellido().equalsIgnoreCase(filtros.apellido))) &&
+                            (filtros.numDoc == null || (h.getNumDoc() != null && h.getNumDoc().equals(filtros.numDoc))))
                     .map(HuespedMapper::entityToDTO)
                     .collect(Collectors.toList());
         }
