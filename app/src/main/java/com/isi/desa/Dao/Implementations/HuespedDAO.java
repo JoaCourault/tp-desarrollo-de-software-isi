@@ -3,8 +3,12 @@ package com.isi.desa.Dao.Implementations;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Exceptions.HuespedConEstadiaAsociadasException;
+import com.isi.desa.Exceptions.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -12,9 +16,8 @@ import com.isi.desa.Utils.Mappers.HuespedMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HuespedDAO implements IHuespedDAO {
 
@@ -25,7 +28,7 @@ public class HuespedDAO implements IHuespedDAO {
         this.mapper = new ObjectMapper();
         //Permitir leer/escribir LocalDate correctamente
         mapper.registerModule(new JavaTimeModule());
-        //Evitar escribir fechas como timestamps (numeros)
+        //Evitar escribir fechas como timestamps (números)
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
@@ -51,7 +54,7 @@ public class HuespedDAO implements IHuespedDAO {
     public List<Huesped> leerHuespedes() {
         File file = getJsonFile();
         if (!file.exists()) {
-            System.out.println(" El archivo de huespedes no existe, creando nuevo...");
+            System.out.println("El archivo de huéspedes no existe, creando nuevo...");
             return new ArrayList<>();
         }
         try {
@@ -60,9 +63,9 @@ public class HuespedDAO implements IHuespedDAO {
             }
             return mapper.readValue(file, new TypeReference<List<Huesped>>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(" El archivo de huespedes esta corrupto o tiene formato invalido.", e);
+            throw new RuntimeException(" El archivo de huéspedes está corrupto o tiene formato inválido.", e);
         } catch (IOException e) {
-            throw new RuntimeException("Error al leer el archivo de huespedes.", e);
+            throw new RuntimeException("Error al leer el archivo de huéspedes.", e);
         }
     }
 
@@ -74,37 +77,26 @@ public class HuespedDAO implements IHuespedDAO {
             File file = getJsonFile();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, huespedes);
         } catch (IOException e) {
-            throw new RuntimeException(" Error al guardar huespedes en el archivo JSON.", e);
+            throw new RuntimeException("Error al guardar huéspedes en el archivo JSON.", e);
         }
-    }
-
-    /**
-     * Convierte un DTO a entidad.
-     */
-    private Huesped dtoToEntity(HuespedDTO dto) {
-        Huesped h = new Huesped();
-        h.setIdHuesped(dto.idHuesped);
-        h.setNombre(dto.nombre);
-        h.setApellido(dto.apellido);
-        h.setNumDoc(dto.numDoc);
-        h.setPosicionIva(dto.posicionIva);
-        h.setCuit(dto.cuit);
-        h.setFechaNacimiento(dto.fechaNacimiento);
-        h.setTelefono(dto.telefono);
-        h.setEmail(dto.email);
-        h.setOcupacion(dto.ocupacion);
-        h.setNacionalidad(dto.nacionalidad);
-        return h;
     }
 
     @Override
     public Huesped crear(HuespedDTO huesped) {
-        List<Huesped> huespedes = leerHuespedes(); // se leen todos los huespedes existentes
+        List<Huesped> huespedes = leerHuespedes();
 
-        Huesped nuevo = dtoToEntity(huesped);
-        huespedes.add(nuevo); //  agregamos a la lista existente
-        guardarHuespedes(huespedes); //  sobrescribimos con la lista actualizada
+        boolean existe = huespedes.stream()
+                .filter(h -> !h.isEliminado())
+                .anyMatch(h -> h.getNumDoc() != null && h.getNumDoc().equalsIgnoreCase(huesped.numDoc));
 
+        if (existe) {
+            throw new RuntimeException("Ya existe un huésped con el documento: " + huesped.numDoc);
+        }
+
+        Huesped nuevo = HuespedMapper.dtoToEntity(huesped);
+        nuevo.setEliminado(false);
+        huespedes.add(nuevo);
+        guardarHuespedes(huespedes);
         return nuevo;
     }
 
@@ -113,14 +105,18 @@ public class HuespedDAO implements IHuespedDAO {
         List<Huesped> huespedes = leerHuespedes();
 
         Optional<Huesped> existente = huespedes.stream()
-                .filter(h -> h.getNumDoc().equals(huesped.numDoc))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getNumDoc() != null && h.getNumDoc().equalsIgnoreCase(huesped.numDoc))
                 .findFirst();
 
         if (existente.isEmpty()) {
             throw new RuntimeException("No se encontro huesped con documento: " + huesped.numDoc);
         }
 
-        Huesped actualizado = dtoToEntity(huesped);
+        Huesped actualizado = HuespedMapper.dtoToEntity(huesped);
+        // mantener historial de estadías y estado eliminado
+        actualizado.setIdsEstadias(existente.get().getIdsEstadias());
+        actualizado.setEliminado(existente.get().isEliminado());
         int index = huespedes.indexOf(existente.get());
         huespedes.set(index, actualizado);
 
@@ -129,29 +125,98 @@ public class HuespedDAO implements IHuespedDAO {
     }
 
     @Override
-    public Huesped eliminar(HuespedDTO huesped) {
+    public Huesped eliminar(String idHuesped) {
         List<Huesped> huespedes = leerHuespedes();
 
         Optional<Huesped> existente = huespedes.stream()
-                .filter(h -> h.getNumDoc().equals(huesped.numDoc))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException(" No se encontro huesped para eliminar: " + huesped.numDoc);
+            throw new RuntimeException("No se encontró huésped con ID: " + idHuesped);
         }
 
-        huespedes.remove(existente.get()); //elimina solo ese huesped
-        guardarHuespedes(huespedes); //guarda los demas intactos
+        Huesped h = existente.get();
+        // si tiene estadías activas podríamos lanzar excepción según la lógica del negocio
+        if (h.getIdsEstadias() != null && !h.getIdsEstadias().isEmpty()) {
+            throw new HuespedConEstadiaAsociadasException("El huésped tiene estadías asociadas y no puede eliminarse.");
+        }
 
-        return existente.get();
+        h.setEliminado(true);
+        int index = huespedes.indexOf(h);
+        huespedes.set(index, h);
+        guardarHuespedes(huespedes);
+
+        return h;
     }
+
 
     @Override
     public Huesped obtenerHuesped(String DNI) {
         List<Huesped> huespedes = leerHuespedes();
         return huespedes.stream()
-                .filter(h -> h.getNumDoc().equals(DNI))
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getNumDoc() != null && h.getNumDoc().equals(DNI))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No se encontro huesped con DNI: " + DNI));
+                .orElseThrow(() -> new RuntimeException("No se encontró huésped con DNI: " + DNI));
+    }
+
+    /* Agrega un ID de estadía al huésped correspondiente */
+    public void agregarEstadiaAHuesped(String idHuesped, String idEstadia) {
+        List<Huesped> huespedes = leerHuespedes();
+
+        Optional<Huesped> existente = huespedes.stream()
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
+                .findFirst();
+
+        if (existente.isEmpty()) {
+            throw new RuntimeException("No se encontró huésped con ID: " + idHuesped);
+        }
+
+        Huesped h = existente.get();
+        h.agregarEstadia(idEstadia);
+        guardarHuespedes(huespedes);
+    }
+
+    public void eliminarEstadiaDeHuesped(String idHuesped, String idEstadia) {
+        List<Huesped> huespedes = leerHuespedes();
+
+        Optional<Huesped> existente = huespedes.stream()
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
+                .findFirst();
+
+        if (existente.isEmpty()) {
+            throw new RuntimeException("No se encontró huésped con ID: " + idHuesped);
+        }
+
+        Huesped h = existente.get();
+        h.eliminarEstadia(idEstadia);
+        guardarHuespedes(huespedes);
+    }
+
+    /**
+     * Devuelve la lista de IDs de estadías de un huésped.
+     */
+    public List<String> obtenerIdsEstadiasDeHuesped(String idHuesped) {
+        return leerHuespedes().stream()
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(idHuesped))
+                .findFirst()
+                .map(Huesped::getIdsEstadias)
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
+    public Huesped getById(String id) {
+        List<Huesped> huespedes = leerHuespedes();
+
+        return huespedes.stream()
+                .filter(h -> !h.isEliminado())
+                .filter(h -> h.getIdHuesped() != null && h.getIdHuesped().equalsIgnoreCase(id))
+                .findFirst()
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + id));
     }
 }

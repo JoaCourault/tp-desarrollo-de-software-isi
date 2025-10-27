@@ -22,7 +22,7 @@ public class HuespedController {
     // Instancia unica (eager singleton)
     private static final HuespedController INSTANCE = new HuespedController();
 
-    // Metodo publico para obtener la instancia
+    // Metodo público para obtener la instancia
     public static HuespedController getInstance() {
         return INSTANCE;
     }
@@ -42,6 +42,12 @@ public class HuespedController {
         throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-11
     }
     public BajaHuespedResultDTO bajaHuesped(BajaHuespedRequestDTO requestDTO) {
-        throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-12
+        try {
+            BajaHuespedResultDTO res = this.service.eliminar(requestDTO);
+            return res;
+        } catch (Exception e){
+            this.logger.error("Error en HuespedController - bajaHuesped: " + e.getMessage(), e);
+            return null;
+        }
     }
 }

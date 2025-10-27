@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Huesped {
     @JsonProperty("id")
@@ -20,6 +22,8 @@ public class Huesped {
     private String ocupacion;
     private String nacionalidad;
     private Direccion direccion;
+    private List<String> idsEstadias;
+    private boolean eliminado = false;
 
     public Huesped() {}
 
@@ -39,6 +43,7 @@ public class Huesped {
         this.nacionalidad = nacionalidad;
         this.direccion = direccion;
         this.idHuesped = idHuesped;
+        this.idsEstadias = new ArrayList<>();
     }
 
     // === Getters & Setters ===
@@ -80,6 +85,26 @@ public class Huesped {
 
     public Direccion getDireccion() { return direccion; }
     public void setDireccion(Direccion direccion) { this.direccion = direccion; }
+
+    public List<String> getIdsEstadias() { return idsEstadias; }
+    public void setIdsEstadias(List<String> idsEstadias) {
+        this.idsEstadias = (idsEstadias != null) ? idsEstadias : new ArrayList<>();
+    }
+
+    public boolean isEliminado() { return eliminado; }
+    public void setEliminado(boolean eliminado) { this.eliminado = eliminado; }
+
+    public void agregarEstadia(String idEstadia) {
+        if (idEstadia != null && !idsEstadias.contains(idEstadia)) {
+            idsEstadias.add(idEstadia);
+        }
+    }
+
+    public void eliminarEstadia(String idEstadia) {
+        if (idEstadia != null) {
+            idsEstadias.remove(idEstadia);
+        }
+    }
 
     // === Mapeo con IDs del JSON ===
     @JsonProperty("idTipoDocumento")
