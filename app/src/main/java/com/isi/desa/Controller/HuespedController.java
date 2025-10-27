@@ -22,7 +22,7 @@ public class HuespedController {
     // Instancia única (eager singleton)
     private static final HuespedController INSTANCE = new HuespedController();
 
-    // Método público para obtener la instancia
+    // Metodo público para obtener la instancia
     public static HuespedController getInstance() {
         return INSTANCE;
     }

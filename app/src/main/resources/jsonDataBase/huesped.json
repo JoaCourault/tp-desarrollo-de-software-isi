@@ -14,19 +14,9 @@
     "email": "maria.gomez@example.com",
     "ocupacion": "Ingeniera Civil",
     "nacionalidad": "Argentina",
-    "direccion": {
-      "calle": null,
-      "numero": null,
-      "departamento": null,
-      "piso": null,
-      "cp": null,
-      "localidad": null,
-      "provincia": null,
-      "pais": null,
-      "id": "DI-001"
-    },
     "id": "HU-001",
-    "idDireccion": "DI-001"
+    "idDireccion": "DI-001",
+    "idsEstadias": ["ES-001", "ES-004"]
   },
   {
     "nombre": "Juan",
@@ -43,19 +33,9 @@
     "email": "juan.perez@example.com",
     "ocupacion": "Contador Público",
     "nacionalidad": "Argentina",
-    "direccion": {
-      "calle": null,
-      "numero": null,
-      "departamento": null,
-      "piso": null,
-      "cp": null,
-      "localidad": null,
-      "provincia": null,
-      "pais": null,
-      "id": "DI-002"
-    },
     "id": "HU-002",
-    "idDireccion": "DI-002"
+    "idDireccion": "DI-002",
+    "idsEstadias": ["ES-002", "ES-003"]
   },
   {
     "nombre": "Lucía",
@@ -72,19 +52,9 @@
     "email": "lucia.martinez@example.es",
     "ocupacion": "Estudiante",
     "nacionalidad": "Española",
-    "direccion": {
-      "calle": null,
-      "numero": null,
-      "departamento": null,
-      "piso": null,
-      "cp": null,
-      "localidad": null,
-      "provincia": null,
-      "pais": null,
-      "id": "DI-003"
-    },
     "id": "HU-003",
-    "idDireccion": "DI-003"
+    "idDireccion": "DI-003",
+    "idsEstadias": []
   },
   {
     "nombre": "Carlos",
@@ -101,18 +71,8 @@
     "email": "carlos.fernandez@example.com",
     "ocupacion": "Abogado",
     "nacionalidad": "Argentina",
-    "direccion": {
-      "calle": null,
-      "numero": null,
-      "departamento": null,
-      "piso": null,
-      "cp": null,
-      "localidad": null,
-      "provincia": null,
-      "pais": null,
-      "id": "DI-004"
-    },
     "id": "HU-004",
-    "idDireccion": "DI-004"
+    "idDireccion": "DI-004",
+    "idsEstadias": ["ES-005"]
   }
 ]

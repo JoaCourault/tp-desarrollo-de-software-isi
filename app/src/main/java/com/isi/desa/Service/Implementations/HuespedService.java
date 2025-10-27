@@ -33,7 +33,7 @@ public class HuespedService implements IHuespedService {
         this.validator = HuespedValidator.getInstance();
     }
 
-    // Método público para obtener la instancia
+    // Metodo público para obtener la instancia
     public static HuespedService getInstance() {
         return INSTANCE;
     }
@@ -49,7 +49,7 @@ public class HuespedService implements IHuespedService {
             Huesped creado = dao.crear(huespedDTO);
 
             // 3. Convertir a DTO para devolver
-            return HuespedMapper.entitytoDTO(creado);
+            return HuespedMapper.entityToDTO(creado);
         } catch (Exception e) {
             // Aquí deberías loguear o lanzar una excepción más específica.
             throw new RuntimeException("Error al crear huésped: " + e.getMessage(), e);
@@ -61,7 +61,7 @@ public class HuespedService implements IHuespedService {
         try {
             validator.create(huespedDTO);
             Huesped modificado = dao.modificar(huespedDTO);
-            return HuespedMapper.entitytoDTO(modificado);
+            return HuespedMapper.entityToDTO(modificado);
         } catch (Exception e) {
             throw new RuntimeException("Error al modificar huésped: " + e.getMessage(), e);
         }
@@ -71,7 +71,7 @@ public class HuespedService implements IHuespedService {
     public HuespedDTO eliminar(HuespedDTO huespedDTO) {
         try {
             Huesped eliminado = dao.eliminar(huespedDTO);
-            return HuespedMapper.entitytoDTO(eliminado);
+            return HuespedMapper.entityToDTO(eliminado);
         } catch (Exception e) {
             throw new RuntimeException("Error al eliminar huésped: " + e.getMessage(), e);
         }
@@ -88,7 +88,7 @@ public class HuespedService implements IHuespedService {
         if (requestDTO == null || requestDTO.huesped == null) {
             // Si no hay filtros, devolver todos los huéspedes
             huespedesEncontrados = dao.leerHuespedes().stream()
-                    .map(HuespedMapper::entitytoDTO)
+                    .map(HuespedMapper::entityToDTO)
                     .collect(Collectors.toList());
         } else {
             HuespedDTO filtros = requestDTO.huesped;
@@ -97,7 +97,7 @@ public class HuespedService implements IHuespedService {
                     .filter(h -> (filtros.nombre == null || h.getNombre().equalsIgnoreCase(filtros.nombre)) &&
                             (filtros.apellido == null || h.getApellido().equalsIgnoreCase(filtros.apellido)) &&
                             (filtros.numDoc == null || h.getNumDoc().equals(filtros.numDoc)))
-                    .map(HuespedMapper::entitytoDTO)
+                    .map(HuespedMapper::entityToDTO)
                     .collect(Collectors.toList());
         }
 
