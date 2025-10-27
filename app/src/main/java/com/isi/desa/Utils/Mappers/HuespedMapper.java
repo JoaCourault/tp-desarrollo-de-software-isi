@@ -58,7 +58,7 @@ public class HuespedMapper {
         h.setNacionalidad(dto.nacionalidad);
         h.setDireccion(DireccionMapper.dtoToEntity(dto.direccion));
 
-        //setear la lista de IDs de estadías
+        //setear la lista de IDs de estadias
         h.setIdsEstadias(
                 dto.idsEstadias != null ? new ArrayList<>(dto.idsEstadias) : new ArrayList<>()
         );

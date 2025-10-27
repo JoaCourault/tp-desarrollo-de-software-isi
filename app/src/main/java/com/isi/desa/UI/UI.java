@@ -84,7 +84,6 @@ public class UI {
                 logger.info("Listado huespedes: " + lista.size() + " encontrados");
                 for (HuespedDTO h : lista) {
                     String line = "- " + h.nombre + " " + h.apellido + " (" + h.numDoc + ")";
-                    System.out.println(line);
                     logger.info(line);
                 }
             }
@@ -119,14 +118,11 @@ public class UI {
                     try {
                         AltaHuespedResultDTO altaRes = HuespedController.getInstance().altaHuesped(altaReq);
                         if (altaRes != null && altaRes.resultado != null && altaRes.resultado.id == 0) {
-                            System.out.println("Huesped creado correctamente.");
                             logger.info("Huesped creado desde UI: " + nuevo.nombre + " " + nuevo.apellido);
                         } else {
-                            System.out.println("No se pudo crear el huesped: " + (altaRes != null && altaRes.resultado!=null? altaRes.resultado.mensaje : "error desconocido"));
-                            logger.warn("Fallo creacion huesped desde UI.");
+                            logger.warn("No se pudo crear el huesped: " + (altaRes != null && altaRes.resultado!=null? altaRes.resultado.mensaje : "error desconocido"));
                         }
                     } catch(Exception e) {
-                        System.out.println("Error al crear huesped: " + e.getMessage());
                         logger.error("Error UI crear huesped: " + e.getMessage(), e);
                     }
                 }
@@ -189,12 +185,11 @@ public class UI {
         }));
 
         // Eliminar huesped
-        huespedMenu.add(new MenuItem("Eliminar huesped (simple)", (Scanner scanner) -> {
+        huespedMenu.add(new MenuItem("Eliminar huesped", (Scanner scanner) -> {
             if (!loggedIn.get()) { throw new NotAutenticatedException("Sesion no iniciada"); }
-            System.out.print("Ingrese numero de documento del huesped a eliminar: ");
-            String numDoc = scanner.nextLine().trim();
             com.isi.desa.Dto.Huesped.BajaHuespedRequestDTO br = new com.isi.desa.Dto.Huesped.BajaHuespedRequestDTO();
-            com.isi.desa.Dto.Huesped.HuespedDTO h = new com.isi.desa.Dto.Huesped.HuespedDTO(); h.numDoc = numDoc; br.idHuesped = h.idHuesped;
+            System.out.print("Ingrese el id del huesped a eliminar: ");
+            br.idHuesped = scanner.nextLine().trim();
             try {
                 com.isi.desa.Dto.Huesped.BajaHuespedResultDTO r = HuespedController.getInstance().bajaHuesped(br);
                 System.out.println("Resultado: " + (r!=null && r.resultado!=null? r.resultado.mensaje : "sin respuesta"));

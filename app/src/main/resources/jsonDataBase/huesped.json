@@ -1,7 +1,7 @@
 [
   {
-    "nombre": "María",
-    "apellido": "Gómez",
+    "nombre": "Maria",
+    "apellido": "Gomez",
     "tipoDocumento": {
       "tipoDocumento": "TD-01",
       "descripcion": "DNI"

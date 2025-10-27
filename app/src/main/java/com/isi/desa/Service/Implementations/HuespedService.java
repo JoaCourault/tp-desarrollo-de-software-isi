@@ -22,16 +22,16 @@ public class HuespedService implements IHuespedService {
     //@Autowired //Descomentar para Spring Boot
     private final IHuespedDAO dao;
 
-    // Instancia única (eager singleton)
+    // Instancia unica (eager singleton)
     private static final HuespedService INSTANCE = new HuespedService();
 
-    // Constructor privado para inyección manual
+    // Constructor privado para inyeccion manual
     private HuespedService() {
         this.dao = new HuespedDAO();
         this.validator = HuespedValidator.getInstance();
     }
 
-    // Método público para obtener la instancia
+    // Metodo publico para obtener la instancia
     public static HuespedService getInstance() {
         return INSTANCE;
     }
@@ -39,8 +39,8 @@ public class HuespedService implements IHuespedService {
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) {
         try {
-            // 1. Validar y convertir a Entidad (si es necesario para la validación)
-            // Asumo que el validator lanza excepción si hay error
+            // 1. Validar y convertir a Entidad (si es necesario para la validacion)
+            // Asumo que el validator lanza excepcion si hay error
             validator.create(huespedDTO);
 
             // 2. DAO devuelve la Entidad creada
