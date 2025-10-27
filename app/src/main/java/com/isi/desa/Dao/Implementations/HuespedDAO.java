@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Exceptions.HuespedConEstadiaAsociadasException;
+import com.isi.desa.Exceptions.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
 
@@ -115,7 +117,7 @@ public class HuespedDAO implements IHuespedDAO {
     }
 
     @Override
-    public Huesped eliminar(HuespedDTO huesped) {
+    public Huesped eliminar(HuespedDTO huesped) throws HuespedConEstadiaAsociadasException {
         List<Huesped> huespedes = leerHuespedes();
 
         Optional<Huesped> existente = huespedes.stream()
@@ -123,12 +125,12 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontró huésped para eliminar: " + huesped.numDoc);
+            throw new HuespedNotFoundException("No se encontró huésped para eliminar: " + huesped.numDoc);
         }
         Huesped encontrado = existente.get();
         //Verifica si tiene estadías asociadas
         if (encontrado.getIdsEstadias() != null && !encontrado.getIdsEstadias().isEmpty()) {
-            throw new RuntimeException("No se puede eliminar el huésped "
+            throw new HuespedConEstadiaAsociadasException("No se puede eliminar el huésped "
                     + encontrado.getNombre() + " " + encontrado.getApellido()
                     + " porque tiene estadías asociadas (" + encontrado.getIdsEstadias().size() + ").");
         }
