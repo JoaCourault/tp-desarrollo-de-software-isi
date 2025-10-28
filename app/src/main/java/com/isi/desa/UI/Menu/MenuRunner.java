@@ -4,15 +4,18 @@ import java.util.Scanner;
 
 public class MenuRunner {
     private final Menu root;
+    private final Scanner scanner; // <-- CAMBIO: Almacena el scanner
 
-    public MenuRunner(Menu root) {
+    // CAMBIO: Acepta un scanner en el constructor
+    public MenuRunner(Menu root, Scanner scanner) {
         this.root = root;
+        this.scanner = scanner;
     }
 
     public void run() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            root.execute(scanner);
-        }
+        // CAMBIO: Ya no usa try-with-resources.
+        // Simplemente ejecuta el menu con el scanner provisto.
+        // El scanner sera cerrado por quien lo creo (la clase UI).
+        root.execute(scanner);
     }
 }
-

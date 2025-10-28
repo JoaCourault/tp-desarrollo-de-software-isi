@@ -19,7 +19,7 @@ public class ModificarHuespedTest {
     private final HuespedService service = HuespedService.getInstance();
     private final HuespedDAO dao = new HuespedDAO();
 
-    /** Caso feliz: modifico teléfono, email y dirección de HU-001 */
+    /** Caso feliz: modifico telefono, email y direccion de HU-001 */
     @Test
     void modificar_ok() {
         // Pre: HU-001 existe en tu JSON de ejemplo
@@ -39,7 +39,7 @@ public class ModificarHuespedTest {
         dto.ocupacion   = "Ingeniera Civil";
         dto.nacionalidad= "ARGENTINA";
 
-        // Dirección: referencio una que exista (DI-005 por ejemplo)
+        // Direccion: referencio una que exista (DI-005 por ejemplo)
         DireccionDTO dir = new DireccionDTO();
         dir.id        = "DI-005";
         dir.pais      = "Argentina";
@@ -57,21 +57,21 @@ public class ModificarHuespedTest {
         req.aceptarIgualmente = false;
 
         ModificarHuespedResultDTO res = service.modificar(req);
-        assertEquals(0, res.resultado.id, "Debe modificar con éxito");
+        assertEquals(0, res.resultado.id, "Debe modificar con exito");
 
-        // Verifico que persistió
+        // Verifico que persistio
         Huesped h = dao.getById("HU-001");
         assertEquals("+54 9 11 7777-7777", h.getTelefono());
         assertEquals("maria.actualizado@example.com", h.getEmail());
         assertEquals("DI-005", h.getDireccion().getIdDireccion());
     }
 
-    /** Omisiones: nombre vacío y sin dirección → id=2 con lista de errores */
+    /** Omisiones: nombre vacio y sin direccion → id=2 con lista de errores */
     @Test
     void modificar_omisiones() {
         HuespedDTO dto = new HuespedDTO();
         dto.idHuesped   = "HU-001";
-        dto.nombre      = "";         // omisión
+        dto.nombre      = "";         // omision
         dto.apellido    = "GOMEZ";
         dto.tipoDocumento = new TipoDocumentoDTO();
         dto.tipoDocumento.tipoDocumento = "TD-01";
@@ -83,7 +83,7 @@ public class ModificarHuespedTest {
         dto.email       = null;
         dto.ocupacion   = "Ingeniera Civil";
         dto.nacionalidad= "ARGENTINA";
-        dto.direccion   = null;       // omisión
+        dto.direccion   = null;       // omision
 
         ModificarHuespedRequestDTO req = new ModificarHuespedRequestDTO();
         req.huesped = dto;
@@ -114,7 +114,7 @@ public class ModificarHuespedTest {
         dto.ocupacion   = "Estudiante";
         dto.nacionalidad= "ESPANIOLA";
 
-        // dirección existente DI-003
+        // direccion existente DI-003
         DireccionDTO dir = new DireccionDTO();
         dir.id = "DI-003";
         dir.pais = "Espania";
@@ -141,7 +141,7 @@ public class ModificarHuespedTest {
         ModificarHuespedResultDTO r2 = service.modificar(req);
         assertEquals(0, r2.resultado.id, "Debe permitir modificar aceptando igualmente");
 
-        // Verifico que se guardó ese doc en HU-003
+        // Verifico que se guardo ese doc en HU-003
         Huesped h3 = dao.getById("HU-003");
         assertEquals("29456832", h3.getNumDoc());
         assertEquals("TD-01", h3.getTipoDocumento().getTipoDocumento());

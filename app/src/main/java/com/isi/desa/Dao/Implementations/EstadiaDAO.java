@@ -87,7 +87,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         }
     }
 
-    // ===== Mapeo DTO->Entidad (si no usás el mapper utilitario) =====
+    // ===== Mapeo DTO->Entidad (si no usas el mapper utilitario) =====
     private Estadia dtoToEntity(EstadiaDTO dto) {
         Estadia e = new Estadia();
         e.setIdEstadia(dto.idEstadia);
@@ -98,7 +98,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         return e;
     }
 
-    // ===== Implementación IEstadiaDAO =====
+    // ===== Implementacion IEstadiaDAO =====
     @Override
     public Estadia crear(EstadiaDTO estadia) {
         List<Estadia> estadias = leerEstadias();

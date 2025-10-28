@@ -42,20 +42,20 @@ public class HuespedService implements IHuespedService {
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
 
-        // 1) Validación (si hay error → IllegalArgumentException)
+        // 1) Validacion (si hay error → IllegalArgumentException)
         validator.create(huespedDTO);
 
-        // 2) Persistencia de Dirección
+        // 2) Persistencia de Direccion
         DireccionDAO direccionDAO = new DireccionDAO();
         try {
-            // intenta obtener la dirección (si ya existe → OK)
+            // intenta obtener la direccion (si ya existe → OK)
             direccionDAO.obtener(huespedDTO.direccion);
         } catch (Exception e) {
             // si no existe → se crea
             direccionDAO.crear(huespedDTO.direccion);
         }
 
-        // 3) Persistencia del Huésped
+        // 3) Persistencia del Huesped
         Huesped creado = dao.crear(huespedDTO);
 
         // 4) Convertir a DTO para devolver
@@ -141,12 +141,12 @@ public class HuespedService implements IHuespedService {
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
         ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
         res.resultado = new Resultado();
-        res.resultado.id = 1; // por defecto error interno genérico
+        res.resultado.id = 1; // por defecto error interno generico
 
         try {
             if (request == null || request.huesped == null) {
                 res.resultado.id = 2;
-                res.resultado.mensaje = "Solicitud inválida: no se enviaron datos de huésped.";
+                res.resultado.mensaje = "Solicitud invalida: no se enviaron datos de huesped.";
                 return res;
             }
 
@@ -176,15 +176,15 @@ public class HuespedService implements IHuespedService {
 
             if (duplicado && (request.aceptarIgualmente == null || !request.aceptarIgualmente)) {
                 res.resultado.id = 3; // advertencia
-                res.resultado.mensaje = "¡CUIDADO! El tipo y número de documento ya existen en el sistema";
+                res.resultado.mensaje = "¡CUIDADO! El tipo y numero de documento ya existen en el sistema";
                 return res; // la UI luego puede reintentar con ACEPTAR IGUALMENTE
             }
 
 
-            // 3 - aplicar modificación
+            // 3 - aplicar modificacion
             dao.modificar(dto);
             res.resultado.id = 0;
-            res.resultado.mensaje = "La operación ha culminado con éxito";
+            res.resultado.mensaje = "La operacion ha culminado con exito";
             return res;
 
         } catch (HuespedNotFoundException nf) {
@@ -193,7 +193,7 @@ public class HuespedService implements IHuespedService {
             return res;
         } catch (Exception e) {
             res.resultado.id = 1;
-            res.resultado.mensaje = "Error interno al modificar huésped: " + e.getMessage();
+            res.resultado.mensaje = "Error interno al modificar huesped: " + e.getMessage();
             return res;
         }
     }

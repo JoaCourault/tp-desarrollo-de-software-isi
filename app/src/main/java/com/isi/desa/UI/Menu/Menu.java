@@ -8,12 +8,20 @@ public class Menu implements MenuComponent {
     private final String title;
     private final List<MenuComponent> children = new ArrayList<>();
 
+    // Texto de la opcion de salida personalizable
+    private String exitOptionText = "Volver"; // Valor por defecto
+
     public Menu(String title) {
         this.title = title;
     }
 
     public void add(MenuComponent comp) { this.children.add(comp); }
     public void remove(MenuComponent comp) { this.children.remove(comp); }
+
+    // Nuevo metodo para setear el texto de salida
+    public void setExitOptionText(String text) {
+        this.exitOptionText = text;
+    }
 
     @Override
     public String getTitle() { return this.title; }
@@ -26,10 +34,10 @@ public class Menu implements MenuComponent {
             for (int i = 0; i < children.size(); i++) {
                 System.out.println((i + 1) + ") " + children.get(i).getTitle());
             }
-            System.out.println("0) Volver/Salir");
+            // Se usa el texto de salida personalizable
+            System.out.println("0) " + this.exitOptionText);
 
             System.out.print("Seleccione una opcion: ");
-            // Si no hay entrada disponible (por ejemplo cuando stdin esta cerrado), salir limpiamente
             if (!scanner.hasNextLine()) {
                 System.out.println();
                 System.out.println("Entrada cerrada. Saliendo del menu.");
@@ -58,7 +66,6 @@ public class Menu implements MenuComponent {
                 selected.execute(scanner);
             } catch (MenuNavigationException mne) {
                 if (mne.getType() == MenuNavigationException.Type.BACK_TO_ROOT) {
-                    // Volver al menu raiz
                     return;
                 } else {
                     System.out.println("Navegacion: " + mne.getType());

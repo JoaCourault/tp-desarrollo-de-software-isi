@@ -171,11 +171,11 @@ public class HuespedValidator implements IHuespedValidator {
         List<String> errores = new ArrayList<>();
 
         if (dto == null) {
-            errores.add("No se enviaron datos de huésped");
+            errores.add("No se enviaron datos de huesped");
             return errores;
         }
 
-        // Requeridos básicos
+        // Requeridos basicos
         if (isBlank(dto.nombre)) {
             errores.add("El nombre es obligatorio");
         }
@@ -186,21 +186,21 @@ public class HuespedValidator implements IHuespedValidator {
             errores.add("El tipo de documento es obligatorio");
         }
         if (isBlank(dto.numDoc)) {
-            errores.add("El número de documento es obligatorio");
+            errores.add("El numero de documento es obligatorio");
         }
 
-        // Dirección en MODIFICACIÓN:
-        // - Debe existir una dirección (no nula)
-        // - Si viene con id => se asume referencia válida y NO se exige calle/nro/etc.
-        // - Si NO viene id => se interpreta como dirección nueva y se validan campos mínimos
+        // Direccion en MODIFICACIoN:
+        // - Debe existir una direccion (no nula)
+        // - Si viene con id => se asume referencia valida y NO se exige calle/nro/etc.
+        // - Si NO viene id => se interpreta como direccion nueva y se validan campos minimos
         if (dto.direccion == null) {
             errores.add("La direccion es obligatoria");
         } else {
             // ¿Referencia existente?
             if (!isBlank(dto.direccion.id)) {
-                // OK: dirección existente, no validar más campos
+                // OK: direccion existente, no validar mas campos
             } else {
-                // Dirección nueva: validar mínimos
+                // Direccion nueva: validar minimos
                 if (isBlank(dto.direccion.calle)) {
                     errores.add("La calle de la direccion es obligatoria");
                 }

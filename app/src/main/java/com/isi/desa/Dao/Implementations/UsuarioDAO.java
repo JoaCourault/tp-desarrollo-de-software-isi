@@ -83,7 +83,7 @@ public class UsuarioDAO implements IUsuarioDAO {
         return new Usuario(dto.idUsuario, dto.contrasenia, dto.nombre, dto.apellido);
     }
 
-    // ===== Implementación IUsuarioDAO =====
+    // ===== Implementacion IUsuarioDAO =====
     @Override
     public Usuario crear(UsuarioDTO dto) {
         List<Usuario> usuarios = leerUsuarios();

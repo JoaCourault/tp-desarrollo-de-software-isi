@@ -83,7 +83,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
         return new TipoDocumento(dto.tipoDocumento, dto.descripcion);
     }
 
-    // ===== Implementación ITipoDocumentoDAO =====
+    // ===== Implementacion ITipoDocumentoDAO =====
     @Override
     public TipoDocumento crear(TipoDocumentoDTO dto) {
         List<TipoDocumento> tipos = leerTipos();

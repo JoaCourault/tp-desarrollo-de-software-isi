@@ -33,7 +33,7 @@ public class DireccionDAO implements IDireccionDAO {
                 File f = Paths.get(url.toURI()).toFile();
                 if (f.exists()) return f;
             }
-            // fallback si no existe o está en JAR
+            // fallback si no existe o esta en JAR
             return getJsonFileForWrite();
         } catch (Exception e) {
             return getJsonFileForWrite();
@@ -47,7 +47,7 @@ public class DireccionDAO implements IDireccionDAO {
             ensureFile(dev);
             return dev;
         } catch (Exception ignore) {
-            // 2) fallback para JAR/producción local
+            // 2) fallback para JAR/produccion local
             File external = Paths.get("data",RES_DIR,JSON_FILE).toFile();
             try {
                 ensureFile(external);
@@ -84,7 +84,7 @@ public class DireccionDAO implements IDireccionDAO {
         }
     }
 
-    // ===== Implementación IDireccionDAO =====
+    // ===== Implementacion IDireccionDAO =====
     @Override
     public Direccion crear(DireccionDTO direccion) {
         List<Direccion> direcciones = leerDirecciones();

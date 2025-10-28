@@ -49,7 +49,7 @@ public class HuespedController {
             res.huesped = creado;
 
         } catch (IllegalArgumentException e) {
-            // Error de datos / validación
+            // Error de datos / validacion
             res.resultado.id = 2;
             res.resultado.mensaje = e.getMessage();
 

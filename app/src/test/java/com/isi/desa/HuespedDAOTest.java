@@ -35,7 +35,7 @@ public class HuespedDAOTest {
         nuevo.ocupacion = "Tester";
         nuevo.nacionalidad = "Argentina";
 
-        // Dirección: si vas a referenciar una existente, con setear el id alcanza
+        // Direccion: si vas a referenciar una existente, con setear el id alcanza
         DireccionDTO dir = new DireccionDTO();
         dir.id = "DI-002";
         nuevo.direccion = dir;
@@ -56,7 +56,7 @@ public class HuespedDAOTest {
             assertEquals("45946104", creado.getNumDoc(), "El DNI deberia coincidir");
             System.out.println("✓ Huesped creado: " + creado.getNombre() + " (" + creado.getIdHuesped() + ")");
         } catch (HuespedDuplicadoException e) {
-            fail("No deberia lanzarse HuespedDuplicadoException en alta válida");
+            fail("No deberia lanzarse HuespedDuplicadoException en alta valida");
         } catch (Exception e) {
             fail("Error inesperado al crear huesped: " + e.getMessage());
         }
@@ -65,7 +65,7 @@ public class HuespedDAOTest {
     @Test
     void testObtenerHuesped() {
         HuespedDAO dao = new HuespedDAO();
-        // Usar un DNI que sí existe en tu JSON
+        // Usar un DNI que si existe en tu JSON
         String dniExistente = "45946104";
 
         try {
@@ -96,7 +96,7 @@ public class HuespedDAOTest {
                 try {
                     dao.crear(buildNuevoHuesped(idAEliminar, dniAEliminar));
                 } catch (HuespedDuplicadoException e) {
-                    fail("No debería lanzar duplicado al preparar datos de prueba");
+                    fail("No deberia lanzar duplicado al preparar datos de prueba");
                 }
             }
 

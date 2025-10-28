@@ -38,7 +38,7 @@ public class HuespedDAO implements IHuespedDAO {
     private static final String JSON_FILE = "huesped.json";
     private static final String RES_DIR   = "jsonDataBase";
 
-    // 1) Lectura: intenta desde resources; si no existe (o está en JAR), usa fallback escribible
+    // 1) Lectura: intenta desde resources; si no existe (o esta en JAR), usa fallback escribible
     private File getJsonFileForRead() {
         try {
             String resourcePath = RES_DIR + "/" + JSON_FILE;
@@ -48,7 +48,7 @@ public class HuespedDAO implements IHuespedDAO {
                 File f = new File(url.toURI());
                 if (f.exists()) return f;
             }
-            // fallback (también sirve si querés forzar lectura local)
+            // fallback (tambien sirve si queres forzar lectura local)
             return getJsonFileForWrite();
         } catch (Exception e) {
             return getJsonFileForWrite();
@@ -63,7 +63,7 @@ public class HuespedDAO implements IHuespedDAO {
             ensureFile(dev);
             return dev;
         } catch (Exception ignore) {
-            // fallback para ejecución empaquetada (JAR): ./data/jsonDataBase/huesped.json
+            // fallback para ejecucion empaquetada (JAR): ./data/jsonDataBase/huesped.json
             File external = Paths.get("data",RES_DIR,JSON_FILE).toFile();
             try { ensureFile(external); } catch (Exception ex) {
                 throw new RuntimeException("No se pudo crear archivo JSON: " + external.getAbsolutePath(), ex);
@@ -79,7 +79,7 @@ public class HuespedDAO implements IHuespedDAO {
     }
 
 
-    // Helper: si hoy usás "jsonDataBase/direccion.json", podés partirlo o
+    // Helper: si hoy usas "jsonDataBase/direccion.json", podes partirlo o
 // directamente setear en cada DAO:
     private String nombreArchivo() {
         // Ejemplo para DireccionDAO:
@@ -133,7 +133,7 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped modificar(HuespedDTO dto) {
         List<Huesped> huespedes = leerHuespedes();
 
-        // 1) buscar SIEMPRE por ID de huésped
+        // 1) buscar SIEMPRE por ID de huesped
         Optional<Huesped> existenteOpt = huespedes.stream()
                 .filter(h -> !h.isEliminado())
                 .filter(h -> h.getIdHuesped() != null
@@ -153,7 +153,7 @@ public class HuespedDAO implements IHuespedDAO {
         actualizado.setEliminado(existente.isEliminado());
         actualizado.setIdsEstadias(existente.getIdsEstadias());
 
-        // 3) reemplazar en la lista por índice
+        // 3) reemplazar en la lista por indice
         int idx = huespedes.indexOf(existente);
         huespedes.set(idx, actualizado);
 

@@ -30,7 +30,7 @@ public class HuespedAltaTest {
 
         // 2) Tipo Doc
         TipoDocumentoDTO td = new TipoDocumentoDTO();
-        td.tipoDocumento = "TD-01"; // DNI (según tu json)
+        td.tipoDocumento = "TD-01"; // DNI (segun tu json)
         td.descripcion = "DNI";
 
         // 3) Huesped
@@ -74,9 +74,9 @@ public class HuespedAltaTest {
             assertEquals("HU-999", persisted.getIdHuesped());
 
         } catch (HuespedDuplicadoException e) {
-            fail("No debería lanzarse HuespedDuplicadoException en alta válida: " + e.getMessage());
+            fail("No deberia lanzarse HuespedDuplicadoException en alta valida: " + e.getMessage());
         } catch (Exception e) {
-            fail("Error inesperado en alta de huésped: " + e.getMessage());
+            fail("Error inesperado en alta de huesped: " + e.getMessage());
         }
     }
 }
