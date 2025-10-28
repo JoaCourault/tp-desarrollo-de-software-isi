@@ -174,7 +174,13 @@ public class HuespedService implements IHuespedService {
 
 
             // 3 - aplicar modificacion
-            dao.modificar(dto);
+            Huesped modificado = dao.modificar(dto);
+
+            if (modificado == null) {
+                res.resultado.id = 1;
+                res.resultado.mensaje = "Error interno al modificar huesped.";
+                return res;
+            }
             res.resultado.id = 0;
             res.resultado.mensaje = "La operacion ha culminado con exito";
             return res;

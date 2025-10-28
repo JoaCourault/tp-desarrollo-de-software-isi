@@ -21,6 +21,8 @@ public class HuespedDAO implements IHuespedDAO {
 
     private static final String JSON_RESOURCE = "jsonDataBase/huesped.json";
     private final ObjectMapper mapper;
+    private static DireccionDAO direccionDAO;
+    private static TipoDocumentoDAO tipoDocumentoDAO;
 
     public HuespedDAO() {
         this.mapper = new ObjectMapper();
@@ -28,15 +30,21 @@ public class HuespedDAO implements IHuespedDAO {
         mapper.registerModule(new JavaTimeModule());
         //Evitar escribir fechas como timestamps (numeros)
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        direccionDAO = new DireccionDAO();
+        tipoDocumentoDAO = new TipoDocumentoDAO();
     }
 
-    // dentro de HuespedDAO
     private static final String JSON_FILE = "huesped.json";
     private static final String RES_DIR   = "jsonDataBase";
 
-    // 1) Lectura: intenta desde resources; si no existe (o esta en JAR), usa fallback escribible
+    // 1) Lectura: intenta primero el archivo editable en src/main/resources (dev)
+    // si existe lo usa; si no existe intenta la ruta desde classloader; de lo contrario usa fallback escribible
     private File getJsonFileForRead() {
         try {
+            // Preferir archivo dev editable (src/main/resources/jsonDataBase/huesped.json)
+            File dev = Paths.get("src", "main", "resources", RES_DIR, JSON_FILE).toFile();
+            if (dev.exists()) return dev;
+
             String resourcePath = RES_DIR + "/" + JSON_FILE;
             var cl = Thread.currentThread().getContextClassLoader();
             var url = cl.getResource(resourcePath);
@@ -75,8 +83,6 @@ public class HuespedDAO implements IHuespedDAO {
     }
 
 
-    // Helper: si hoy usas "jsonDataBase/direccion.json", podes partirlo o
-// directamente setear en cada DAO:
     private String nombreArchivo() {
         // Ejemplo para DireccionDAO:
         return "direccion.json";
@@ -96,10 +102,11 @@ public class HuespedDAO implements IHuespedDAO {
         }
     }
 
-    private void guardarHuespedes(List<Huesped> huespedes) {
+    private boolean guardarHuespedes(List<Huesped> huespedes) {
         try {
             File file = getJsonFileForWrite();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, huespedes);
+            return true;
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar " + JSON_FILE, e);
         }
@@ -145,15 +152,17 @@ public class HuespedDAO implements IHuespedDAO {
 
         // 2) mapear lo nuevo manteniendo campos internos
         Huesped actualizado = HuespedMapper.dtoToEntity(dto);
-        // conservar flags e historial
-        actualizado.setEliminado(existente.isEliminado());
-        actualizado.setIdsEstadias(existente.getIdsEstadias());
 
         // 3) reemplazar en la lista por indice
         int idx = huespedes.indexOf(existente);
         huespedes.set(idx, actualizado);
 
-        guardarHuespedes(huespedes);
+        direccionDAO.modificar(dto.direccion); // actualizar direccion tambien
+        tipoDocumentoDAO.modificar(dto.tipoDocumento);
+        boolean ok = guardarHuespedes(huespedes);
+        if(!ok) {
+            throw new RuntimeException("Error al guardar los cambios del huesped con ID: " + dto.idHuesped);
+        }
         return actualizado;
     }
 

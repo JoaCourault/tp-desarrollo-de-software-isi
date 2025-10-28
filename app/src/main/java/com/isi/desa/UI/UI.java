@@ -178,7 +178,7 @@ public class UI {
                                     cambios.numDoc = seleccionado.numDoc;
                                     System.out.print("Nombre [" + seleccionado.nombre + "]: "); String n = sc.nextLine().trim(); cambios.nombre = n.isEmpty()? seleccionado.nombre : n;
                                     System.out.print("Apellido [" + seleccionado.apellido + "]: "); String a = sc.nextLine().trim(); cambios.apellido = a.isEmpty()? seleccionado.apellido : a;
-                                    System.out.print("Tipo de documento [" + (seleccionado.tipoDocumento!=null?seleccionado.tipoDocumento.tipoDocumento:"") + "]: "); String td = sc.nextLine().trim();
+                                    System.out.print("Tipo de documento [" + (seleccionado.tipoDocumento!=null?seleccionado.tipoDocumento.descripcion:"") + "]: "); String td = sc.nextLine().trim();
                                     if (td.isEmpty()) cambios.tipoDocumento = seleccionado.tipoDocumento; else { TipoDocumentoDTO tdd = new TipoDocumentoDTO(); tdd.tipoDocumento = td; cambios.tipoDocumento = tdd; }
                                     System.out.print("Posicion IVA [" + (seleccionado.posicionIva!=null?seleccionado.posicionIva:"") + "]: "); String iva = sc.nextLine().trim(); cambios.posicionIva = iva.isEmpty()? seleccionado.posicionIva : iva;
                                     System.out.print("CUIT [" + (seleccionado.cuit!=null?seleccionado.cuit:"") + "]: "); String cuit = sc.nextLine().trim(); cambios.cuit = cuit.isEmpty()? seleccionado.cuit : cuit;
@@ -216,7 +216,12 @@ public class UI {
                                     try { dir.numero = num.isEmpty()? (dirOrig!=null?dirOrig.numero:null) : Integer.parseInt(num); }
                                     catch(Exception ex){ dir.numero = (dirOrig!=null?dirOrig.numero:null); }
 
+                                    dir.id = (dirOrig!=null?dirOrig.id:null);
+
                                     cambios.direccion = dir;
+                                    cambios.idsEstadias = seleccionado.idsEstadias;
+                                    cambios.idHuesped = seleccionado.idHuesped;
+
                                     com.isi.desa.Dto.Huesped.ModificarHuespedRequestDTO mr = new com.isi.desa.Dto.Huesped.ModificarHuespedRequestDTO();
                                     mr.huesped = cambios;
                                     try {
@@ -233,12 +238,12 @@ public class UI {
                                     // --- OPCION 2: ELIMINAR (con confirmacion) ---
                                     System.out.println("\n--- Confirmar Eliminacion ---");
                                     System.out.println("¿Esta seguro que desea eliminar a " + seleccionado.nombre + " " + seleccionado.apellido + " (Doc: " + seleccionado.numDoc + ")?");
-                                    System.out.print("Esta accion no se puede deshacer. (escriba 'si' para confirmar, o presione ENTER para cancelar): ");
+                                    System.out.print("Esta accion no se puede deshacer. (escriba 'si' o 's' para confirmar, o presione ENTER para cancelar): ");
                                     String confirm = sc.nextLine().trim().toLowerCase();
 
                                     if (confirm.equals("si") || confirm.equals("s")) {
                                         com.isi.desa.Dto.Huesped.BajaHuespedRequestDTO br = new com.isi.desa.Dto.Huesped.BajaHuespedRequestDTO();
-                                        br.idHuesped = seleccionado.numDoc; // Usar el numDoc del huesped seleccionado
+                                        br.idHuesped = seleccionado.idHuesped;
                                         try {
                                             com.isi.desa.Dto.Huesped.BajaHuespedResultDTO r = HuespedController.getInstance().bajaHuesped(br);
                                             System.out.println("Resultado: " + (r!=null && r.resultado!=null? r.resultado.mensaje : "sin respuesta"));

@@ -23,45 +23,32 @@ public class DireccionDAO implements IDireccionDAO {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // ===== Helpers de ruta (sin clase extra) =====
+    // ===== Helpers de ruta (solo build) =====
     private File getJsonFileForRead() {
         try {
-            String resourcePath = RES_DIR + "/" + JSON_FILE;
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            URL url = cl.getResource(resourcePath);
-            if (url != null && !"jar".equalsIgnoreCase(url.getProtocol())) {
-                File f = Paths.get(url.toURI()).toFile();
-                if (f.exists()) return f;
-            }
-            // fallback si no existe o esta en JAR
-            return getJsonFileForWrite();
+            File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
+            if (f1.exists()) return f1;
+
+            File f2 = Paths.get("build","resources","main",RES_DIR,JSON_FILE).toFile();
+            if (f2.exists()) return f2;
+
+            // No se crean archivos ni carpetas: informar al usuario
+            throw new RuntimeException("No se encontro el archivo de datos '" + RES_DIR + "/" + JSON_FILE + "' en build. Ejecute el build y reintente.");
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception e) {
-            return getJsonFileForWrite();
+            throw new RuntimeException("Error al localizar el archivo JSON en build: " + e.getMessage(), e);
         }
     }
 
     private File getJsonFileForWrite() {
-        // 1) ruta dev (IDE)
-        File dev = Paths.get("src","main","resources",RES_DIR,JSON_FILE).toFile();
-        try {
-            ensureFile(dev);
-            return dev;
-        } catch (Exception ignore) {
-            // 2) fallback para JAR/produccion local
-            File external = Paths.get("data",RES_DIR,JSON_FILE).toFile();
-            try {
-                ensureFile(external);
-                return external;
-            } catch (Exception ex) {
-                throw new RuntimeException("No se pudo crear archivo JSON: " + external.getAbsolutePath(), ex);
-            }
-        }
-    }
+        File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
+        if (f1.exists() && f1.isFile()) return f1;
 
-    private void ensureFile(File f) throws Exception {
-        File p = f.getParentFile();
-        if (p != null && !p.exists()) p.mkdirs();
-        if (!f.exists()) f.createNewFile();
+        File f2 = Paths.get("build","resources","main",RES_DIR,JSON_FILE).toFile();
+        if (f2.exists() && f2.isFile()) return f2;
+
+        throw new RuntimeException("No se encontro archivo de salida en build para escribir '" + RES_DIR + "/" + JSON_FILE + "'. No se crean carpetas nuevas. Ejecute el build primero.");
     }
 
     // ===== IO =====
