@@ -35,9 +35,35 @@ public class HuespedController {
             return null;
         }
     }
+
     public AltaHuespedResultDTO altaHuesped(AltaHuesperRequestDTO requestDTO) {
-        throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-10
+        AltaHuespedResultDTO res = new AltaHuespedResultDTO();
+
+        try {
+            // Ejecuta CU-09
+            HuespedDTO creado = this.service.crear(requestDTO.huesped);
+
+            // Alta exitosa
+            res.resultado.id = 0;
+            res.resultado.mensaje = "Huesped dado de alta exitosamente.";
+            res.huesped = creado;
+
+        } catch (IllegalArgumentException e) {
+            // Error de datos / validación
+            res.resultado.id = 2;
+            res.resultado.mensaje = e.getMessage();
+
+        } catch (Exception e) {
+            // Error interno
+            this.logger.error("Error en altaHuesped: " + e.getMessage(), e);
+            res.resultado.id = 1;
+            res.resultado.mensaje = "Ocurrio un error interno al realizar el alta del huesped.";
+        }
+
+        return res;
     }
+
+
     public ModificarHuespedResultDTO modificarHuesped(ModificarHuespedRequestDTO requestDTO) {
         throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-11
     }

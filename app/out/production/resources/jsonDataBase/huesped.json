@@ -1,0 +1,249 @@
+[ {
+  "nombre" : "Maria",
+  "apellido" : "Gomez",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "35648972",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20356489721",
+  "fechaNacimiento" : "1990-07-15",
+  "telefono" : "+54 9 11 4567-8910",
+  "email" : "maria.gomez@example.com",
+  "ocupacion" : "Ingeniera Civil",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-001"
+  },
+  "idsEstadias" : [ "ES-001", "ES-004" ],
+  "eliminado" : false,
+  "id" : "HU-001",
+  "idTipoDocumento" : "TD-01",
+  "idDireccion" : "DI-001"
+}, {
+  "nombre" : "Juan",
+  "apellido" : "Perez",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "29456832",
+  "posicionIva" : "Monotributista",
+  "cuit" : "20294568326",
+  "fechaNacimiento" : "1985-02-21",
+  "telefono" : "+54 9 351 432-5678",
+  "email" : "juan.perez@example.com",
+  "ocupacion" : "Contador Publico",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-002"
+  },
+  "idsEstadias" : [ "ES-002", "ES-003" ],
+  "eliminado" : false,
+  "id" : "HU-002",
+  "idTipoDocumento" : "TD-01",
+  "idDireccion" : "DI-002"
+}, {
+  "nombre" : "Lucia",
+  "apellido" : "Martinez",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "XK348912",
+  "posicionIva" : "Exento",
+  "cuit" : "0",
+  "fechaNacimiento" : "1992-10-03",
+  "telefono" : "+34 600 123 456",
+  "email" : "lucia.martinez@example.es",
+  "ocupacion" : "Estudiante",
+  "nacionalidad" : "Espaniola",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-003"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-003",
+  "idTipoDocumento" : "TD-01",
+  "idDireccion" : "DI-003"
+}, {
+  "nombre" : "Carlos",
+  "apellido" : "Fernandez",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "1548392",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20154839216",
+  "fechaNacimiento" : "1978-11-11",
+  "telefono" : "+54 9 261 321-7654",
+  "email" : "carlos.fernandez@example.com",
+  "ocupacion" : "Abogado",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-004"
+  },
+  "idsEstadias" : [ "ES-005" ],
+  "eliminado" : false,
+  "id" : "HU-004",
+  "idTipoDocumento" : "TD-01",
+  "idDireccion" : "DI-004"
+}, {
+  "nombre" : "Pepe",
+  "apellido" : "Argento",
+  "tipoDocumento" : {
+    "tipoDocumento" : null,
+    "descripcion" : null
+  },
+  "numDoc" : "503333999",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-50333999-7",
+  "fechaNacimiento" : "1980-05-15",
+  "telefono" : "+54 9 11 5555-1111",
+  "email" : "pepe.argento@example.com",
+  "ocupacion" : "Vendedor",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-017"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-999",
+  "idTipoDocumento" : null,
+  "idDireccion" : "DI-017"
+}, {
+  "nombre" : "Pepe",
+  "apellido" : "Argento",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "45946104",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-50333999-7",
+  "fechaNacimiento" : "1980-05-15",
+  "telefono" : "+54 9 11 5555-1111",
+  "email" : "pepe.argento@example.com",
+  "ocupacion" : "Vendedor",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-019"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-999",
+  "idTipoDocumento" : "TD-01",
+  "idDireccion" : "DI-019"
+}, {
+  "nombre" : "Test",
+  "apellido" : "JUnit",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "99999999",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-99999999-9",
+  "fechaNacimiento" : "1999-01-01",
+  "telefono" : "+54 9 11 9999-9999",
+  "email" : "test.junit@example.com",
+  "ocupacion" : "Tester",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-001"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-999",
+  "idTipoDocumento" : "TD-01",
+  "idDireccion" : "DI-001"
+}, {
+  "nombre" : "Test",
+  "apellido" : "JUnit",
+  "tipoDocumento" : {
+    "tipoDocumento" : "TD-01",
+    "descripcion" : null
+  },
+  "numDoc" : "99899898",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-99999999-9",
+  "fechaNacimiento" : "1999-01-01",
+  "telefono" : "+54 9 11 9999-9999",
+  "email" : "test.junit@example.com",
+  "ocupacion" : "Tester",
+  "nacionalidad" : "Argentina",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-001"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : true,
+  "id" : "HU-998",
+  "idTipoDocumento" : "TD-01",
+  "idDireccion" : "DI-001"
+} ]

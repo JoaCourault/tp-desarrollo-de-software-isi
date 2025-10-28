@@ -10,6 +10,7 @@ import java.util.List;
 public class Huesped {
     @JsonProperty("id")
     private String idHuesped;
+
     private String nombre;
     private String apellido;
     private TipoDocumento tipoDocumento;

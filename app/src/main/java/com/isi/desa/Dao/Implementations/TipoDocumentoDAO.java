@@ -22,6 +22,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
         try {
             java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
             if (resourceUrl == null) {
+                // Si no existe, lo creamos en la carpeta de recursos de trabajo
                 File file = new File("src/main/resources/" + JSON_RESOURCE);
                 file.getParentFile().mkdirs();
                 file.createNewFile();
@@ -29,7 +30,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
             }
             return new File(resourceUrl.toURI());
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo acceder al archivo de tipoDocumento.", e);
+            throw new RuntimeException("No se pudo acceder al archivo de estadias.", e);
         }
     }
 

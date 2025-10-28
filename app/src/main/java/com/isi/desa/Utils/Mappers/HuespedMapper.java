@@ -5,6 +5,7 @@ import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
+import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 
 import java.util.ArrayList;
 
@@ -13,8 +14,9 @@ public class HuespedMapper {
     public static HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
 
-        TipoDocumentoDTO tipoDocDto = new TipoDocumentoDTO();
+        TipoDocumentoDTO tipoDocDto = null;
         if (h.getTipoDocumento() != null) {
+            tipoDocDto = new TipoDocumentoDTO();
             tipoDocDto.tipoDocumento = h.getTipoDocumento().getTipoDocumento();
             tipoDocDto.descripcion = h.getTipoDocumento().getDescripcion();
         }
@@ -56,9 +58,16 @@ public class HuespedMapper {
         h.setEmail(dto.email);
         h.setOcupacion(dto.ocupacion);
         h.setNacionalidad(dto.nacionalidad);
-        h.setDireccion(DireccionMapper.dtoToEntity(dto.direccion));
 
-        //setear la lista de IDs de estadias
+        // ✅ ESTO FALTABA (SETEO DEL TIPO DOCUMENTO EN LA ENTIDAD)
+        if (dto.tipoDocumento != null) {
+            TipoDocumento td = new TipoDocumento();
+            td.setTipoDocumento(dto.tipoDocumento.tipoDocumento);
+            td.setDescripcion(dto.tipoDocumento.descripcion);
+            h.setTipoDocumento(td);
+        }
+
+        h.setDireccion(DireccionMapper.dtoToEntity(dto.direccion));
         h.setIdsEstadias(
                 dto.idsEstadias != null ? new ArrayList<>(dto.idsEstadias) : new ArrayList<>()
         );

@@ -1,0 +1,13 @@
+[ {
+  "descripcion" : "DNI",
+  "id" : "TD-01"
+}, {
+  "descripcion" : "LE",
+  "id" : "TD-02"
+}, {
+  "descripcion" : "LC",
+  "id" : "TD-03"
+}, {
+  "descripcion" : "Pasaporte",
+  "id" : "TD-04"
+} ]

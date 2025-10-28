@@ -44,9 +44,17 @@ public class HuespedDAO implements IHuespedDAO {
             }
             return new File(resourceUrl.toURI());
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo acceder al archivo de huespedes.", e);
+            throw new RuntimeException("No se pudo acceder al archivo de estadias.", e);
         }
     }
+
+    // Helper: si hoy usás "jsonDataBase/direccion.json", podés partirlo o
+// directamente setear en cada DAO:
+    private String nombreArchivo() {
+        // Ejemplo para DireccionDAO:
+        return "direccion.json";
+    }
+
 
     /**
      * Lee el archivo JSON completo y devuelve todos los huespedes.

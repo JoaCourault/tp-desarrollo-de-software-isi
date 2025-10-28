@@ -1,5 +1,6 @@
 package com.isi.desa.Service.Implementations;
 
+import com.isi.desa.Dao.Implementations.DireccionDAO;
 import com.isi.desa.Dao.Implementations.HuespedDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.*;
@@ -38,21 +39,27 @@ public class HuespedService implements IHuespedService {
 
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) {
+
+        // 1) Validación (si hay error → IllegalArgumentException)
+        validator.create(huespedDTO);
+
+        // 2) Persistencia de Dirección
+        DireccionDAO direccionDAO = new DireccionDAO();
         try {
-            // 1. Validar y convertir a Entidad (si es necesario para la validacion)
-            // Asumo que el validator lanza excepcion si hay error
-            validator.create(huespedDTO);
-
-            // 2. DAO devuelve la Entidad creada
-            Huesped creado = dao.crear(huespedDTO);
-
-            // 3. Convertir a DTO para devolver
-            return HuespedMapper.entityToDTO(creado);
+            // intenta obtener la dirección (si ya existe → OK)
+            direccionDAO.obtener(huespedDTO.direccion);
         } catch (Exception e) {
-            // Aqui deberias loguear o lanzar una excepcion mas especifica.
-            throw new RuntimeException("Error al crear huesped: " + e.getMessage(), e);
+            // si no existe → se crea
+            direccionDAO.crear(huespedDTO.direccion);
         }
+
+        // 3) Persistencia del Huésped
+        Huesped creado = dao.crear(huespedDTO);
+
+        // 4) Convertir a DTO para devolver
+        return HuespedMapper.entityToDTO(creado);
     }
+
 
     @Override
     public HuespedDTO modificar(HuespedDTO huespedDTO) {

@@ -25,6 +25,7 @@ public class DireccionDAO implements IDireccionDAO {
         try {
             java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
             if (resourceUrl == null) {
+                // Si no existe, lo creamos en la carpeta de recursos de trabajo
                 File file = new File("src/main/resources/" + JSON_RESOURCE);
                 file.getParentFile().mkdirs();
                 file.createNewFile();
@@ -32,7 +33,7 @@ public class DireccionDAO implements IDireccionDAO {
             }
             return new File(resourceUrl.toURI());
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo acceder al archivo de direcciones.", e);
+            throw new RuntimeException("No se pudo acceder al archivo de estadias.", e);
         }
     }
 
@@ -76,9 +77,25 @@ public class DireccionDAO implements IDireccionDAO {
     //  Implementacion de la interfaz IDireccionDAO
     // ============================================================
 
+    // DireccionDAO.java  (solo el método crear)
     @Override
     public Direccion crear(DireccionDTO direccion) {
         List<Direccion> direcciones = leerDirecciones();
+
+        // ★ Si no viene ID, generamos uno incremental tipo "DI-016"
+        if (direccion.id == null || direccion.id.isBlank()) {
+            int max = 0;
+            for (Direccion d : direcciones) {
+                String id = d.getIdDireccion();         // ej: "DI-015"
+                if (id != null && id.startsWith("DI-")) {
+                    try {
+                        int n = Integer.parseInt(id.substring(3)); // toma "015" -> 15
+                        if (n > max) max = n;
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+            direccion.id = String.format("DI-%03d", max + 1);   // DI-016
+        }
 
         boolean existe = direcciones.stream()
                 .anyMatch(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id));
