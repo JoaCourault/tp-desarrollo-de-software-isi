@@ -5,6 +5,8 @@ import com.isi.desa.Dao.Implementations.HuespedDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.*;
 import com.isi.desa.Dto.Resultado;
+import com.isi.desa.Exceptions.HuespedDuplicadoException;
+import com.isi.desa.Exceptions.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Implementations.Validators.HuespedValidator;
@@ -38,7 +40,7 @@ public class HuespedService implements IHuespedService {
     }
 
     @Override
-    public HuespedDTO crear(HuespedDTO huespedDTO) {
+    public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
 
         // 1) Validación (si hay error → IllegalArgumentException)
         validator.create(huespedDTO);
@@ -134,5 +136,65 @@ public class HuespedService implements IHuespedService {
         }
 
         return resultDTO;
+    }
+
+    public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
+        ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
+        res.resultado = new Resultado();
+        res.resultado.id = 1; // por defecto error interno genérico
+
+        try {
+            if (request == null || request.huesped == null) {
+                res.resultado.id = 2;
+                res.resultado.mensaje = "Solicitud inválida: no se enviaron datos de huésped.";
+                return res;
+            }
+
+            HuespedDTO dto = request.huesped;
+
+            // 2.A - Validar omisiones
+            List<String> errores = ((HuespedValidator) validator).validateUpdate(dto);
+            if (errores != null && !errores.isEmpty()) {
+                res.resultado.id = 2;
+                res.resultado.mensaje = String.join("; ", errores);
+                return res;
+            }
+
+            // 2.B - Duplicado de tipoDoc + numDoc
+            boolean duplicado = dao.leerHuespedes().stream()
+                    .filter(h -> h != null && !h.isEliminado())
+                    .anyMatch(h ->
+                            h.getIdHuesped() != null &&
+                                    !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) &&
+                                    h.getTipoDocumento() != null &&
+                                    dto.tipoDocumento != null &&
+                                    h.getTipoDocumento().getTipoDocumento() != null &&
+                                    h.getTipoDocumento().getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
+                                    h.getNumDoc() != null &&
+                                    h.getNumDoc().equals(dto.numDoc)
+                    );
+
+            if (duplicado && (request.aceptarIgualmente == null || !request.aceptarIgualmente)) {
+                res.resultado.id = 3; // advertencia
+                res.resultado.mensaje = "¡CUIDADO! El tipo y número de documento ya existen en el sistema";
+                return res; // la UI luego puede reintentar con ACEPTAR IGUALMENTE
+            }
+
+
+            // 3 - aplicar modificación
+            dao.modificar(dto);
+            res.resultado.id = 0;
+            res.resultado.mensaje = "La operación ha culminado con éxito";
+            return res;
+
+        } catch (HuespedNotFoundException nf) {
+            res.resultado.id = 2;
+            res.resultado.mensaje = nf.getMessage();
+            return res;
+        } catch (Exception e) {
+            res.resultado.id = 1;
+            res.resultado.mensaje = "Error interno al modificar huésped: " + e.getMessage();
+            return res;
+        }
     }
 }

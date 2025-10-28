@@ -65,8 +65,18 @@ public class HuespedController {
 
 
     public ModificarHuespedResultDTO modificarHuesped(ModificarHuespedRequestDTO requestDTO) {
-        throw new UnsupportedOperationException("Not supported yet."); //Se implementa para SCRUM-11
+        try {
+            return this.service.modificar(requestDTO);
+        } catch (Exception e) {
+            this.logger.error("Error en HuespedController - modificarHuesped: " + e.getMessage(), e);
+            ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
+            res.resultado = new com.isi.desa.Dto.Resultado();
+            res.resultado.id = 1;
+            res.resultado.mensaje = "Error interno";
+            return res;
+        }
     }
+
     public BajaHuespedResultDTO bajaHuesped(BajaHuespedRequestDTO requestDTO) {
         try {
             BajaHuespedResultDTO res = this.service.eliminar(requestDTO);

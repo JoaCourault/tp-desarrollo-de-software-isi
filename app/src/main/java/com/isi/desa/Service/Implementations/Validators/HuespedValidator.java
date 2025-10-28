@@ -165,4 +165,71 @@ public class HuespedValidator implements IHuespedValidator {
     public String validateFechaNacimiento(LocalDate fechaNacimiento) {
         return (fechaNacimiento == null) ? "La fecha de nacimiento es un campo obligatorio" : null;
     }
+
+    // HuespedValidator.java
+    public List<String> validateUpdate(HuespedDTO dto) {
+        List<String> errores = new ArrayList<>();
+
+        if (dto == null) {
+            errores.add("No se enviaron datos de huésped");
+            return errores;
+        }
+
+        // Requeridos básicos
+        if (isBlank(dto.nombre)) {
+            errores.add("El nombre es obligatorio");
+        }
+        if (isBlank(dto.apellido)) {
+            errores.add("El apellido es obligatorio");
+        }
+        if (dto.tipoDocumento == null || isBlank(dto.tipoDocumento.tipoDocumento)) {
+            errores.add("El tipo de documento es obligatorio");
+        }
+        if (isBlank(dto.numDoc)) {
+            errores.add("El número de documento es obligatorio");
+        }
+
+        // Dirección en MODIFICACIÓN:
+        // - Debe existir una dirección (no nula)
+        // - Si viene con id => se asume referencia válida y NO se exige calle/nro/etc.
+        // - Si NO viene id => se interpreta como dirección nueva y se validan campos mínimos
+        if (dto.direccion == null) {
+            errores.add("La direccion es obligatoria");
+        } else {
+            // ¿Referencia existente?
+            if (!isBlank(dto.direccion.id)) {
+                // OK: dirección existente, no validar más campos
+            } else {
+                // Dirección nueva: validar mínimos
+                if (isBlank(dto.direccion.calle)) {
+                    errores.add("La calle de la direccion es obligatoria");
+                }
+                if (dto.direccion.numero == null) {
+                    errores.add("El numero de la direccion es obligatorio");
+                }
+                if (dto.direccion.codigoPostal == null) {
+                    errores.add("El codigo postal de la direccion es obligatorio");
+                }
+                if (isBlank(dto.direccion.localidad)) {
+                    errores.add("La localidad de la direccion es obligatoria");
+                }
+                if (isBlank(dto.direccion.provincia)) {
+                    errores.add("La provincia de la direccion es obligatoria");
+                }
+                if (isBlank(dto.direccion.pais)) {
+                    errores.add("El pais de la direccion es obligatorio");
+                }
+            }
+        }
+
+        return errores;
+    }
+
+    // Helper
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+
+
 }

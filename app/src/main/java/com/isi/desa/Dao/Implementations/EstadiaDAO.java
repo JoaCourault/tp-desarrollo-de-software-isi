@@ -1,93 +1,93 @@
 package com.isi.desa.Dao.Implementations;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.isi.desa.Dao.Interfaces.IEstadiaDAO;
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
-import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
-import com.isi.desa.Model.Entities.Huesped.Huesped;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.isi.desa.Utils.Mappers.EstadiaMapper.dtoToEntity;
-
 public class EstadiaDAO implements IEstadiaDAO {
 
-    private static final String JSON_RESOURCE = "jsonDataBase/estadia.json";
+    private static final String RES_DIR   = "jsonDataBase";
+    private static final String JSON_FILE = "estadia.json";
+
     private final ObjectMapper mapper;
 
     public EstadiaDAO() {
         this.mapper = new ObjectMapper();
-        //Permitir leer/escribir LocalDate correctamente
         mapper.registerModule(new JavaTimeModule());
-        //Evitar escribir fechas como timestamps (numeros)
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    private File getJsonFile() {
+    // ===== Helpers de ruta =====
+    private File getJsonFileForRead() {
         try {
-            java.net.URL resourceUrl = getClass().getClassLoader().getResource(JSON_RESOURCE);
-            if (resourceUrl == null) {
-                // Si no existe, lo creamos en la carpeta de recursos de trabajo
-                File file = new File("src/main/resources/" + JSON_RESOURCE);
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-                return file;
+            String resourcePath = RES_DIR + "/" + JSON_FILE;
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            URL url = cl.getResource(resourcePath);
+            if (url != null && !"jar".equalsIgnoreCase(url.getProtocol())) {
+                File f = Paths.get(url.toURI()).toFile();
+                if (f.exists()) return f;
             }
-            return new File(resourceUrl.toURI());
+            return getJsonFileForWrite();
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo acceder al archivo de estadias.", e);
+            return getJsonFileForWrite();
         }
     }
 
-
-    /**
-     * Lee todas las estadias desde el archivo JSON.
-     */
-
-    public List<Estadia> leerEstadias() {
-        File file = getJsonFile();
-        if (!file.exists()) {
-            System.out.println(" El archivo de estadias no existe, creando nuevo...");
-            return new ArrayList<>();
-        }
+    private File getJsonFileForWrite() {
+        File dev = Paths.get("src","main","resources",RES_DIR,JSON_FILE).toFile();
         try {
-            if (file.length() == 0) {
-                return new ArrayList<>();
+            ensureFile(dev);
+            return dev;
+        } catch (Exception ignore) {
+            File external = Paths.get("data",RES_DIR,JSON_FILE).toFile();
+            try {
+                ensureFile(external);
+                return external;
+            } catch (Exception ex) {
+                throw new RuntimeException("No se pudo crear archivo JSON: " + external.getAbsolutePath(), ex);
             }
-            return mapper.readValue(file, new TypeReference<List<Estadia>>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(" El archivo de estadias esta corrupto o tiene formato invalido.", e);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al leer el archivo de estadias.", e);
         }
     }
 
-    /**
-     * Guarda la lista de estadias en el archivo JSON.
-     */
+    private void ensureFile(File f) throws Exception {
+        File p = f.getParentFile();
+        if (p != null && !p.exists()) p.mkdirs();
+        if (!f.exists()) f.createNewFile();
+    }
+
+    // ===== IO =====
+    public List<Estadia> leerEstadias() {
+        File file = getJsonFileForRead();
+        try {
+            if (file.length() == 0) return new ArrayList<>();
+            return mapper.readValue(file, new TypeReference<List<Estadia>>() {});
+        } catch (IOException e) {
+            throw new RuntimeException("Error al leer " + JSON_FILE, e);
+        }
+    }
 
     private void guardarEstadias(List<Estadia> estadias) {
         try {
-            File file = getJsonFile();
+            File file = getJsonFileForWrite();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, estadias);
         } catch (IOException e) {
-            throw new RuntimeException(" Error al guardar estadia en el archivo JSON.", e);
+            throw new RuntimeException("Error al guardar " + JSON_FILE, e);
         }
     }
 
-    /**
-     * Convierte un DTO a entidad.
-     */
+    // ===== Mapeo DTO->Entidad (si no usás el mapper utilitario) =====
     private Estadia dtoToEntity(EstadiaDTO dto) {
         Estadia e = new Estadia();
         e.setIdEstadia(dto.idEstadia);
@@ -98,16 +98,14 @@ public class EstadiaDAO implements IEstadiaDAO {
         return e;
     }
 
+    // ===== Implementación IEstadiaDAO =====
     @Override
-
     public Estadia crear(EstadiaDTO estadia) {
         List<Estadia> estadias = leerEstadias();
         boolean existe = estadias.stream()
                 .anyMatch(e -> e.getIdEstadia().equalsIgnoreCase(estadia.idEstadia));
 
-        if (existe) {
-            throw new RuntimeException("Ya existe una estadia con el ID: " + estadia.idEstadia);
-        }
+        if (existe) throw new RuntimeException("Ya existe una estadia con el ID: " + estadia.idEstadia);
 
         Estadia nueva = dtoToEntity(estadia);
         estadias.add(nueva);
@@ -123,9 +121,8 @@ public class EstadiaDAO implements IEstadiaDAO {
                 .filter(e -> e.getIdEstadia().equalsIgnoreCase(estadia.idEstadia))
                 .findFirst();
 
-        if (existente.isEmpty()) {
+        if (existente.isEmpty())
             throw new RuntimeException("No se encontro la estadia con ID: " + estadia.idEstadia);
-        }
 
         Estadia actualizada = dtoToEntity(estadia);
         estadias.set(estadias.indexOf(existente.get()), actualizada);
@@ -138,10 +135,8 @@ public class EstadiaDAO implements IEstadiaDAO {
         List<Estadia> estadias = leerEstadias();
 
         boolean eliminado = estadias.removeIf(e -> e.getIdEstadia().equalsIgnoreCase(estadia.idEstadia));
-
-        if (!eliminado) {
+        if (!eliminado)
             throw new RuntimeException("No se encontro la estadia a eliminar: " + estadia.idEstadia);
-        }
 
         guardarEstadias(estadias);
         return dtoToEntity(estadia);
@@ -150,51 +145,33 @@ public class EstadiaDAO implements IEstadiaDAO {
     @Override
     public Estadia obtener(EstadiaDTO estadia) {
         List<Estadia> estadias = leerEstadias();
-
         return estadias.stream()
                 .filter(e -> e.getIdEstadia().equalsIgnoreCase(estadia.idEstadia))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No se encontro estadia con ID: " + estadia.idEstadia));
     }
 
-    /**
-     * Verifica si un huesped ha tenido alguna estadia.
-     * Supone que EstadiaDTO o Estadia tiene una lista de huespedes asociados.
-     * Si aun no existe esa relacion en la entidad, este metodo se actualizara cuando la agregues.
-     */
     @Override
     public List<String> obtenerIdsHuespedesConEstadias(String idHuesped) {
         List<Estadia> estadias = leerEstadias();
-
-        List<String> idsHuespedes = new ArrayList<>();
-
+        List<String> ids = new ArrayList<>();
         for (Estadia e : estadias) {
             try {
-                // Obtener el campo "huespedes" de la clase Estadia (debe ser List<Huesped>)
                 var field = e.getClass().getDeclaredField("huespedes");
                 field.setAccessible(true);
                 var huespedes = (List<?>) field.get(e);
-
                 if (huespedes == null) continue;
-
                 for (Object h : huespedes) {
                     var metodoId = h.getClass().getMethod("getIdHuesped");
                     String idActual = (String) metodoId.invoke(h);
-                    if (idActual != null && idActual.equals(idHuesped)) {
-                        idsHuespedes.add(idActual);
-                    }
+                    if (idHuesped.equals(idActual)) ids.add(idActual);
                 }
-
             } catch (NoSuchFieldException nf) {
-                // Si aun no existe la relacion explicita, continuar
                 continue;
             } catch (Exception ex) {
-                // Cualquier otro error, continuar con la siguiente estadia
                 continue;
             }
         }
-
-        return idsHuespedes;
+        return ids;
     }
-
 }
