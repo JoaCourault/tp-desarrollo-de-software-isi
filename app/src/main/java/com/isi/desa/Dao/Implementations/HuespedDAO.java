@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Exceptions.HuespedConEstadiaAsociadasException;
+import com.isi.desa.Exceptions.HuespedDuplicadoException;
 import com.isi.desa.Exceptions.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -90,7 +91,7 @@ public class HuespedDAO implements IHuespedDAO {
     }
 
     @Override
-    public Huesped crear(HuespedDTO huesped) {
+    public Huesped crear(HuespedDTO huesped) throws HuespedDuplicadoException {
         List<Huesped> huespedes = leerHuespedes();
 
         boolean existe = huespedes.stream()
@@ -98,7 +99,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .anyMatch(h -> h.getNumDoc() != null && h.getNumDoc().equalsIgnoreCase(huesped.numDoc));
 
         if (existe) {
-            throw new RuntimeException("Ya existe un huesped con el documento: " + huesped.numDoc);
+            throw new HuespedDuplicadoException("Ya existe un huesped con el documento: " + huesped.numDoc);
         }
 
         Huesped nuevo = HuespedMapper.dtoToEntity(huesped);
@@ -118,7 +119,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontro huesped con documento: " + huesped.numDoc);
+            throw new HuespedNotFoundException("No se encontro huesped con documento: " + huesped.numDoc);
         }
 
         Huesped actualizado = HuespedMapper.dtoToEntity(huesped);
@@ -142,7 +143,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontro huesped con ID: " + idHuesped);
+            throw new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped);
         }
 
         Huesped h = existente.get();
@@ -167,7 +168,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .filter(h -> !h.isEliminado())
                 .filter(h -> h.getNumDoc() != null && h.getNumDoc().equals(DNI))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No se encontro huesped con DNI: " + DNI));
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con DNI: " + DNI));
     }
 
     /* Agrega un ID de estadia al huesped correspondiente */
@@ -180,7 +181,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontro huesped con ID: " + idHuesped);
+            throw new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped);
         }
 
         Huesped h = existente.get();
@@ -197,7 +198,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .findFirst();
 
         if (existente.isEmpty()) {
-            throw new RuntimeException("No se encontro huesped con ID: " + idHuesped);
+            throw new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped);
         }
 
         Huesped h = existente.get();
