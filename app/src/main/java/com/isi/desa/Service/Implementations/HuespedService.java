@@ -5,14 +5,15 @@ import com.isi.desa.Dao.Implementations.HuespedDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.*;
 import com.isi.desa.Dto.Resultado;
-import com.isi.desa.Exceptions.HuespedDuplicadoException;
-import com.isi.desa.Exceptions.HuespedNotFoundException;
+import com.isi.desa.Exceptions.Huesped.CannotCreateHuespedException;
+import com.isi.desa.Exceptions.Huesped.CannotModifyHuespedEsception;
+import com.isi.desa.Exceptions.Huesped.HuespedDuplicadoException;
+import com.isi.desa.Exceptions.Huesped.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Implementations.Validators.HuespedValidator;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,10 @@ public class HuespedService implements IHuespedService {
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
 
         // 1) Validacion (si hay error → IllegalArgumentException)
-        validator.create(huespedDTO);
+        CannotCreateHuespedException validation = this.validator.validateCreate(huespedDTO);
+        if (validation != null) {
+            throw validation;
+        }
 
         // 2) Persistencia de Direccion
         DireccionDAO direccionDAO = new DireccionDAO();
@@ -60,18 +64,6 @@ public class HuespedService implements IHuespedService {
 
         // 4) Convertir a DTO para devolver
         return HuespedMapper.entityToDTO(creado);
-    }
-
-
-    @Override
-    public HuespedDTO modificar(HuespedDTO huespedDTO) {
-        try {
-            validator.create(huespedDTO);
-            Huesped modificado = dao.modificar(huespedDTO);
-            return HuespedMapper.entityToDTO(modificado);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al modificar huesped: " + e.getMessage(), e);
-        }
     }
 
     @Override
@@ -152,11 +144,11 @@ public class HuespedService implements IHuespedService {
 
             HuespedDTO dto = request.huesped;
 
-            // 2.A - Validar omisiones
-            List<String> errores = ((HuespedValidator) validator).validateUpdate(dto);
-            if (errores != null && !errores.isEmpty()) {
+            // 2.A - Validar
+            CannotModifyHuespedEsception errorValidacion = this.validator.validateUpdate(dto);
+            if (errorValidacion != null) {
                 res.resultado.id = 2;
-                res.resultado.mensaje = String.join("; ", errores);
+                res.resultado.mensaje = errorValidacion.getMessage();
                 return res;
             }
 

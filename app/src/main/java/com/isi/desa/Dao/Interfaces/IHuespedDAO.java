@@ -1,7 +1,6 @@
 package com.isi.desa.Dao.Interfaces;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
-import com.isi.desa.Exceptions.HuespedConEstadiaAsociadasException;
-import com.isi.desa.Exceptions.HuespedDuplicadoException;
+import com.isi.desa.Exceptions.Huesped.HuespedDuplicadoException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 
 import java.util.List;

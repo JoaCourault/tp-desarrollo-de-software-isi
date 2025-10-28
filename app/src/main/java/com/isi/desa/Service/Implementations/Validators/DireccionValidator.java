@@ -1,6 +1,7 @@
 package com.isi.desa.Service.Implementations.Validators;
 
 import com.isi.desa.Dto.Direccion.DireccionDTO;
+import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
 import java.util.ArrayList;
@@ -20,9 +21,14 @@ public class DireccionValidator implements IDireccionValidator {
 
     @Override
     public Direccion create(DireccionDTO direccionDTO) {
-        List<String> errores = validate(direccionDTO);
+        List<RuntimeException> errores = validate(direccionDTO);
         if (errores != null && !errores.isEmpty()) {
-            throw new IllegalArgumentException(String.join(", ", errores));
+            throw new InvalidDirectionException(
+                    errores.stream()
+                            .map(RuntimeException::getMessage)
+                            .reduce((a, b) -> a + ", " + b)
+                            .orElse("")
+            );
         }
         return new Direccion(
                 direccionDTO.id,
@@ -37,40 +43,40 @@ public class DireccionValidator implements IDireccionValidator {
         );
     }
     @Override
-    public List<String> validate(DireccionDTO direccionDTO) {
-        List<String> errores = new ArrayList<>();
-        String error;
-        error = validatePais(direccionDTO.pais); if (error != null) errores.add(error);
-        error = validateProvincia(direccionDTO.provincia); if (error != null) errores.add(error);
-        error = validateLocalidad(direccionDTO.localidad); if (error != null) errores.add(error);
-        error = validateCodigoPostal(direccionDTO.codigoPostal); if (error != null) errores.add(error);
-        error = validateCalle(direccionDTO.calle); if (error != null) errores.add(error);
-        error = validateNumero(direccionDTO.numero); if (error != null) errores.add(error);
-        // departamento y piso pueden ser opcionales
+    public List<RuntimeException> validate(DireccionDTO direccionDTO) {
+        List<RuntimeException> errores = new ArrayList<>();
+        RuntimeException error;
+        error = new InvalidDirectionException(validatePais(direccionDTO.pais)); if (error != null) errores.add(error);
+        error = new InvalidDirectionException(validateProvincia(direccionDTO.provincia)); if (error != null) errores.add(error);
+        error = new InvalidDirectionException(validateLocalidad(direccionDTO.localidad)); if (error != null) errores.add(error);
+        error = new InvalidDirectionException(validateCodigoPostal(direccionDTO.codigoPostal)); if (error != null) errores.add(error);
+        error = new InvalidDirectionException(validateCalle(direccionDTO.calle)); if (error != null) errores.add(error);
+        error = new InvalidDirectionException(validateNumero(direccionDTO.numero)); if (error != null) errores.add(error);
+
         return errores;
     }
-    @Override
-    public String validatePais(String pais) {
+
+    private String validatePais(String pais) {
         return (pais == null || pais.trim().isEmpty()) ? "El pais es obligatorio" : null;
     }
-    @Override
-    public String validateProvincia(String provincia) {
+
+    private String validateProvincia(String provincia) {
         return (provincia == null || provincia.trim().isEmpty()) ? "La provincia es obligatoria" : null;
     }
-    @Override
-    public String validateLocalidad(String localidad) {
+
+    private String validateLocalidad(String localidad) {
         return (localidad == null || localidad.trim().isEmpty()) ? "La localidad es obligatoria" : null;
     }
-    @Override
-    public String validateCodigoPostal(Integer codigoPostal) {
+
+    private String validateCodigoPostal(Integer codigoPostal) {
         return (codigoPostal == null || codigoPostal <= 0) ? "El codigo postal es obligatorio y debe ser positivo" : null;
     }
-    @Override
-    public String validateCalle(String calle) {
+
+    private String validateCalle(String calle) {
         return (calle == null || calle.trim().isEmpty()) ? "La calle es obligatoria" : null;
     }
-    @Override
-    public String validateNumero(Integer numero) {
+
+    private String validateNumero(Integer numero) {
         return (numero == null || numero <= 0) ? "El numero es obligatorio y debe ser positivo" : null;
     }
 }

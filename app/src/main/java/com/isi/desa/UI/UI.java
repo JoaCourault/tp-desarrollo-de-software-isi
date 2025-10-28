@@ -9,12 +9,10 @@ import com.isi.desa.Dto.Usuario.AutenticarUsuarioRequestDto;
 import com.isi.desa.Dto.Usuario.AutenticarUsuarioResponseDto;
 import com.isi.desa.Dto.Huesped.AltaHuesperRequestDTO;
 import com.isi.desa.Dto.Huesped.AltaHuespedResultDTO;
-import com.isi.desa.Dto.Huesped.BajaHuespedRequestDTO;
-import com.isi.desa.Dto.Huesped.BajaHuespedResultDTO;
 import com.isi.desa.Dto.Huesped.BuscarHuespedRequestDTO;
 import com.isi.desa.Dto.Huesped.BuscarHuespedResultDTO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
-import com.isi.desa.Exceptions.NotAutenticatedException;
+import com.isi.desa.Exceptions.Usuario.NotAutenticatedException;
 import com.isi.desa.Service.Implementations.Logger;
 import com.isi.desa.Service.Interfaces.ILogger;
 import com.isi.desa.UI.Menu.Menu;
@@ -23,7 +21,6 @@ import com.isi.desa.UI.Menu.MenuRunner;
 import com.isi.desa.UI.Menu.MenuNavigationException;
 
 import java.util.Scanner;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UI {

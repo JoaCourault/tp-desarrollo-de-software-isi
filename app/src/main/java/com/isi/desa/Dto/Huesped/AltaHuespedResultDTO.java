@@ -4,7 +4,7 @@ import com.isi.desa.Dto.Resultado;
 
 public class AltaHuespedResultDTO {
     public Resultado resultado;
-    public HuespedDTO huesped; // <<< NUEVO
+    public HuespedDTO huesped;
 
     public AltaHuespedResultDTO() {
         this.resultado = new Resultado();
