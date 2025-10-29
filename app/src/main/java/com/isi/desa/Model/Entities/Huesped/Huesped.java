@@ -6,6 +6,7 @@ import com.isi.desa.Model.Entities.Direccion.Direccion;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Huesped {
     @JsonProperty("id")
@@ -129,4 +130,17 @@ public class Huesped {
     public String getIdDireccion() {
         return (direccion != null) ? direccion.getIdDireccion() : null;
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Huesped)) return false;
+        Huesped otro = (Huesped) o;
+        return idHuesped != null && idHuesped.equalsIgnoreCase(otro.idHuesped);
+    }
+
+    public int hashCode() {
+        return Objects.hash(idHuesped != null ? idHuesped.toLowerCase() : null);
+    }
+
+
 }

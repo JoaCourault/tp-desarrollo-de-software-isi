@@ -18,53 +18,49 @@ import static com.isi.desa.Utils.Mappers.DireccionMapper.dtoToEntity;
 
 public class DireccionDAO implements IDireccionDAO {
 
-    private static final String RES_DIR   = "jsonDataBase";
+    private static final String RES_DIR = "app/src/main/resources/jsonDataBase";
     private static final String JSON_FILE = "direccion.json";
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     // ===== Helpers de ruta (solo build) =====
-    private File getJsonFileForRead() {
+    private File getJsonFile() {
         try {
-            File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
-            if (f1.exists()) return f1;
+            File dir = new File(RES_DIR);
+            if (!dir.exists()) dir.mkdirs();
 
-            File f2 = Paths.get("build","resources","main",RES_DIR,JSON_FILE).toFile();
-            if (f2.exists()) return f2;
-
-            // No se crean archivos ni carpetas: informar al usuario
-            throw new RuntimeException("No se encontro el archivo de datos '" + RES_DIR + "/" + JSON_FILE + "' en build. Ejecute el build y reintente.");
-        } catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
-            throw new RuntimeException("Error al localizar el archivo JSON en build: " + e.getMessage(), e);
+            File file = new File(dir, JSON_FILE);
+            if (!file.exists()) file.createNewFile();
+            return file;
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo acceder o crear el archivo JSON de huespedes.", e);
         }
     }
 
-    private File getJsonFileForWrite() {
-        File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
-        if (f1.exists() && f1.isFile()) return f1;
-
-        File f2 = Paths.get("build","resources","main",RES_DIR,JSON_FILE).toFile();
-        if (f2.exists() && f2.isFile()) return f2;
-
-        throw new RuntimeException("No se encontro archivo de salida en build para escribir '" + RES_DIR + "/" + JSON_FILE + "'. No se crean carpetas nuevas. Ejecute el build primero.");
-    }
+//    private File getJsonFileForWrite() {
+//        File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
+//        if (f1.exists() && f1.isFile()) return f1;
+//
+//        File f2 = Paths.get("build","resources","main",RES_DIR,JSON_FILE).toFile();
+//        if (f2.exists() && f2.isFile()) return f2;
+//
+//        throw new RuntimeException("No se encontro archivo de salida en build para escribir '" + RES_DIR + "/" + JSON_FILE + "'. No se crean carpetas nuevas. Ejecute el build primero.");
+//    }
 
     // ===== IO =====
     private List<Direccion> leerDirecciones() {
-        File file = getJsonFileForRead();
+        File file = getJsonFile();
         try {
             if (file.length() == 0) return new ArrayList<>();
             return mapper.readValue(file, new TypeReference<List<Direccion>>() {});
         } catch (IOException e) {
-            throw new RuntimeException("Error al leer " + JSON_FILE, e);
+            throw new RuntimeException("Error al leer el archivo JSON de direcciones: " + file.getAbsolutePath(), e);
         }
     }
 
     private void guardarDirecciones(List<Direccion> direcciones) {
+        File file = getJsonFile();
         try {
-            File file = getJsonFileForWrite();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, direcciones);
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar " + JSON_FILE, e);

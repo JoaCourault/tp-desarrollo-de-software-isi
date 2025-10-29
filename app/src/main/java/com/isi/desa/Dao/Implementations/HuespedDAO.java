@@ -9,6 +9,7 @@ import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Exceptions.Huesped.HuespedConEstadiaAsociadasException;
 import com.isi.desa.Exceptions.Huesped.HuespedDuplicadoException;
 import com.isi.desa.Exceptions.Huesped.HuespedNotFoundException;
+import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
 
@@ -19,96 +20,138 @@ import java.util.*;
 
 public class HuespedDAO implements IHuespedDAO {
 
-    private static final String JSON_RESOURCE = "jsonDataBase/huesped.json";
+   // private static final String JSON_RESOURCE = "jsonDataBase/huesped.json";
     private final ObjectMapper mapper;
     private static DireccionDAO direccionDAO;
     private static TipoDocumentoDAO tipoDocumentoDAO;
 
     public HuespedDAO() {
         this.mapper = new ObjectMapper();
-        //Permitir leer/escribir LocalDate correctamente
-        mapper.registerModule(new JavaTimeModule());
-        //Evitar escribir fechas como timestamps (numeros)
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.registerModule(new JavaTimeModule()); //Permitir leer/escribir LocalDate correctamente
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); //Evitar escribir fechas como timestamps (numeros)
         direccionDAO = new DireccionDAO();
         tipoDocumentoDAO = new TipoDocumentoDAO();
     }
 
+//    private static final String JSON_FILE = "huesped.json";
+//    private static final String RES_DIR   = "jsonDataBase";
+//
+//    // 1) Lectura: intenta primero el archivo editable en src/main/resources (dev)
+//    // si existe lo usa; si no existe intenta la ruta desde classloader; de lo contrario usa fallback escribible
+//    private File getJsonFileForRead() {
+//        try {
+//            // Preferir archivo dev editable (src/main/resources/jsonDataBase/huesped.json)
+//            File dev = Paths.get("src", "main", "resources", RES_DIR, JSON_FILE).toFile();
+//            if (dev.exists()) return dev;
+//
+//            String resourcePath = RES_DIR + "/" + JSON_FILE;
+//            var cl = Thread.currentThread().getContextClassLoader();
+//            var url = cl.getResource(resourcePath);
+//            if (url != null && !"jar".equalsIgnoreCase(url.getProtocol())) {
+//                File f = new File(url.toURI());
+//                if (f.exists()) return f;
+//            }
+//            // fallback (tambien sirve si queres forzar lectura local)
+//            return getJsonFileForWrite();
+//        } catch (Exception e) {
+//            return getJsonFileForWrite();
+//        }
+//    }
+//
+//    // 2) Escritura: siempre a src/main/resources/jsonDataBase (dev) o data/jsonDataBase (fallback)
+//    private File getJsonFileForWrite() {
+//        try {
+//            // ruta “dev” (IDE): src/main/resources/jsonDataBase/huesped.json
+//            File dev = Paths.get("src","main","resources",RES_DIR,JSON_FILE).toFile();
+//            ensureFile(dev);
+//            return dev;
+//        } catch (Exception ignore) {
+//            // fallback para ejecucion empaquetada (JAR): ./data/jsonDataBase/huesped.json
+//            File external = Paths.get("data",RES_DIR,JSON_FILE).toFile();
+//            try { ensureFile(external); } catch (Exception ex) {
+//                throw new RuntimeException("No se pudo crear archivo JSON: " + external.getAbsolutePath(), ex);
+//            }
+//            return external;
+//        }
+//    }
+//
+//    private void ensureFile(File f) throws Exception {
+//        File p = f.getParentFile();
+//        if (p != null && !p.exists()) p.mkdirs();
+//        if (!f.exists()) f.createNewFile();
+//    }
+//
+//
+//    private String nombreArchivo() {
+//        // Ejemplo para DireccionDAO:
+//        return "direccion.json";
+//    }
+//
+//
+//    /**
+//     * Lee el archivo JSON completo y devuelve todos los huespedes.
+//     */
+//    public List<Huesped> leerHuespedes() {
+//        File file = getJsonFileForRead();
+//        try {
+//            if (file.length() == 0) return new ArrayList<>();
+//            return mapper.readValue(file, new TypeReference<List<Huesped>>() {});
+//        } catch (IOException e) {
+//            throw new RuntimeException("Error al leer " + JSON_FILE, e);
+//        }
+//    }
+//
+//    private boolean guardarHuespedes(List<Huesped> huespedes) {
+//        try {
+//            File file = getJsonFileForWrite();
+//            mapper.writerWithDefaultPrettyPrinter().writeValue(file, huespedes);
+//            return true;
+//        } catch (IOException e) {
+//            throw new RuntimeException("Error al guardar " + JSON_FILE, e);
+//        }
+//    }
+// -------------------------------------------------------------------------
+// CONFIGURACIÓN DEL ARCHIVO JSON ÚNICO (modo desarrollo y ejecución directa)
+// -------------------------------------------------------------------------
+    private static final String RES_DIR = "app/src/main/resources/jsonDataBase";
     private static final String JSON_FILE = "huesped.json";
-    private static final String RES_DIR   = "jsonDataBase";
 
-    // 1) Lectura: intenta primero el archivo editable en src/main/resources (dev)
-    // si existe lo usa; si no existe intenta la ruta desde classloader; de lo contrario usa fallback escribible
-    private File getJsonFileForRead() {
+    private File getJsonFile() {
         try {
-            // Preferir archivo dev editable (src/main/resources/jsonDataBase/huesped.json)
-            File dev = Paths.get("src", "main", "resources", RES_DIR, JSON_FILE).toFile();
-            if (dev.exists()) return dev;
+            File dir = new File(RES_DIR);
+            if (!dir.exists()) dir.mkdirs();
 
-            String resourcePath = RES_DIR + "/" + JSON_FILE;
-            var cl = Thread.currentThread().getContextClassLoader();
-            var url = cl.getResource(resourcePath);
-            if (url != null && !"jar".equalsIgnoreCase(url.getProtocol())) {
-                File f = new File(url.toURI());
-                if (f.exists()) return f;
-            }
-            // fallback (tambien sirve si queres forzar lectura local)
-            return getJsonFileForWrite();
-        } catch (Exception e) {
-            return getJsonFileForWrite();
+            File file = new File(dir, JSON_FILE);
+            if (!file.exists()) file.createNewFile();
+            return file;
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo acceder o crear el archivo JSON de huespedes.", e);
         }
     }
-
-    // 2) Escritura: siempre a src/main/resources/jsonDataBase (dev) o data/jsonDataBase (fallback)
-    private File getJsonFileForWrite() {
-        try {
-            // ruta “dev” (IDE): src/main/resources/jsonDataBase/huesped.json
-            File dev = Paths.get("src","main","resources",RES_DIR,JSON_FILE).toFile();
-            ensureFile(dev);
-            return dev;
-        } catch (Exception ignore) {
-            // fallback para ejecucion empaquetada (JAR): ./data/jsonDataBase/huesped.json
-            File external = Paths.get("data",RES_DIR,JSON_FILE).toFile();
-            try { ensureFile(external); } catch (Exception ex) {
-                throw new RuntimeException("No se pudo crear archivo JSON: " + external.getAbsolutePath(), ex);
-            }
-            return external;
-        }
-    }
-
-    private void ensureFile(File f) throws Exception {
-        File p = f.getParentFile();
-        if (p != null && !p.exists()) p.mkdirs();
-        if (!f.exists()) f.createNewFile();
-    }
-
-
-    private String nombreArchivo() {
-        // Ejemplo para DireccionDAO:
-        return "direccion.json";
-    }
-
 
     /**
-     * Lee el archivo JSON completo y devuelve todos los huespedes.
+     * Lee todos los huespedes desde el archivo JSON.
      */
     public List<Huesped> leerHuespedes() {
-        File file = getJsonFileForRead();
+        File file = getJsonFile();
         try {
             if (file.length() == 0) return new ArrayList<>();
             return mapper.readValue(file, new TypeReference<List<Huesped>>() {});
         } catch (IOException e) {
-            throw new RuntimeException("Error al leer " + JSON_FILE, e);
+            throw new RuntimeException("Error al leer el archivo JSON de huespedes: " + file.getAbsolutePath(), e);
         }
     }
 
+    /**
+     * Guarda la lista completa de huespedes en el archivo JSON.
+     */
     private boolean guardarHuespedes(List<Huesped> huespedes) {
+        File file = getJsonFile();
         try {
-            File file = getJsonFileForWrite();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, huespedes);
             return true;
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar " + JSON_FILE, e);
+            throw new RuntimeException("Error al guardar el archivo JSON de huespedes: " + file.getAbsolutePath(), e);
         }
     }
 
@@ -117,12 +160,25 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped crear(HuespedDTO huesped) throws HuespedDuplicadoException {
         List<Huesped> huespedes = leerHuespedes();
 
-        boolean existe = huespedes.stream()
-                .filter(h -> !h.isEliminado())
-                .anyMatch(h -> h.getNumDoc() != null && h.getNumDoc().equalsIgnoreCase(huesped.numDoc));
+        // Generar ID incremental si no viene (HU-###)
+        if (huesped.idHuesped == null || huesped.idHuesped.isBlank()) {
+            int max = 0;
+            for (Huesped d : huespedes) {
+                String id = d.getIdHuesped(); // p.ej.: "HU-015"
+                if (id != null && id.startsWith("HU-")) {
+                    try {
+                        int n = Integer.parseInt(id.substring(3));
+                        if (n > max) max = n;
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+            huesped.idHuesped = String.format("HU-%03d", max + 1);
+        }
 
+        boolean existe = huespedes.stream()
+                .anyMatch(d -> d.getIdHuesped().equalsIgnoreCase(huesped.idHuesped));
         if (existe) {
-            throw new HuespedDuplicadoException("Ya existe un huesped con el documento: " + huesped.numDoc);
+            throw new RuntimeException("Ya existe una huesped con el ID: " + huesped.idHuesped);
         }
 
         Huesped nuevo = HuespedMapper.dtoToEntity(huesped);
@@ -136,36 +192,47 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped modificar(HuespedDTO dto) {
         List<Huesped> huespedes = leerHuespedes();
 
-        // 1) buscar SIEMPRE por ID de huesped
-        Optional<Huesped> existenteOpt = huespedes.stream()
-                .filter(h -> !h.isEliminado())
-                .filter(h -> h.getIdHuesped() != null
-                        && h.getIdHuesped().equalsIgnoreCase(dto.idHuesped))
-                .findFirst();
-
-        if (existenteOpt.isEmpty()) {
-            throw new HuespedNotFoundException(
-                    "No se encontro huesped con ID: " + dto.idHuesped);
+        // Buscar huésped por ID
+        int idx = -1;
+        for (int i = 0; i < huespedes.size(); i++) {
+            Huesped h = huespedes.get(i);
+            if (!h.isEliminado() && h.getIdHuesped() != null &&
+                    h.getIdHuesped().equalsIgnoreCase(dto.idHuesped)) {
+                idx = i;
+                break;
+            }
         }
 
-        Huesped existente = existenteOpt.get();
+        if (idx == -1) {
+            throw new HuespedNotFoundException(
+                    "No se encontró huésped con ID: " + dto.idHuesped);
+        }
 
-        // 2) mapear lo nuevo manteniendo campos internos
+        Huesped existente = huespedes.get(idx);
+
+        // Crear el huésped actualizado a partir del DTO
         Huesped actualizado = HuespedMapper.dtoToEntity(dto);
 
-        // 3) reemplazar en la lista por indice
-        int idx = huespedes.indexOf(existente);
+        // Preservar campos internos
+        actualizado.setIdsEstadias(existente.getIdsEstadias());
+        actualizado.setEliminado(existente.isEliminado());
+
+        // Reemplazar el huésped en la lista (pisando el anterior)
         huespedes.set(idx, actualizado);
 
-        direccionDAO.modificar(dto.direccion); // actualizar direccion tambien
-        tipoDocumentoDAO.modificar(dto.tipoDocumento);
+        // Actualizar datos relacionados
+        if (dto.direccion != null)
+            direccionDAO.modificar(dto.direccion);
+        if (dto.tipoDocumento != null)
+            tipoDocumentoDAO.modificar(dto.tipoDocumento);
+
+        // Guardar lista completa en el mismo archivo
         boolean ok = guardarHuespedes(huespedes);
-        if(!ok) {
-            throw new RuntimeException("Error al guardar los cambios del huesped con ID: " + dto.idHuesped);
+        if (!ok) {
+            throw new RuntimeException("Error al guardar los cambios del huésped con ID: " + dto.idHuesped);
         }
         return actualizado;
     }
-
 
     @Override
     public Huesped eliminar(String idHuesped) {
