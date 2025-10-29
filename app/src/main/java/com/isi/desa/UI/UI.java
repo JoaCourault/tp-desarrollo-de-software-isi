@@ -106,19 +106,31 @@ public class UI {
                             System.out.print("No se encontro ningun huesped con esos filtros. Desea crear uno nuevo? (s/n): ");
                             String opt = sc.nextLine().trim().toLowerCase();
                             if (opt.equals("s") || opt.equals("si")) {
-                                HuespedDTO nuevo = cargarHuespedDesdeInput(sc);
-                                AltaHuesperRequestDTO altaReq = new AltaHuesperRequestDTO(); altaReq.huesped = nuevo;
-                                try {
-                                    AltaHuespedResultDTO altaRes = HuespedController.getInstance().altaHuesped(altaReq);
-                                    if (altaRes != null && altaRes.resultado != null && altaRes.resultado.id == 0) {
-                                        logger.info("Huesped creado desde UI: " + nuevo.nombre + " " + nuevo.apellido);
-                                    } else {
-                                        logger.warn("No se pudo crear el huesped: " + (altaRes != null && altaRes.resultado!=null? altaRes.resultado.mensaje : "error desconocido"));
+                                boolean continuar = true;
+                                do {
+                                    HuespedDTO nuevo = cargarHuespedDesdeInput(sc);
+                                    AltaHuesperRequestDTO altaReq = new AltaHuesperRequestDTO();
+                                    altaReq.huesped = nuevo;
+                                    try {
+                                        AltaHuespedResultDTO altaRes = HuespedController.getInstance().altaHuesped(altaReq);
+                                        if (altaRes != null && altaRes.resultado != null && altaRes.resultado.id == 0) {
+                                            logger.info("El Huesped creado desde UI " + nuevo.nombre + " " + nuevo.apellido + " ha sido cargado correctamente. ¿Desea cargar otro? (SI / NO)");
+                                            String resp = sc.nextLine().trim().toLowerCase();
+                                            if (!resp.equals("s") && !resp.equals("si")) {
+                                                continuar = false;
+                                            }
+                                        } else {
+                                            logger.warn("No se pudo crear el huesped: " +
+                                                    (altaRes != null && altaRes.resultado != null ? altaRes.resultado.mensaje : "error desconocido"));
+                                            continuar = false; // corta el ciclo si fallo
+                                        }
+                                    } catch(Exception e) {
+                                        logger.error("Error UI crear huesped: " + e.getMessage(), e);
+                                        continuar = false;
                                     }
-                                } catch(Exception e) {
-                                    logger.error("Error UI crear huesped: " + e.getMessage(), e);
-                                }
+                                } while (continuar);
                             }
+
                         }
                         else if (res == null || res.huespedesEncontrados == null || res.huespedesEncontrados.isEmpty()) {
                             // No se encontraron huespedes
@@ -334,7 +346,7 @@ public class UI {
         System.out.print("Departamento: "); dir.departamento = scanner.nextLine().trim();
 
         System.out.print("Piso: ");
-        try { String piso = scanner.nextLine().trim(); dir.piso = piso.isEmpty()? null : Integer.parseInt(piso); } catch(Exception ex){ dir.piso = null; }
+        try { String piso = scanner.nextLine().trim(); dir.piso = piso.isEmpty()? 0 : Integer.parseInt(piso); } catch(Exception ex){ dir.piso = 0; }
 
         nuevo.direccion = dir;
         return nuevo;
