@@ -8,7 +8,6 @@ import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,17 +48,17 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
     }
 
     // ===== IO =====
-    private List<TipoDocumento> leerTipos() {
+    private List<TipoDocumentoDTO> leerTiposDto() {
         File file = getJsonFileForRead();
         try {
             if (file.length() == 0) return new ArrayList<>();
-            return mapper.readValue(file, new TypeReference<List<TipoDocumento>>() {});
+            return mapper.readValue(file, new TypeReference<List<TipoDocumentoDTO>>() {});
         } catch (IOException e) {
             throw new RuntimeException("Error al leer " + JSON_FILE, e);
         }
     }
 
-    private void guardarTipos(List<TipoDocumento> tipos) {
+    private void guardarTipos(List<TipoDocumentoDTO> tipos) {
         try {
             File file = getJsonFileForWrite();
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, tipos);
@@ -69,60 +68,62 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
     }
 
     private TipoDocumento dtoToEntity(TipoDocumentoDTO dto) {
-        return new TipoDocumento(dto.tipoDocumento, dto.descripcion);
+        return new TipoDocumento(dto.tipoDocumento);
     }
 
     // ===== Implementacion ITipoDocumentoDAO =====
     @Override
     public TipoDocumento crear(TipoDocumentoDTO dto) {
-        List<TipoDocumento> tipos = leerTipos();
+        List<TipoDocumentoDTO> tipos = leerTiposDto();
 
-        boolean existe = tipos.stream().anyMatch(t -> t.getTipoDocumento().equals(dto.tipoDocumento));
+        boolean existe = tipos.stream().anyMatch(t -> t.tipoDocumento != null && t.tipoDocumento.equals(dto.tipoDocumento));
         if (existe) throw new RuntimeException("Ya existe un tipo de documento con ID " + dto.tipoDocumento);
 
-        TipoDocumento nuevo = dtoToEntity(dto);
-        tipos.add(nuevo);
+        tipos.add(dto);
         guardarTipos(tipos);
-        return nuevo;
+        return dtoToEntity(dto);
     }
 
     @Override
     public TipoDocumento obtener(String id) {
-        List<TipoDocumento> tipos = leerTipos();
-        return tipos.stream()
-                .filter(t -> t.getTipoDocumento().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No se encontro tipo de documento con ID: " + id));
+        List<TipoDocumentoDTO> tipos = leerTiposDto();
+        Optional<TipoDocumentoDTO> found = tipos.stream()
+                .filter(t -> t.tipoDocumento != null && t.tipoDocumento.equals(id))
+                .findFirst();
+        if (found.isEmpty()) {
+            throw new RuntimeException("No se encontro tipo de documento con ID: " + id);
+        }
+        return new TipoDocumento(found.get().tipoDocumento);
     }
 
     @Override
     public TipoDocumento modificar(TipoDocumentoDTO dto) {
-        List<TipoDocumento> tipos = leerTipos();
+        List<TipoDocumentoDTO> tipos = leerTiposDto();
 
-        Optional<TipoDocumento> existente = tipos.stream()
-                .filter(t -> t.getTipoDocumento().equals(dto.tipoDocumento))
+        Optional<TipoDocumentoDTO> existente = tipos.stream()
+                .filter(t -> t.tipoDocumento != null && t.tipoDocumento.equals(dto.tipoDocumento))
                 .findFirst();
 
         if (existente.isEmpty()) {
             throw new RuntimeException("No se encontro tipo de documento con ID: " + dto.tipoDocumento);
         }
 
-        TipoDocumento actualizado = existente.get();
-        actualizado.setDescripcion(dto.descripcion);
+        TipoDocumentoDTO actualizado = existente.get();
+        // No hay campo descripcion: el identificador (tipoDocumento) es único y no se modifica aquí.
 
         int index = tipos.indexOf(existente.get());
         tipos.set(index, actualizado);
 
         guardarTipos(tipos);
-        return actualizado;
+        return dtoToEntity(actualizado);
     }
 
     @Override
     public TipoDocumento eliminar(TipoDocumentoDTO dto) {
-        List<TipoDocumento> tipos = leerTipos();
+        List<TipoDocumentoDTO> tipos = leerTiposDto();
 
-        Optional<TipoDocumento> existente = tipos.stream()
-                .filter(t -> t.getTipoDocumento().equals(dto.tipoDocumento))
+        Optional<TipoDocumentoDTO> existente = tipos.stream()
+                .filter(t -> t.tipoDocumento != null && t.tipoDocumento.equals(dto.tipoDocumento))
                 .findFirst();
 
         if (existente.isEmpty()) {
@@ -131,6 +132,6 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
 
         tipos.remove(existente.get());
         guardarTipos(tipos);
-        return existente.get();
+        return dtoToEntity(existente.get());
     }
 }

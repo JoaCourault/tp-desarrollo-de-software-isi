@@ -1,11 +1,11 @@
 package com.isi.desa.Utils.Mappers;
 
-import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
+import com.isi.desa.Dao.Implementations.DireccionDAO;
 
 import java.util.ArrayList;
 
@@ -15,10 +15,11 @@ public class HuespedMapper {
         if (h == null) return null;
 
         TipoDocumentoDTO tipoDocDto = null;
-        if (h.getTipoDocumento() != null) {
+        TipoDocumento tdEntity = h.getTipoDocumento();
+        if (tdEntity != null) {
+            String id = tdEntity.getTipoDocumento();
             tipoDocDto = new TipoDocumentoDTO();
-            tipoDocDto.tipoDocumento = h.getTipoDocumento().getTipoDocumento();
-            tipoDocDto.descripcion = h.getTipoDocumento().getDescripcion();
+            tipoDocDto.tipoDocumento = id;
         }
 
         HuespedDTO dto = new HuespedDTO();
@@ -34,7 +35,26 @@ public class HuespedMapper {
         dto.email = h.getEmail();
         dto.ocupacion = h.getOcupacion();
         dto.nacionalidad = h.getNacionalidad();
-        dto.direccion = DireccionMapper.entityToDto(h.getDireccion());
+
+        // Direccion: si viene solo con id, intentar completar desde DAO
+        Direccion dEntity = h.getDireccion();
+        if (dEntity != null) {
+            if ((dEntity.getCalle() == null || dEntity.getCalle().trim().isEmpty())
+                    && dEntity.getIdDireccion() != null && !dEntity.getIdDireccion().trim().isEmpty()) {
+                try {
+                    com.isi.desa.Dto.Direccion.DireccionDTO req = new com.isi.desa.Dto.Direccion.DireccionDTO();
+                    req.id = dEntity.getIdDireccion();
+                    DireccionDAO direccionDAO = new DireccionDAO();
+                    dEntity = direccionDAO.obtener(req);
+                } catch (Exception ignore) {
+                    // si falla, dejamos la direccion tal como viene (solo id)
+                }
+            }
+            dto.direccion = DireccionMapper.entityToDto(dEntity);
+        } else {
+            dto.direccion = null;
+        }
+
         dto.idsEstadias = (h.getIdsEstadias() != null)
                 ? new ArrayList<>(h.getIdsEstadias())
                 : new ArrayList<>();
@@ -59,11 +79,10 @@ public class HuespedMapper {
         h.setOcupacion(dto.ocupacion);
         h.setNacionalidad(dto.nacionalidad);
 
-        // ✅ ESTO FALTABA (SETEO DEL TIPO DOCUMENTO EN LA ENTIDAD)
+        // TipoDocumento
         if (dto.tipoDocumento != null) {
             TipoDocumento td = new TipoDocumento();
             td.setTipoDocumento(dto.tipoDocumento.tipoDocumento);
-            td.setDescripcion(dto.tipoDocumento.descripcion);
             h.setTipoDocumento(td);
         }
 

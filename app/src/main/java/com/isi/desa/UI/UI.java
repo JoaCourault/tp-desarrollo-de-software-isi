@@ -178,7 +178,7 @@ public class UI {
                                     cambios.numDoc = seleccionado.numDoc;
                                     System.out.print("Nombre [" + seleccionado.nombre + "]: "); String n = sc.nextLine().trim(); cambios.nombre = n.isEmpty()? seleccionado.nombre : n;
                                     System.out.print("Apellido [" + seleccionado.apellido + "]: "); String a = sc.nextLine().trim(); cambios.apellido = a.isEmpty()? seleccionado.apellido : a;
-                                    System.out.print("Tipo de documento [" + (seleccionado.tipoDocumento!=null?seleccionado.tipoDocumento.descripcion:"") + "]: "); String td = sc.nextLine().trim();
+                                    System.out.print("Tipo de documento [" + (seleccionado.tipoDocumento!=null?seleccionado.tipoDocumento.tipoDocumento:"") + "]: "); String td = sc.nextLine().trim();
                                     if (td.isEmpty()) cambios.tipoDocumento = seleccionado.tipoDocumento; else { TipoDocumentoDTO tdd = new TipoDocumentoDTO(); tdd.tipoDocumento = td; cambios.tipoDocumento = tdd; }
                                     System.out.print("Posicion IVA [" + (seleccionado.posicionIva!=null?seleccionado.posicionIva:"") + "]: "); String iva = sc.nextLine().trim(); cambios.posicionIva = iva.isEmpty()? seleccionado.posicionIva : iva;
                                     System.out.print("CUIT [" + (seleccionado.cuit!=null?seleccionado.cuit:"") + "]: "); String cuit = sc.nextLine().trim(); cambios.cuit = cuit.isEmpty()? seleccionado.cuit : cuit;

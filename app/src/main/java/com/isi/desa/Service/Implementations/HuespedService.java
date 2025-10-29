@@ -101,10 +101,12 @@ public class HuespedService implements IHuespedService {
 
         if (requestDTO == null || requestDTO.huesped == null) {
             // Si no hay filtros, devolver todos los huespedes NO eliminados
-            huespedesEncontrados = dao.leerHuespedes().stream()
+            List<HuespedDTO> allHuespedes = dao.leerHuespedes().stream()
                     .filter(h -> h != null && !h.isEliminado())
                     .map(HuespedMapper::entityToDTO)
                     .collect(Collectors.toList());
+            huespedesEncontrados = allHuespedes;
+
         } else {
             HuespedDTO filtros = requestDTO.huesped;
 
