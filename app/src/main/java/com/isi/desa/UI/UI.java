@@ -141,7 +141,10 @@ public class UI {
                                 // Mostrar la lista
                                 for (int i = 0; i < res.huespedesEncontrados.size(); i++) {
                                     HuespedDTO h = res.huespedesEncontrados.get(i);
-                                    System.out.println((i+1) + ". " + h.nombre + " " + h.apellido + " (" + h.numDoc + ")");
+                                    System.out.println((i+1) + ". " + h.nombre + " " + h.apellido +
+                                            " - " + h.tipoDocumento.tipoDocumento +
+                                            " (" + h.numDoc + ")"
+                                    );
                                 }
 
                                 int idx;

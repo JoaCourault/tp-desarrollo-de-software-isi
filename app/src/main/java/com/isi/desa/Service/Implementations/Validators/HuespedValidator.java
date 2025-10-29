@@ -82,11 +82,9 @@ public class HuespedValidator implements IHuespedValidator {
         String fechaNacimientoError = validateFechaNacimiento(huespedDTO.fechaNacimiento);
         if (fechaNacimientoError != null) errores.add(new IllegalArgumentException(fechaNacimientoError));
 
-        if (huespedDTO.direccion != null) {
-            errores.addAll(direccionValidator.validate(huespedDTO.direccion));
-        } else {
-            errores.add(new IllegalArgumentException("La direccion es obligatoria"));
-        }
+        InvalidDirectionException direccionValidationError = direccionValidator.validate(huespedDTO.direccion);
+        if (direccionValidationError != null) errores.add(direccionValidationError);
+
 
         if (!errores.isEmpty()) {
             return new CannotCreateHuespedException(errores.stream().map(

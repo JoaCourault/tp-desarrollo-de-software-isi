@@ -21,15 +21,9 @@ public class DireccionValidator implements IDireccionValidator {
 
     @Override
     public Direccion create(DireccionDTO direccionDTO) {
-        List<RuntimeException> errores = validate(direccionDTO);
-        if (errores != null && !errores.isEmpty()) {
-            throw new InvalidDirectionException(
-                    errores.stream()
-                            .map(RuntimeException::getMessage)
-                            .reduce((a, b) -> a + ", " + b)
-                            .orElse("")
-            );
-        }
+        InvalidDirectionException validationError = validate(direccionDTO);
+        if (validationError != null) throw validationError;
+
         return new Direccion(
                 direccionDTO.id,
                 direccionDTO.calle,
@@ -42,18 +36,43 @@ public class DireccionValidator implements IDireccionValidator {
                 direccionDTO.localidad
         );
     }
+    
     @Override
-    public List<RuntimeException> validate(DireccionDTO direccionDTO) {
-        List<RuntimeException> errores = new ArrayList<>();
-        RuntimeException error;
-        error = new InvalidDirectionException(validatePais(direccionDTO.pais)); if (error != null) errores.add(error);
-        error = new InvalidDirectionException(validateProvincia(direccionDTO.provincia)); if (error != null) errores.add(error);
-        error = new InvalidDirectionException(validateLocalidad(direccionDTO.localidad)); if (error != null) errores.add(error);
-        error = new InvalidDirectionException(validateCodigoPostal(direccionDTO.codigoPostal)); if (error != null) errores.add(error);
-        error = new InvalidDirectionException(validateCalle(direccionDTO.calle)); if (error != null) errores.add(error);
-        error = new InvalidDirectionException(validateNumero(direccionDTO.numero)); if (error != null) errores.add(error);
+    public InvalidDirectionException validate(DireccionDTO direccionDTO) {
+        if (direccionDTO == null) {
 
-        return errores;
+            return new InvalidDirectionException("La direccion no puede ser nula");
+        }
+
+        List<RuntimeException> errores = new ArrayList<>();
+        String error;
+        if ((error = validatePais(direccionDTO.pais)) != null) {
+            errores.add(new InvalidDirectionException(error));
+        }
+        if ((error = validateProvincia(direccionDTO.provincia)) != null) {
+            errores.add(new InvalidDirectionException(error));
+        }
+        if ((error = validateLocalidad(direccionDTO.localidad)) != null) {
+            errores.add(new InvalidDirectionException(error));
+        }
+        if ((error = validateCodigoPostal(direccionDTO.codigoPostal)) != null) {
+            errores.add(new InvalidDirectionException(error));
+        }
+        if ((error = validateCalle(direccionDTO.calle)) != null) {
+            errores.add(new InvalidDirectionException(error));
+        }
+        if ((error = validateNumero(direccionDTO.numero)) != null) {
+            errores.add(new InvalidDirectionException(error));
+        }
+
+        if (!errores.isEmpty()) return new InvalidDirectionException(
+                errores.stream()
+                        .map(RuntimeException::getMessage)
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("")
+        );
+
+        return null;
     }
 
     private String validatePais(String pais) {
