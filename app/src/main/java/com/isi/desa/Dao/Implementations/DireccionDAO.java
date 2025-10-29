@@ -23,7 +23,7 @@ public class DireccionDAO implements IDireccionDAO {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // ===== Helpers de ruta (solo build) =====
+    // Helpers de ruta (solo build)
     private File getJsonFile() {
         try {
             File dir = new File(RES_DIR);
@@ -37,17 +37,7 @@ public class DireccionDAO implements IDireccionDAO {
         }
     }
 
-//    private File getJsonFileForWrite() {
-//        File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
-//        if (f1.exists() && f1.isFile()) return f1;
-//
-//        File f2 = Paths.get("build","resources","main",RES_DIR,JSON_FILE).toFile();
-//        if (f2.exists() && f2.isFile()) return f2;
-//
-//        throw new RuntimeException("No se encontro archivo de salida en build para escribir '" + RES_DIR + "/" + JSON_FILE + "'. No se crean carpetas nuevas. Ejecute el build primero.");
-//    }
-
-    // ===== IO =====
+    // === IO ===
     private List<Direccion> leerDirecciones() {
         File file = getJsonFile();
         try {
@@ -67,7 +57,7 @@ public class DireccionDAO implements IDireccionDAO {
         }
     }
 
-    // ===== Implementacion IDireccionDAO =====
+    // ==== Implementacion IDireccionDAO ====
     @Override
     public Direccion crear(DireccionDTO direccion) {
         List<Direccion> direcciones = leerDirecciones();
@@ -76,7 +66,7 @@ public class DireccionDAO implements IDireccionDAO {
         if (direccion.id == null || direccion.id.isBlank()) {
             int max = 0;
             for (Direccion d : direcciones) {
-                String id = d.getIdDireccion(); // p.ej.: "DI-015"
+                String id = d.getIdDireccion();
                 if (id != null && id.startsWith("DI-")) {
                     try {
                         int n = Integer.parseInt(id.substring(3));

@@ -20,7 +20,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // ===== Helpers de ruta (solo build) =====
+    // === Helpers de ruta (solo build) ===
     private File getJsonFileForRead() {
         try {
             File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
@@ -47,7 +47,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
         throw new RuntimeException("No se encontro archivo de salida en build para escribir '" + RES_DIR + "/" + JSON_FILE + "'. No se crean carpetas nuevas. Ejecute el build primero.");
     }
 
-    // ===== IO =====
+    // === IO ===
     private List<TipoDocumentoDTO> leerTiposDto() {
         File file = getJsonFileForRead();
         try {
@@ -71,7 +71,7 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
         return new TipoDocumento(dto.tipoDocumento);
     }
 
-    // ===== Implementacion ITipoDocumentoDAO =====
+    // === Implementacion ITipoDocumentoDAO ===
     @Override
     public TipoDocumento crear(TipoDocumentoDTO dto) {
         List<TipoDocumentoDTO> tipos = leerTiposDto();

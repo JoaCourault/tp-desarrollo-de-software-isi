@@ -43,26 +43,26 @@ public class HuespedService implements IHuespedService {
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
 
-        // 1) Validacion (si hay error → IllegalArgumentException)
+        // Validacion
         CannotCreateHuespedException validation = this.validator.validateCreate(huespedDTO);
         if (validation != null) {
             throw validation;
         }
 
-        // 2) Persistencia de Direccion
+        // Persistencia de Direccion
         DireccionDAO direccionDAO = new DireccionDAO();
         try {
-            // intenta obtener la direccion (si ya existe → OK)
+            // intenta obtener la direccion
             direccionDAO.obtener(huespedDTO.direccion);
         } catch (Exception e) {
-            // si no existe → se crea
+            // si no existe se crea
             direccionDAO.crear(huespedDTO.direccion);
         }
 
-        // 3) Persistencia del Huesped
+        // Persistencia del Huesped
         Huesped creado = dao.crear(huespedDTO);
 
-        // 4) Convertir a DTO para devolver
+        // Convertir a DTO para devolver
         return HuespedMapper.entityToDTO(creado);
     }
 
@@ -146,7 +146,7 @@ public class HuespedService implements IHuespedService {
 
             HuespedDTO dto = request.huesped;
 
-            // 2.A - Validar
+            // Validar
             CannotModifyHuespedEsception errorValidacion = this.validator.validateUpdate(dto);
             if (errorValidacion != null) {
                 res.resultado.id = 2;
@@ -154,7 +154,7 @@ public class HuespedService implements IHuespedService {
                 return res;
             }
 
-            // 2.B - Duplicado de tipoDoc + numDoc
+            // Duplicado de tipoDoc + numDoc
             boolean duplicado = dao.leerHuespedes().stream()
                     .filter(h -> h != null && !h.isEliminado())
                     .anyMatch(h ->
@@ -175,7 +175,7 @@ public class HuespedService implements IHuespedService {
             }
 
 
-            // 3 - aplicar modificacion
+            // aplicar modificacion
             Huesped modificado = dao.modificar(dto);
 
             if (modificado == null) {

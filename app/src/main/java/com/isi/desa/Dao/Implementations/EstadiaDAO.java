@@ -28,7 +28,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    // ===== Helpers de ruta (solo build) =====
+    // Helpers de ruta (solo build)
     private File getJsonFileForRead() {
         try {
             File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
@@ -51,7 +51,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         throw new RuntimeException("No se encontro archivo de salida en build para escribir '" + RES_DIR + "/" + JSON_FILE + "'. No se crean carpetas nuevas. Ejecute el build primero.");
     }
 
-    // ===== IO =====
+    // === IO ===
     public List<Estadia> leerEstadias() {
         File file = getJsonFileForRead();
         try {
@@ -71,7 +71,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         }
     }
 
-    // ===== Mapeo DTO->Entidad (si no usas el mapper utilitario) =====
+    // === Mapeo DTO->Entidad (si no, usa el mapper) ===
     private Estadia dtoToEntity(EstadiaDTO dto) {
         Estadia e = new Estadia();
         e.setIdEstadia(dto.idEstadia);
@@ -82,7 +82,7 @@ public class EstadiaDAO implements IEstadiaDAO {
         return e;
     }
 
-    // ===== Implementacion IEstadiaDAO =====
+    // === Implementacion IEstadiaDAO ===
     @Override
     public Estadia crear(EstadiaDTO estadia) {
         List<Estadia> estadias = leerEstadias();

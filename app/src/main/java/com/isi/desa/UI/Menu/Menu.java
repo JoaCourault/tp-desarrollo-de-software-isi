@@ -8,7 +8,7 @@ public class Menu implements MenuComponent {
     private final String title;
     private final List<MenuComponent> children = new ArrayList<>();
 
-    // Texto de la opcion de salida personalizable
+    // Texto de la opcion de salida
     private String exitOptionText = "Volver"; // Valor por defecto
 
     public Menu(String title) {

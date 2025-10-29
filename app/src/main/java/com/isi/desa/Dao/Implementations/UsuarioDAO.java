@@ -21,7 +21,7 @@ public class UsuarioDAO implements IUsuarioDAO {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // ===== Helpers de ruta (solo build) =====
+    // === Helpers de ruta (solo build) ===
     private File getJsonFileForRead() {
         try {
             File f1 = Paths.get("app","build","resources","main",RES_DIR,JSON_FILE).toFile();
@@ -48,7 +48,7 @@ public class UsuarioDAO implements IUsuarioDAO {
         throw new RuntimeException("No se encontro archivo de salida en build para escribir '" + RES_DIR + "/" + JSON_FILE + "'. No se crean carpetas nuevas. Ejecute el build primero.");
     }
 
-    // ===== IO =====
+    // === IO ===
     private List<Usuario> leerUsuarios() {
         File file = getJsonFileForRead();
         try {
@@ -72,7 +72,7 @@ public class UsuarioDAO implements IUsuarioDAO {
         return new Usuario(dto.idUsuario, dto.contrasenia, dto.nombre, dto.apellido);
     }
 
-    // ===== Implementacion IUsuarioDAO =====
+    // === Implementacion IUsuarioDAO ===
     @Override
     public Usuario crear(UsuarioDTO dto) {
         List<Usuario> usuarios = leerUsuarios();

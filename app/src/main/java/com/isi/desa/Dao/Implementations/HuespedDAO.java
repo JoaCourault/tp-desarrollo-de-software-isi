@@ -20,7 +20,6 @@ import java.util.*;
 
 public class HuespedDAO implements IHuespedDAO {
 
-   // private static final String JSON_RESOURCE = "jsonDataBase/huesped.json";
     private final ObjectMapper mapper;
     private static DireccionDAO direccionDAO;
     private static TipoDocumentoDAO tipoDocumentoDAO;
@@ -32,87 +31,7 @@ public class HuespedDAO implements IHuespedDAO {
         direccionDAO = new DireccionDAO();
         tipoDocumentoDAO = new TipoDocumentoDAO();
     }
-
-//    private static final String JSON_FILE = "huesped.json";
-//    private static final String RES_DIR   = "jsonDataBase";
-//
-//    // 1) Lectura: intenta primero el archivo editable en src/main/resources (dev)
-//    // si existe lo usa; si no existe intenta la ruta desde classloader; de lo contrario usa fallback escribible
-//    private File getJsonFileForRead() {
-//        try {
-//            // Preferir archivo dev editable (src/main/resources/jsonDataBase/huesped.json)
-//            File dev = Paths.get("src", "main", "resources", RES_DIR, JSON_FILE).toFile();
-//            if (dev.exists()) return dev;
-//
-//            String resourcePath = RES_DIR + "/" + JSON_FILE;
-//            var cl = Thread.currentThread().getContextClassLoader();
-//            var url = cl.getResource(resourcePath);
-//            if (url != null && !"jar".equalsIgnoreCase(url.getProtocol())) {
-//                File f = new File(url.toURI());
-//                if (f.exists()) return f;
-//            }
-//            // fallback (tambien sirve si queres forzar lectura local)
-//            return getJsonFileForWrite();
-//        } catch (Exception e) {
-//            return getJsonFileForWrite();
-//        }
-//    }
-//
-//    // 2) Escritura: siempre a src/main/resources/jsonDataBase (dev) o data/jsonDataBase (fallback)
-//    private File getJsonFileForWrite() {
-//        try {
-//            // ruta “dev” (IDE): src/main/resources/jsonDataBase/huesped.json
-//            File dev = Paths.get("src","main","resources",RES_DIR,JSON_FILE).toFile();
-//            ensureFile(dev);
-//            return dev;
-//        } catch (Exception ignore) {
-//            // fallback para ejecucion empaquetada (JAR): ./data/jsonDataBase/huesped.json
-//            File external = Paths.get("data",RES_DIR,JSON_FILE).toFile();
-//            try { ensureFile(external); } catch (Exception ex) {
-//                throw new RuntimeException("No se pudo crear archivo JSON: " + external.getAbsolutePath(), ex);
-//            }
-//            return external;
-//        }
-//    }
-//
-//    private void ensureFile(File f) throws Exception {
-//        File p = f.getParentFile();
-//        if (p != null && !p.exists()) p.mkdirs();
-//        if (!f.exists()) f.createNewFile();
-//    }
-//
-//
-//    private String nombreArchivo() {
-//        // Ejemplo para DireccionDAO:
-//        return "direccion.json";
-//    }
-//
-//
-//    /**
-//     * Lee el archivo JSON completo y devuelve todos los huespedes.
-//     */
-//    public List<Huesped> leerHuespedes() {
-//        File file = getJsonFileForRead();
-//        try {
-//            if (file.length() == 0) return new ArrayList<>();
-//            return mapper.readValue(file, new TypeReference<List<Huesped>>() {});
-//        } catch (IOException e) {
-//            throw new RuntimeException("Error al leer " + JSON_FILE, e);
-//        }
-//    }
-//
-//    private boolean guardarHuespedes(List<Huesped> huespedes) {
-//        try {
-//            File file = getJsonFileForWrite();
-//            mapper.writerWithDefaultPrettyPrinter().writeValue(file, huespedes);
-//            return true;
-//        } catch (IOException e) {
-//            throw new RuntimeException("Error al guardar " + JSON_FILE, e);
-//        }
-//    }
-// -------------------------------------------------------------------------
 // CONFIGURACIÓN DEL ARCHIVO JSON ÚNICO (modo desarrollo y ejecución directa)
-// -------------------------------------------------------------------------
     private static final String RES_DIR = "app/src/main/resources/jsonDataBase";
     private static final String JSON_FILE = "huesped.json";
 
@@ -129,9 +48,7 @@ public class HuespedDAO implements IHuespedDAO {
         }
     }
 
-    /**
-     * Lee todos los huespedes desde el archivo JSON.
-     */
+    // === Lee todos los huespedes desde el archivo JSON ===
     public List<Huesped> leerHuespedes() {
         File file = getJsonFile();
         try {
@@ -142,9 +59,8 @@ public class HuespedDAO implements IHuespedDAO {
         }
     }
 
-    /**
-     * Guarda la lista completa de huespedes en el archivo JSON.
-     */
+    // === Guarda la lista completa de huespedes en el archivo JSON. ===
+
     private boolean guardarHuespedes(List<Huesped> huespedes) {
         File file = getJsonFile();
         try {
@@ -248,7 +164,7 @@ public class HuespedDAO implements IHuespedDAO {
         }
 
         Huesped h = existente.get();
-        // si tiene estadias activas podriamos lanzar excepcion segun la logica del negocio
+
         if (h.getIdsEstadias() != null && !h.getIdsEstadias().isEmpty()) {
             throw new HuespedConEstadiaAsociadasException("El huesped tiene estadias asociadas y no puede eliminarse.");
         }
@@ -272,7 +188,7 @@ public class HuespedDAO implements IHuespedDAO {
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con DNI: " + DNI));
     }
 
-    /* Agrega un ID de estadia al huesped correspondiente */
+    // === Agrega un ID de estadia al huesped correspondiente ===
     public void agregarEstadiaAHuesped(String idHuesped, String idEstadia) {
         List<Huesped> huespedes = leerHuespedes();
 
@@ -307,9 +223,7 @@ public class HuespedDAO implements IHuespedDAO {
         guardarHuespedes(huespedes);
     }
 
-    /**
-     * Devuelve la lista de IDs de estadias de un huesped.
-     */
+    // === Devuelve la lista de IDs de estadias de un huesped. ===
     public List<String> obtenerIdsEstadiasDeHuesped(String idHuesped) {
         return leerHuespedes().stream()
                 .filter(h -> !h.isEliminado())

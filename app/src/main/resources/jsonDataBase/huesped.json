@@ -133,19 +133,109 @@
   "ocupacion" : "estudiante",
   "nacionalidad" : "Argentina",
   "direccion" : {
-    "calle" : "Tacuari",
-    "numero" : 7041,
+    "calle" : null,
+    "numero" : null,
     "departamento" : null,
     "piso" : null,
-    "cp" : 3000,
-    "localidad" : "Santa Fe",
-    "provincia" : "Santa Fe",
-    "pais" : "Argentina",
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
     "id" : "DI-016"
   },
   "idsEstadias" : [ ],
   "eliminado" : false,
   "id" : "HU-005",
   "idDireccion" : "DI-016",
+  "idTipoDocumento" : "DNI"
+}, {
+  "nombre" : "Luis",
+  "apellido" : "Meister",
+  "tipoDocumento" : {
+    "tipoDocumento" : "DNI"
+  },
+  "numDoc" : "40646857",
+  "posicionIva" : "",
+  "cuit" : null,
+  "fechaNacimiento" : "1997-12-08",
+  "telefono" : "3425415787",
+  "email" : "luisillo",
+  "ocupacion" : "Estudiante",
+  "nacionalidad" : "Argentino",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-017"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : true,
+  "id" : "HU-006",
+  "idDireccion" : "DI-017",
+  "idTipoDocumento" : "DNI"
+}, {
+  "nombre" : "luis",
+  "apellido" : "meister",
+  "tipoDocumento" : {
+    "tipoDocumento" : "DNI"
+  },
+  "numDoc" : "41547879",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : null,
+  "fechaNacimiento" : "1997-10-12",
+  "telefono" : "3241452541",
+  "email" : "luisillo",
+  "ocupacion" : "nadabro",
+  "nacionalidad" : "argentinobro",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-018"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-007",
+  "idDireccion" : "DI-018",
+  "idTipoDocumento" : "DNI"
+}, {
+  "nombre" : "prueba",
+  "apellido" : "dpto",
+  "tipoDocumento" : {
+    "tipoDocumento" : "DNI"
+  },
+  "numDoc" : "41547852",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : null,
+  "fechaNacimiento" : "1492-10-04",
+  "telefono" : "3245145478",
+  "email" : "holisquetal",
+  "ocupacion" : "solteria",
+  "nacionalidad" : "cubano",
+  "direccion" : {
+    "calle" : "la de el",
+    "numero" : 2541,
+    "departamento" : "3B",
+    "piso" : 25,
+    "cp" : 2541,
+    "localidad" : "tierra media",
+    "provincia" : "tolkiel",
+    "pais" : "islandia",
+    "id" : "DI-019"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-008",
+  "idDireccion" : "DI-019",
   "idTipoDocumento" : "DNI"
 } ]

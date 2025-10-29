@@ -1,8 +1,8 @@
 [ {
   "calle" : "Av. Siempre Viva",
   "numero" : 742,
-  "departamento" : "A",
-  "piso" : 3,
+  "departamento" : null,
+  "piso" : null,
   "cp" : 1001,
   "localidad" : "Buenos Aires",
   "provincia" : "Buenos Aires",
@@ -158,4 +158,34 @@
   "provincia" : "Santa Fe",
   "pais" : "Argentina",
   "id" : "DI-016"
+}, {
+  "calle" : "2802",
+  "numero" : 2820,
+  "departamento" : null,
+  "piso" : null,
+  "cp" : 3000,
+  "localidad" : "Santa Fe",
+  "provincia" : "Santa Fe",
+  "pais" : "Argentina",
+  "id" : "DI-017"
+}, {
+  "calle" : "alguna",
+  "numero" : 1234,
+  "departamento" : "2A",
+  "piso" : 2,
+  "cp" : 3000,
+  "localidad" : "santafe",
+  "provincia" : "santafe",
+  "pais" : "argentina",
+  "id" : "DI-018"
+}, {
+  "calle" : "la de el",
+  "numero" : 2541,
+  "departamento" : "3B",
+  "piso" : 25,
+  "cp" : 2541,
+  "localidad" : "tierra media",
+  "provincia" : "tolkiel",
+  "pais" : "islandia",
+  "id" : "DI-019"
 } ]

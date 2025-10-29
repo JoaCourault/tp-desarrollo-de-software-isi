@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class MenuRunner {
     private final Menu root;
-    private final Scanner scanner; // <-- CAMBIO: Almacena el scanner
+    private final Scanner scanner; // CAMBIO: Almacena el scanner
 
     // CAMBIO: Acepta un scanner en el constructor
     public MenuRunner(Menu root, Scanner scanner) {

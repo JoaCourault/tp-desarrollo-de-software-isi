@@ -33,9 +33,9 @@ public class UI {
                 if (!loggedIn.get()) {
                     // --- FASE DE LOGIN ---
                     Menu loginMenu = new Menu("Bienvenido - Iniciar Sesion");
-                    loginMenu.setExitOptionText("Salir"); // Personalizar texto de salida
+                    loginMenu.setExitOptionText("Salir"); // Texto de salida
 
-                    // -- Item: Autenticar usuario ---
+                    // -- Autenticar usuario ---
                     loginMenu.add(new MenuItem("Autenticar usuario", (Scanner sc) -> {
                         System.out.print("Nombre: ");
                         String nombre = sc.nextLine();
@@ -178,11 +178,11 @@ public class UI {
                                     // --- OPCION 1: MODIFICAR ---
                                     System.out.println("--- Modificar campos (deje vacio para mantener el valor actual) ---");
                                     HuespedDTO cambios = new HuespedDTO();
-                                    cambios.numDoc = seleccionado.numDoc;
                                     System.out.print("Nombre [" + seleccionado.nombre + "]: "); String n = sc.nextLine().trim(); cambios.nombre = n.isEmpty()? seleccionado.nombre : n;
                                     System.out.print("Apellido [" + seleccionado.apellido + "]: "); String a = sc.nextLine().trim(); cambios.apellido = a.isEmpty()? seleccionado.apellido : a;
                                     System.out.print("Tipo de documento [" + (seleccionado.tipoDocumento!=null?seleccionado.tipoDocumento.tipoDocumento:"") + "]: "); String td = sc.nextLine().trim();
                                     if (td.isEmpty()) cambios.tipoDocumento = seleccionado.tipoDocumento; else { TipoDocumentoDTO tdd = new TipoDocumentoDTO(); tdd.tipoDocumento = td; cambios.tipoDocumento = tdd; }
+                                    System.out.print("Numero de Documento [" + seleccionado.numDoc + "]: "); String numerDoc = sc.nextLine().trim(); cambios.numDoc = numerDoc.isEmpty()? seleccionado.numDoc : numerDoc;
                                     System.out.print("Posicion IVA [" + (seleccionado.posicionIva!=null?seleccionado.posicionIva:"") + "]: "); String iva = sc.nextLine().trim(); cambios.posicionIva = iva.isEmpty()? seleccionado.posicionIva : iva;
                                     System.out.print("CUIT [" + (seleccionado.cuit!=null?seleccionado.cuit:"") + "]: "); String cuit = sc.nextLine().trim(); cambios.cuit = cuit.isEmpty()? seleccionado.cuit : cuit;
                                     System.out.print("Fecha de nacimiento [" + (seleccionado.fechaNacimiento!=null?seleccionado.fechaNacimiento:"") + "]: "); String fn = sc.nextLine().trim();
@@ -218,6 +218,11 @@ public class UI {
                                     // *** FIX NPE (asignar) ***
                                     try { dir.numero = num.isEmpty()? (dirOrig!=null?dirOrig.numero:null) : Integer.parseInt(num); }
                                     catch(Exception ex){ dir.numero = (dirOrig!=null?dirOrig.numero:null); }
+                                    System.out.print("Departamento [" + (dirOrig!=null && dirOrig.departamento!=null?dirOrig.departamento:"") + "]: "); String depto = sc.nextLine().trim();
+                                    dir.departamento = depto.isEmpty()? (dirOrig!=null?dirOrig.departamento:null) : depto;
+
+                                    System.out.print("Piso [" + (dirOrig!=null && dirOrig.piso!=null?dirOrig.piso:"") + "]: "); String piso_dpto = sc.nextLine().trim();
+                                    dir.piso = piso_dpto.isEmpty()? (dirOrig!=null?dirOrig.piso:null) : Integer.parseInt(piso_dpto);
 
                                     dir.id = (dirOrig!=null?dirOrig.id:null);
 
@@ -303,6 +308,7 @@ public class UI {
         if (!tdStr.isEmpty()) { TipoDocumentoDTO td = new TipoDocumentoDTO(); td.tipoDocumento = tdStr; nuevo.tipoDocumento = td; }
         System.out.print("Numero de documento: "); nuevo.numDoc = scanner.nextLine().trim();
         System.out.print("Posicion IVA: "); nuevo.posicionIva = scanner.nextLine().trim();
+        if (nuevo.posicionIva.isEmpty()) nuevo.posicionIva = "Consumidor Final";
         System.out.print("CUIT (por ejemplo 20-XXXXXXXX-X): "); String cuitStr = scanner.nextLine().trim(); nuevo.cuit = cuitStr.isEmpty()? null : cuitStr;
         System.out.print("Fecha de nacimiento (YYYY-MM-DD): ");
         try { String f = scanner.nextLine().trim(); nuevo.fechaNacimiento = f.isEmpty()? null : java.time.LocalDate.parse(f); } catch(Exception ex){ nuevo.fechaNacimiento = null; }
@@ -324,6 +330,11 @@ public class UI {
 
         System.out.print("Numero: ");
         try { String num = scanner.nextLine().trim(); dir.numero = num.isEmpty()? null : Integer.parseInt(num); } catch(Exception ex){ dir.numero = null; }
+
+        System.out.print("Departamento: "); dir.departamento = scanner.nextLine().trim();
+
+        System.out.print("Piso: ");
+        try { String piso = scanner.nextLine().trim(); dir.piso = piso.isEmpty()? null : Integer.parseInt(piso); } catch(Exception ex){ dir.piso = null; }
 
         nuevo.direccion = dir;
         return nuevo;
