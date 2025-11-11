@@ -15,12 +15,13 @@ import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Format.DateFormat;
 import com.isi.desa.Utils.Mappers.DireccionMapper;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-// @Service //Descomentar para correr con Spring Boot
+@Service
 public class HuespedValidator implements IHuespedValidator {
     private final IDireccionValidator direccionValidator;
     private final IHuespedDAO dao;

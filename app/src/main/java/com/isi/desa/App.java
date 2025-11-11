@@ -3,14 +3,19 @@
  */
 package com.isi.desa;
 
-import com.isi.desa.UI.UI;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 
-//@SpringBootApplication //Descomentar para correr con Spring Boot
+import com.isi.desa.Config.CorsConfig;
+
+@Import(CorsConfig.class)
+@SpringBootApplication
 public class App {
     public static void main(String[] args) {
-        // Descomentar para correr con Spring Boot
-        // ApplicationContext context = SpringApplication.run(App.class, args);
 
-        UI.run();
+        ApplicationContext context = SpringApplication.run(App.class, args);
+
     }
 }

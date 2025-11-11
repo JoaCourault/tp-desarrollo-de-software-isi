@@ -12,12 +12,14 @@ import com.isi.desa.Exceptions.Huesped.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
+@Service
 public class HuespedDAO implements IHuespedDAO {
 
     private final ObjectMapper mapper;

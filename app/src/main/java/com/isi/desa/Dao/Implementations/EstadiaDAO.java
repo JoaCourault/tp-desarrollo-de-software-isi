@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.isi.desa.Dao.Interfaces.IEstadiaDAO;
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class EstadiaDAO implements IEstadiaDAO {
 
     private static final String RES_DIR   = "jsonDataBase";

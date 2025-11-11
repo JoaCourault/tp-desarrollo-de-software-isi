@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class TipoDocumentoDAO implements ITipoDocumentoDAO {
 
     private static final String RES_DIR   = "jsonDataBase";

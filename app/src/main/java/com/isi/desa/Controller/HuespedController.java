@@ -4,20 +4,15 @@ import com.isi.desa.Service.Implementations.HuespedService;
 import com.isi.desa.Service.Implementations.Logger;
 import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Interfaces.ILogger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
-//@Controller //Descomentar para correr con Spring Boot
+@Controller
 public class HuespedController {
-    //@Autowired //Descomentar para correr con Spring Boot
-    private final IHuespedService service;
-    //@Autowired //Descomentar para correr con Spring Boot
-    private final ILogger logger;
-
-    // Constructor privado para singleton y para evitar instanciacion directa
-    private HuespedController() {
-        // Usar singletons de implementacion (se asume que existen getInstance())
-        this.service = HuespedService.getInstance();
-        this.logger = Logger.getInstance();
-    }
+    @Autowired
+    private IHuespedService service;
+    @Autowired
+    private ILogger logger;
 
     // Instancia unica (eager singleton)
     private static final HuespedController INSTANCE = new HuespedController();

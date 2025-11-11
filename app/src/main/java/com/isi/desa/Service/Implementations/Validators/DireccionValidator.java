@@ -4,9 +4,12 @@ import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class DireccionValidator implements IDireccionValidator {
     // Instancia unica (eager singleton)
     private static final DireccionValidator INSTANCE = new DireccionValidator();

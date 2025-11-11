@@ -14,26 +14,23 @@ import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Implementations.Validators.HuespedValidator;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@Service //Descomentar para Spring Boot
+@Service
 public class HuespedService implements IHuespedService {
-    //@Autowired //Descomentar para Spring Boot
-    private final IHuespedValidator validator;
-    //@Autowired //Descomentar para Spring Boot
-    private final IHuespedDAO dao;
+    @Autowired
+    private IHuespedValidator validator;
+    @Autowired
+    private IHuespedDAO dao;
 
     // Instancia unica (eager singleton)
     private static final HuespedService INSTANCE = new HuespedService();
 
-    // Constructor privado para inyeccion manual
-    private HuespedService() {
-        this.dao = new HuespedDAO();
-        this.validator = HuespedValidator.getInstance();
-    }
 
     // Metodo publico para obtener la instancia
     public static HuespedService getInstance() {

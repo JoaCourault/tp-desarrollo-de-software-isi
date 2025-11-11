@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isi.desa.Dao.Interfaces.IDireccionDAO;
 import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import static com.isi.desa.Utils.Mappers.DireccionMapper.dtoToEntity;
 
+@Service
 public class DireccionDAO implements IDireccionDAO {
 
     private static final String RES_DIR = "app/src/main/resources/jsonDataBase";

@@ -2,6 +2,7 @@ package com.isi.desa.Dao.Interfaces;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Exceptions.Huesped.HuespedDuplicadoException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
