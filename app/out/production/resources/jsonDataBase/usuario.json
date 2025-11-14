@@ -13,4 +13,9 @@
   "contrasenia" : "r",
   "nombre" : "r",
   "apellido" : "r"
-} ]
+}, {
+  "idUsuario" : "a",
+  "contrasenia" : "a",
+  "nombre" : "a",
+  "apellido" : "a"
+}]

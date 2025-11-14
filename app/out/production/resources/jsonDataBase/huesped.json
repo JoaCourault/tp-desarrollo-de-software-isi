@@ -26,8 +26,8 @@
   "idsEstadias" : [ "ES-001", "ES-004" ],
   "eliminado" : false,
   "id" : "HU-001",
-  "idDireccion" : "DI-001",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-001"
 }, {
   "nombre" : "Juan",
   "apellido" : "Perez",
@@ -56,8 +56,8 @@
   "idsEstadias" : [ "ES-002", "ES-003" ],
   "eliminado" : false,
   "id" : "HU-002",
-  "idDireccion" : "DI-002",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-002"
 }, {
   "nombre" : "Lucia",
   "apellido" : "Martinez",
@@ -86,8 +86,8 @@
   "idsEstadias" : [ ],
   "eliminado" : false,
   "id" : "HU-003",
-  "idDireccion" : "DI-003",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-003"
 }, {
   "nombre" : "Carlos",
   "apellido" : "Fernandez",
@@ -116,8 +116,8 @@
   "idsEstadias" : [ "ES-005" ],
   "eliminado" : false,
   "id" : "HU-004",
-  "idDireccion" : "DI-004",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-004"
 }, {
   "nombre" : "Guillermina GENIA",
   "apellido" : "Belletti",
@@ -146,8 +146,8 @@
   "idsEstadias" : [ ],
   "eliminado" : false,
   "id" : "HU-005",
-  "idDireccion" : "DI-016",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-016"
 }, {
   "nombre" : "Luis",
   "apellido" : "Meister",
@@ -176,8 +176,8 @@
   "idsEstadias" : [ ],
   "eliminado" : true,
   "id" : "HU-006",
-  "idDireccion" : "DI-017",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-017"
 }, {
   "nombre" : "luis",
   "apellido" : "meister",
@@ -206,8 +206,8 @@
   "idsEstadias" : [ ],
   "eliminado" : false,
   "id" : "HU-007",
-  "idDireccion" : "DI-018",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-018"
 }, {
   "nombre" : "prueba",
   "apellido" : "dpto",
@@ -236,8 +236,8 @@
   "idsEstadias" : [ ],
   "eliminado" : true,
   "id" : "HU-008",
-  "idDireccion" : "DI-019",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-019"
 }, {
   "nombre" : "prueba",
   "apellido" : "crear varios",
@@ -266,8 +266,8 @@
   "idsEstadias" : [ ],
   "eliminado" : true,
   "id" : "HU-009",
-  "idDireccion" : "DI-020",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-020"
 }, {
   "nombre" : "prueba",
   "apellido" : "segunco creado",
@@ -296,8 +296,8 @@
   "idsEstadias" : [ ],
   "eliminado" : true,
   "id" : "HU-010",
-  "idDireccion" : "DI-021",
-  "idTipoDocumento" : "DNI"
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-021"
 }, {
   "nombre" : "prueba",
   "apellido" : "dpto",
@@ -326,6 +326,96 @@
   "idsEstadias" : [ ],
   "eliminado" : true,
   "id" : "HU-011",
-  "idDireccion" : "DI-022",
-  "idTipoDocumento" : "DNI"
-} ]
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-022"
+}, {
+  "nombre" : "Agustin",
+  "apellido" : "Acosta",
+  "tipoDocumento" : {
+    "tipoDocumento" : "DNI"
+  },
+  "numDoc" : "45946104",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-45946104-4",
+  "fechaNacimiento" : "2004-04-29",
+  "telefono" : "13053962805",
+  "email" : "ivansm@geekshive.comi",
+  "ocupacion" : "estudiante",
+  "nacionalidad" : "argentino",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-023"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-012",
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-023"
+}, {
+  "nombre" : "Belleti",
+  "apellido" : "Guillermina",
+  "tipoDocumento" : {
+    "tipoDocumento" : "Pasaporte"
+  },
+  "numDoc" : "45946104",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "22-45946104-5",
+  "fechaNacimiento" : "2004-04-29",
+  "telefono" : "13053962805",
+  "email" : "agustin@geekshive.com",
+  "ocupacion" : "estudiante",
+  "nacionalidad" : "argentino",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-024"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-013",
+  "idTipoDocumento" : "Pasaporte",
+  "idDireccion" : "DI-024"
+}, {
+  "nombre" : "Prueba",
+  "apellido" : "Prueba",
+  "tipoDocumento" : {
+    "tipoDocumento" : "DNI"
+  },
+  "numDoc" : "12345678",
+  "posicionIva" : "Consumidor Final",
+  "cuit" : "20-12345678-5",
+  "fechaNacimiento" : "2001-01-01",
+  "telefono" : "123456789",
+  "email" : "",
+  "ocupacion" : "Pruebasianda",
+  "nacionalidad" : "Pruebasianda",
+  "direccion" : {
+    "calle" : null,
+    "numero" : null,
+    "departamento" : null,
+    "piso" : null,
+    "cp" : null,
+    "localidad" : null,
+    "provincia" : null,
+    "pais" : null,
+    "id" : "DI-025"
+  },
+  "idsEstadias" : [ ],
+  "eliminado" : false,
+  "id" : "HU-014",
+  "idTipoDocumento" : "DNI",
+  "idDireccion" : "DI-025"
+}]
