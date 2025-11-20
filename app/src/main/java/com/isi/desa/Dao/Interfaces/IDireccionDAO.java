@@ -11,4 +11,6 @@ public interface IDireccionDAO {
     Direccion eliminar(DireccionDTO direccion);
 
     Direccion obtener(DireccionDTO direccion);
+
+    Direccion obtenerDireccionDeHuespedPorId(String idHuesped);
 }

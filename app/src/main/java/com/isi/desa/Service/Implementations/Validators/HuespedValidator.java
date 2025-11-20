@@ -111,7 +111,7 @@ public class HuespedValidator implements IHuespedValidator {
                             .getMessage()
             );
         }
-        if (!huesperAEliminar.getIdsEstadias().isEmpty()) {
+        if (!this.dao.obtenerEstadiasDeHuesped(huesperAEliminar.getIdHuesped()).isEmpty()) {
             return new CannotDeleteHuespedException(
                     new HuespedConEstadiaAsociadasException("No se puede eliminar el huesped porque tiene estadias asociadas")
                             .getMessage()

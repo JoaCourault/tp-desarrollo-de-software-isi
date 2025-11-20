@@ -2,9 +2,12 @@ package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
+import jdk.dynalink.linker.LinkerServices;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EstadiaMapper {
     public static EstadiaDTO entityToDto(Estadia e) {
@@ -24,5 +27,19 @@ public class EstadiaMapper {
         e.setCheckOut(dto.checkOut);
         e.setCantNoches(dto.cantNoches);
         return e;
+    }
+    public static List<Estadia> dtoLisToEntitiesList(List<EstadiaDTO> dto) {
+        List<Estadia> estadias = new ArrayList<>();
+        for (EstadiaDTO e : dto) {
+            estadias.add(dtoToEntity(e));
+        }
+        return estadias;
+    }
+    public static List<EstadiaDTO> entityListToDtoList(List<Estadia> estadias) {
+        List<EstadiaDTO> dtoList = new ArrayList<>();
+        for (Estadia e : estadias) {
+            dtoList.add(entityToDto(e));
+        }
+        return dtoList;
     }
 }

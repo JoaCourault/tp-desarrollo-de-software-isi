@@ -90,15 +90,15 @@ public class DireccionValidator implements IDireccionValidator {
         return (localidad == null || localidad.trim().isEmpty()) ? "La localidad es obligatoria" : null;
     }
 
-    private String validateCodigoPostal(Integer codigoPostal) {
-        return (codigoPostal == null || codigoPostal <= 0) ? "El codigo postal es obligatorio y debe ser positivo" : null;
+    private String validateCodigoPostal(String codigoPostal) {
+        return (codigoPostal == null || !codigoPostal.isEmpty()) ? "El codigo postal es obligatorio y debe ser positivo" : null;
     }
 
     private String validateCalle(String calle) {
         return (calle == null || calle.trim().isEmpty()) ? "La calle es obligatoria" : null;
     }
 
-    private String validateNumero(Integer numero) {
-        return (numero == null || numero <= 0) ? "El numero es obligatorio y debe ser positivo" : null;
+    private String validateNumero(String numero) {
+        return (numero == null || !numero.isEmpty()) ? "El numero es obligatorio y debe ser positivo" : null;
     }
 }

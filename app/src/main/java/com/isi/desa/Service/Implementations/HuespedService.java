@@ -48,7 +48,8 @@ public class HuespedService implements IHuespedService {
                 .anyMatch(h ->
                         h.getTipoDocumento() != null &&
                                 huespedDTO.tipoDocumento != null &&
-                                h.getTipoDocumento().getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
+                                huespedDTO.tipoDocumento.tipoDocumento != null &&
+                                h.getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
                                 h.getNumDoc() != null &&
                                 h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
                 );
@@ -106,9 +107,17 @@ public class HuespedService implements IHuespedService {
         res.resultado = new Resultado();
         res.huespedesEncontrados = new ArrayList<>();
 
-        HuespedDTO filtro = req.huesped;
-
+        // proteger contra req o filtro nulos
+        HuespedDTO filtro = (req == null) ? null : req.huesped;
         List<Huesped> todos = this.dao.leerHuespedes();
+
+        if (filtro == null) {
+            // si no hay filtro, devolvemos todos
+            res.huespedesEncontrados = todos;
+            res.resultado.id = 0;
+            res.resultado.mensaje = "OK";
+            return res;
+        }
 
         // Si el usuario no completa NADA → devolver todos
         boolean algunCampo =
@@ -130,22 +139,25 @@ public class HuespedService implements IHuespedService {
             boolean coincide = true;
 
             if (filtro.nombre != null && !filtro.nombre.isEmpty()) {
-                coincide &= h.getNombre().toLowerCase().contains(filtro.nombre.toLowerCase());
+                if (h.getNombre() == null) { coincide = false; }
+                else { coincide &= h.getNombre().toLowerCase().contains(filtro.nombre.toLowerCase()); }
             }
 
             if (filtro.apellido != null && !filtro.apellido.isEmpty()) {
-                coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase());
+                if (h.getApellido() == null) { coincide = false; }
+                else { coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase()); }
             }
 
             if (filtro.tipoDocumento != null) {
                 coincide &= (
                         h.getTipoDocumento() != null &&
-                                h.getTipoDocumento().getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento)
+                                h.getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento)
                 );
             }
 
             if (filtro.numDoc != null && !filtro.numDoc.isEmpty()) {
-                coincide &= h.getNumDoc().equalsIgnoreCase(filtro.numDoc);
+                if (h.getNumDoc() == null) { coincide = false; }
+                else { coincide &= h.getNumDoc().equalsIgnoreCase(filtro.numDoc); }
             }
 
             if (coincide) res.huespedesEncontrados.add(h);
@@ -187,7 +199,7 @@ public class HuespedService implements IHuespedService {
                                     !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) &&
                                     h.getTipoDocumento() != null &&
                                     dto.tipoDocumento != null &&
-                                    h.getTipoDocumento().getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
+                                    h.getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
                                     h.getNumDoc().equals(dto.numDoc)
                     );
 

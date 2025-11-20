@@ -10,12 +10,13 @@ import org.springframework.context.annotation.Import;
 
 import com.isi.desa.Config.CorsConfig;
 
+import java.util.TimeZone;
+
 @Import(CorsConfig.class)
 @SpringBootApplication
 public class App {
     public static void main(String[] args) {
-
-        ApplicationContext context = SpringApplication.run(App.class, args);
-
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Argentina/Buenos_Aires"));
+        SpringApplication.run(App.class, args);
     }
 }

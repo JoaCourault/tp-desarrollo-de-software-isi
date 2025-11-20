@@ -49,8 +49,6 @@ public class HuespedController {
         AltaHuespedResultDTO res = new AltaHuespedResultDTO();
 
         try {
-            System.out.println("DEBUG REQUEST HUESPED: " + requestDTO.huesped);
-
             // alta del huesped
             HuespedDTO creado = this.service.crear(requestDTO.huesped);
 
