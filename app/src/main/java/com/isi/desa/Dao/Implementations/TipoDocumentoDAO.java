@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Service("tipoDocumentoDAO")
 public class TipoDocumentoDAO implements ITipoDocumentoDAO {
+
     @Autowired
     private TipoDocumentoRepository repo;
 

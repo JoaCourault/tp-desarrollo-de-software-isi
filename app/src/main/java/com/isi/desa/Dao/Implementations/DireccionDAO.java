@@ -11,55 +11,94 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Service
+@Service("direccionDAO")
 public class DireccionDAO implements IDireccionDAO {
+
     @Autowired
     private DireccionRepository repository;
 
+    // ============================================================
+    // ===============           CREAR           ===================
+    // ============================================================
+
     @Override
     @Transactional
-    public Direccion crear(DireccionDTO direccion) {
-        if (direccion.id == null || direccion.id.isBlank()) {
-            direccion.id = java.util.UUID.randomUUID().toString();
-        }
-        if (repository.existsById(direccion.id)) {
-            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.id);
-        }
-        Direccion nueva = DireccionMapper.dtoToEntity(direccion);
+    public Direccion crear(DireccionDTO dto) {
+
+        // El ID SIEMPRE se genera aquí, no aceptamos uno del front
+        dto.id = java.util.UUID.randomUUID().toString();
+
+        Direccion nueva = DireccionMapper.dtoToEntity(dto);
         return repository.save(nueva);
     }
 
-    @Override
-    @Transactional
-    public Direccion modificar(DireccionDTO direccion) {
-        if (!repository.existsById(direccion.id)) {
-            throw new RuntimeException("No se encontro la direccion con ID: " + direccion.id);
-        }
-        Direccion actualizada = DireccionMapper.dtoToEntity(direccion);
-        return repository.save(actualizada);
-    }
+    // ============================================================
+    // ===============         MODIFICAR         ===================
+    // ============================================================
 
     @Override
     @Transactional
-    public Direccion eliminar(DireccionDTO direccion) {
-        Direccion existente = repository.findById(direccion.id)
-                .orElseThrow(() -> new RuntimeException("No se encontro la direccion a eliminar: " + direccion.id));
+    public Direccion modificar(DireccionDTO dto) {
+        if (dto.id == null || dto.id.isBlank()) {
+            throw new RuntimeException("El ID de la dirección es obligatorio para modificar.");
+        }
+
+        if (!repository.existsById(dto.id)) {
+            throw new RuntimeException("No se encontró la dirección con ID: " + dto.id);
+        }
+
+        Direccion actualizada = DireccionMapper.dtoToEntity(dto);
+        return repository.save(actualizada);
+    }
+
+    // ============================================================
+    // ===============          ELIMINAR         ===================
+    // ============================================================
+
+    @Override
+    @Transactional
+    public Direccion eliminar(DireccionDTO dto) {
+        if (dto.id == null || dto.id.isBlank()) {
+            throw new RuntimeException("El ID de la dirección es obligatorio.");
+        }
+
+        Direccion existente = repository.findById(dto.id)
+                .orElseThrow(() -> new RuntimeException("No se encontró la dirección con ID: " + dto.id));
+
         repository.delete(existente);
         return existente;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Direccion obtener(DireccionDTO direccion) {
-        return repository.findById(direccion.id)
-                .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.id));
-    }
+    // ============================================================
+    // ===============           OBTENER         ===================
+    // ============================================================
 
     @Override
+    @Transactional(readOnly = true)
+    public Direccion obtener(DireccionDTO dto) {
+        if (dto.id == null || dto.id.isBlank()) {
+            throw new RuntimeException("El ID de la dirección es obligatorio.");
+        }
+
+        return repository.findById(dto.id)
+                .orElseThrow(() -> new RuntimeException("No se encontró dirección con ID: " + dto.id));
+    }
+
+    // ============================================================
+    // ===============  OBTENER POR ID HUESPED  ===================
+    // ============================================================
+
+    @Override
+    @Transactional(readOnly = true)
     public Direccion obtenerDireccionDeHuespedPorId(String idHuesped) {
-        String id = Optional.ofNullable(idHuesped)
-                .orElseThrow(() -> new RuntimeException("El ID del huesped no puede ser nulo"));
-        return repository.findByIdHuesped(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró dirección para el huesped con ID: " + id));
+
+        if (idHuesped == null || idHuesped.isBlank()) {
+            throw new RuntimeException("El ID del huésped no puede ser nulo");
+        }
+
+        return repository.findByIdHuesped(idHuesped)
+                .orElseThrow(() -> new RuntimeException(
+                        "No se encontró dirección para el huésped con ID: " + idHuesped
+                ));
     }
 }

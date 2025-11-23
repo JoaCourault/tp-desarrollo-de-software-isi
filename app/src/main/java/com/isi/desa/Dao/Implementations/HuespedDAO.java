@@ -18,12 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
+@Service("huespedDAO")
 public class HuespedDAO implements IHuespedDAO {
 
-    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -33,29 +31,39 @@ public class HuespedDAO implements IHuespedDAO {
     @Autowired
     private EstadiaRepository estadiaRepository;
 
+    @Autowired
+    private HuespedMapper mapper; // ✔ CORREGIDO – ahora se inyecta el mapper Bean
+
     @Override
     @Transactional
     public Huesped crear(HuespedDTO huesped) throws HuespedDuplicadoException {
+
         if (huesped.idHuesped != null && repository.existsById(huesped.idHuesped)) {
             throw new HuespedDuplicadoException("Ya existe un huesped con el ID: " + huesped.idHuesped);
         }
-        // Generar ID incremental si no viene (HU-###)
+
         if (huesped.idHuesped == null || huesped.idHuesped.isBlank()) {
             long count = repository.count();
             huesped.idHuesped = String.format("HU-%03d", count + 1);
         }
-        Huesped nuevo = HuespedMapper.dtoToEntity(huesped);
+
+        Huesped nuevo = mapper.dtoToEntity(huesped); // ✔ CORREGIDO (YA NO ES STATIC)
         nuevo.setEliminado(false);
+
         return repository.save(nuevo);
     }
 
     @Override
     @Transactional
     public Huesped modificar(HuespedDTO dto) {
+
         Huesped existente = repository.findById(dto.idHuesped)
-                .orElseThrow(() -> new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
-        Huesped actualizado = HuespedMapper.dtoToEntity(dto);
+                .orElseThrow(() ->
+                        new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
+
+        Huesped actualizado = mapper.dtoToEntity(dto); // ✔ CORREGIDO
         actualizado.setEliminado(existente.isEliminado());
+
         return repository.save(actualizado);
     }
 
@@ -64,9 +72,12 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped eliminar(String idHuesped) {
         Huesped existente = repository.findById(idHuesped)
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped));
+
         if (!obtenerEstadiasDeHuesped(idHuesped).isEmpty()) {
-            throw new HuespedConEstadiaAsociadasException("El huesped tiene estadias asociadas y no puede eliminarse.");
+            throw new HuespedConEstadiaAsociadasException(
+                    "El huesped tiene estadias asociadas y no puede eliminarse.");
         }
+
         existente.setEliminado(true);
         return repository.save(existente);
     }
@@ -76,7 +87,7 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped obtenerHuesped(String DNI) {
         return repository.findAll().stream()
                 .filter(h -> !h.isEliminado())
-                .filter(h -> h.getNumDoc() != null && h.getNumDoc().equals(DNI))
+                .filter(h -> DNI.equals(h.getNumDoc()))
                 .findFirst()
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con DNI: " + DNI));
     }
@@ -84,7 +95,10 @@ public class HuespedDAO implements IHuespedDAO {
     @Override
     @Transactional(readOnly = true)
     public List<Huesped> leerHuespedes() {
-        return repository.findAll().stream().filter(h -> !h.isEliminado()).toList();
+        return repository.findAll()
+                .stream()
+                .filter(h -> !h.isEliminado())
+                .toList();
     }
 
     @Override
@@ -98,7 +112,11 @@ public class HuespedDAO implements IHuespedDAO {
     @Override
     @Transactional
     public void agregarEstadiaAHuesped(String idHuesped, String idEstadia) {
-        String sql = "INSERT INTO huesped_estadia (id_huesped, id_estadia) VALUES (:idHuesped, :idEstadia)";
+        String sql = """
+                INSERT INTO huesped_estadia (id_huesped, id_estadia)
+                VALUES (:idHuesped, :idEstadia)
+                """;
+
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("idHuesped", idHuesped);
         query.setParameter("idEstadia", idEstadia);
@@ -108,11 +126,16 @@ public class HuespedDAO implements IHuespedDAO {
     @Override
     @Transactional(readOnly = true)
     public List<Estadia> obtenerEstadiasDeHuesped(String idHuesped) {
-        String sql = "SELECT e.* FROM estadia e " +
-                     "INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia " +
-                     "WHERE he.id_huesped = :idHuesped";
+
+        String sql = """
+                SELECT e.* FROM estadia e
+                INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia
+                WHERE he.id_huesped = :idHuesped
+                """;
+
         Query query = entityManager.createNativeQuery(sql, Estadia.class);
         query.setParameter("idHuesped", idHuesped);
+
         return query.getResultList();
     }
 }

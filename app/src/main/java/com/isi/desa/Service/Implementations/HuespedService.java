@@ -13,6 +13,7 @@ import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,25 +25,22 @@ public class HuespedService implements IHuespedService {
     @Autowired
     private IHuespedValidator validator;
 
+    @Qualifier("huespedDAO")
     @Autowired
     private IHuespedDAO dao;
 
-    private static final HuespedService INSTANCE = new HuespedService();
+    @Autowired
+    private DireccionDAO direccionDAO;
 
-    public static HuespedService getInstance() {
-        return INSTANCE;
-    }
+    @Autowired
+    private HuespedMapper mapper; // ✔ CORREGIDO → mapper Bean
 
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
 
-        // Validación básica
-        CannotCreateHuespedException validation = this.validator.validateCreate(huespedDTO);
-        if (validation != null) {
-            throw validation;
-        }
+        CannotCreateHuespedException validation = validator.validateCreate(huespedDTO);
+        if (validation != null) throw validation;
 
-        // 🔥 VALIDACIÓN DE DUPLICADOS (agregada)
         boolean duplicado = dao.leerHuespedes().stream()
                 .filter(h -> h != null && !h.isEliminado())
                 .anyMatch(h ->
@@ -54,26 +52,18 @@ public class HuespedService implements IHuespedService {
                                 h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
                 );
 
-        if (duplicado) {
-            throw new HuespedDuplicadoException(
-                    "Ya existe un huésped con ese tipo y número de documento."
-            );
-        }
+        if (duplicado)
+            throw new HuespedDuplicadoException("Ya existe un huésped con ese tipo y número de documento.");
 
-        // Persistencia de Dirección
-        DireccionDAO direccionDAO = new DireccionDAO();
         try {
             direccionDAO.obtener(huespedDTO.direccion);
         } catch (Exception e) {
             direccionDAO.crear(huespedDTO.direccion);
         }
 
-        // Persistencia del huésped
         Huesped creado = dao.crear(huespedDTO);
-
-        return HuespedMapper.entityToDTO(creado);
+        return mapper.entityToDTO(creado); // ✔ CORREGIDO
     }
-
 
     @Override
     public BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO requestDTO) {
@@ -82,7 +72,7 @@ public class HuespedService implements IHuespedService {
         res.resultado.id = 0;
         res.resultado.mensaje = "Huesped eliminado exitosamente.";
 
-        RuntimeException validation = this.validator.validateDelete(requestDTO.idHuesped);
+        RuntimeException validation = validator.validateDelete(requestDTO.idHuesped);
         if (validation != null) {
             res.resultado.id = 2;
             res.resultado.mensaje = validation.getMessage();
@@ -90,36 +80,34 @@ public class HuespedService implements IHuespedService {
         }
 
         Huesped eliminado = dao.eliminar(requestDTO.idHuesped);
+
         if (eliminado == null) {
             res.resultado.id = 1;
             res.resultado.mensaje = "No se pudo eliminar el huesped.";
             return res;
         }
 
-        res.huesped = HuespedMapper.entityToDTO(eliminado);
+        res.huesped = mapper.entityToDTO(eliminado); // ✔ CORREGIDO
         return res;
     }
 
-
     @Override
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO req) {
+
         BuscarHuespedResultDTO res = new BuscarHuespedResultDTO();
         res.resultado = new Resultado();
         res.huespedesEncontrados = new ArrayList<>();
 
-        // proteger contra req o filtro nulos
         HuespedDTO filtro = (req == null) ? null : req.huesped;
-        List<Huesped> todos = this.dao.leerHuespedes();
+        List<Huesped> todos = dao.leerHuespedes();
 
         if (filtro == null) {
-            // si no hay filtro, devolvemos todos
             res.huespedesEncontrados = todos;
             res.resultado.id = 0;
             res.resultado.mensaje = "OK";
             return res;
         }
 
-        // Si el usuario no completa NADA → devolver todos
         boolean algunCampo =
                 (filtro.nombre != null && !filtro.nombre.isEmpty()) ||
                         (filtro.apellido != null && !filtro.apellido.isEmpty()) ||
@@ -133,31 +121,28 @@ public class HuespedService implements IHuespedService {
             return res;
         }
 
-        // Filtrado
         for (Huesped h : todos) {
 
             boolean coincide = true;
 
             if (filtro.nombre != null && !filtro.nombre.isEmpty()) {
-                if (h.getNombre() == null) { coincide = false; }
-                else { coincide &= h.getNombre().toLowerCase().contains(filtro.nombre.toLowerCase()); }
+                coincide &= h.getNombre() != null &&
+                        h.getNombre().toLowerCase().contains(filtro.nombre.toLowerCase());
             }
 
             if (filtro.apellido != null && !filtro.apellido.isEmpty()) {
-                if (h.getApellido() == null) { coincide = false; }
-                else { coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase()); }
+                coincide &= h.getApellido() != null &&
+                        h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase());
             }
 
             if (filtro.tipoDocumento != null) {
-                coincide &= (
-                        h.getTipoDocumento() != null &&
-                                h.getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento)
-                );
+                coincide &= h.getTipoDocumento() != null &&
+                        h.getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento);
             }
 
             if (filtro.numDoc != null && !filtro.numDoc.isEmpty()) {
-                if (h.getNumDoc() == null) { coincide = false; }
-                else { coincide &= h.getNumDoc().equalsIgnoreCase(filtro.numDoc); }
+                coincide &= h.getNumDoc() != null &&
+                        h.getNumDoc().equalsIgnoreCase(filtro.numDoc);
             }
 
             if (coincide) res.huespedesEncontrados.add(h);
@@ -168,30 +153,30 @@ public class HuespedService implements IHuespedService {
         return res;
     }
 
-
     @Override
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
+
         ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
         res.resultado = new Resultado();
         res.resultado.id = 1;
 
         try {
+
             if (request == null || request.huesped == null) {
                 res.resultado.id = 2;
-                res.resultado.mensaje = "Solicitud invalida: no se enviaron datos de huesped.";
+                res.resultado.mensaje = "Solicitud inválida: no se enviaron datos.";
                 return res;
             }
 
             HuespedDTO dto = request.huesped;
 
-            CannotModifyHuespedEsception errorValidacion = this.validator.validateUpdate(dto);
+            CannotModifyHuespedEsception errorValidacion = validator.validateUpdate(dto);
             if (errorValidacion != null) {
                 res.resultado.id = 2;
                 res.resultado.mensaje = errorValidacion.getMessage();
                 return res;
             }
 
-            // Validación duplicado en UPDATE
             boolean duplicado = dao.leerHuespedes().stream()
                     .filter(h -> h != null && !h.isEliminado())
                     .anyMatch(h ->
@@ -205,7 +190,7 @@ public class HuespedService implements IHuespedService {
 
             if (duplicado && (request.aceptarIgualmente == null || !request.aceptarIgualmente)) {
                 res.resultado.id = 3;
-                res.resultado.mensaje = "¡CUIDADO! El tipo y numero de documento ya existen en el sistema";
+                res.resultado.mensaje = "El tipo + número de documento ya existen.";
                 return res;
             }
 
@@ -213,12 +198,12 @@ public class HuespedService implements IHuespedService {
 
             if (modificado == null) {
                 res.resultado.id = 1;
-                res.resultado.mensaje = "Error interno al modificar huesped.";
+                res.resultado.mensaje = "Error interno.";
                 return res;
             }
 
             res.resultado.id = 0;
-            res.resultado.mensaje = "La operacion ha culminado con exito";
+            res.resultado.mensaje = "Operación exitosa.";
             return res;
 
         } catch (HuespedNotFoundException nf) {
@@ -228,7 +213,7 @@ public class HuespedService implements IHuespedService {
 
         } catch (Exception e) {
             res.resultado.id = 1;
-            res.resultado.mensaje = "Error interno al modificar huesped: " + e.getMessage();
+            res.resultado.mensaje = "Error interno: " + e.getMessage();
             return res;
         }
     }
