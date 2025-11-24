@@ -4,5 +4,6 @@ public enum EstadoHabitacion {
     OCUPADA,
     RESERVADA,
     DISPONIBLE,
-    FUERA_DE_SERVICIO
+    FUERA_DE_SERVICIO,
+    MANTENIMIENTO
 }

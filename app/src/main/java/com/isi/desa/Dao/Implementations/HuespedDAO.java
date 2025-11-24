@@ -1,7 +1,6 @@
 package com.isi.desa.Dao.Implementations;
 
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
-import com.isi.desa.Dao.Repositories.EstadiaRepository;
 import com.isi.desa.Dao.Repositories.HuespedRepository;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Exceptions.Huesped.HuespedConEstadiaAsociadasException;
@@ -14,24 +13,21 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service; // O @Repository
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
+@Service("huespedDAO") // Le damos nombre explícito al Bean
 public class HuespedDAO implements IHuespedDAO {
 
-    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
     private HuespedRepository repository;
 
-    @Autowired
-    private EstadiaRepository estadiaRepository;
+    // CORRECCIÓN: Se eliminó estadiaRepository porque no se usaba y generaba warning.
 
     @Override
     @Transactional
@@ -55,6 +51,7 @@ public class HuespedDAO implements IHuespedDAO {
         Huesped existente = repository.findById(dto.idHuesped)
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
         Huesped actualizado = HuespedMapper.dtoToEntity(dto);
+        // Mantenemos el estado de eliminado original
         actualizado.setEliminado(existente.isEliminado());
         return repository.save(actualizado);
     }
@@ -64,6 +61,7 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped eliminar(String idHuesped) {
         Huesped existente = repository.findById(idHuesped)
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped));
+
         if (!obtenerEstadiasDeHuesped(idHuesped).isEmpty()) {
             throw new HuespedConEstadiaAsociadasException("El huesped tiene estadias asociadas y no puede eliminarse.");
         }
@@ -98,6 +96,7 @@ public class HuespedDAO implements IHuespedDAO {
     @Override
     @Transactional
     public void agregarEstadiaAHuesped(String idHuesped, String idEstadia) {
+        // CORRECCIÓN: El SQL es correcto. Los warnings del IDE son porque no está conectado a la BD.
         String sql = "INSERT INTO huesped_estadia (id_huesped, id_estadia) VALUES (:idHuesped, :idEstadia)";
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("idHuesped", idHuesped);
@@ -109,8 +108,8 @@ public class HuespedDAO implements IHuespedDAO {
     @Transactional(readOnly = true)
     public List<Estadia> obtenerEstadiasDeHuesped(String idHuesped) {
         String sql = "SELECT e.* FROM estadia e " +
-                     "INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia " +
-                     "WHERE he.id_huesped = :idHuesped";
+                "INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia " +
+                "WHERE he.id_huesped = :idHuesped";
         Query query = entityManager.createNativeQuery(sql, Estadia.class);
         query.setParameter("idHuesped", idHuesped);
         return query.getResultList();

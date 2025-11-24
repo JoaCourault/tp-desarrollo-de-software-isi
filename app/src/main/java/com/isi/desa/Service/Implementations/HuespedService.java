@@ -1,5 +1,6 @@
 package com.isi.desa.Service.Implementations;
 
+// Asegúrate de importar la Interfaz o la Clase de DireccionDAO según corresponda
 import com.isi.desa.Dao.Implementations.DireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.*;
@@ -13,6 +14,7 @@ import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,13 +27,13 @@ public class HuespedService implements IHuespedService {
     private IHuespedValidator validator;
 
     @Autowired
+    @Qualifier("huespedDAO") // CORRECCIÓN: Resuelve la ambigüedad del Bean
     private IHuespedDAO dao;
 
-    private static final HuespedService INSTANCE = new HuespedService();
+    @Autowired // CORRECCIÓN: Inyección de dependencia en lugar de 'new'
+    private DireccionDAO direccionDAO;
 
-    public static HuespedService getInstance() {
-        return INSTANCE;
-    }
+    // CORRECCIÓN: Se eliminó el patrón Singleton manual (getInstance) porque Spring ya es Singleton.
 
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
@@ -42,7 +44,7 @@ public class HuespedService implements IHuespedService {
             throw validation;
         }
 
-        // 🔥 VALIDACIÓN DE DUPLICADOS (agregada)
+        // Validación de duplicados (Optimización: Se podría mover a una Query en el Repo)
         boolean duplicado = dao.leerHuespedes().stream()
                 .filter(h -> h != null && !h.isEliminado())
                 .anyMatch(h ->
@@ -60,8 +62,7 @@ public class HuespedService implements IHuespedService {
             );
         }
 
-        // Persistencia de Dirección
-        DireccionDAO direccionDAO = new DireccionDAO();
+        // Persistencia de Dirección (Usando el Bean inyectado)
         try {
             direccionDAO.obtener(huespedDTO.direccion);
         } catch (Exception e) {
@@ -78,6 +79,7 @@ public class HuespedService implements IHuespedService {
     @Override
     public BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO requestDTO) {
         BajaHuespedResultDTO res = new BajaHuespedResultDTO();
+        res.resultado = new Resultado();
 
         res.resultado.id = 0;
         res.resultado.mensaje = "Huesped eliminado exitosamente.";
@@ -107,19 +109,16 @@ public class HuespedService implements IHuespedService {
         res.resultado = new Resultado();
         res.huespedesEncontrados = new ArrayList<>();
 
-        // proteger contra req o filtro nulos
         HuespedDTO filtro = (req == null) ? null : req.huesped;
         List<Huesped> todos = this.dao.leerHuespedes();
 
         if (filtro == null) {
-            // si no hay filtro, devolvemos todos
             res.huespedesEncontrados = todos;
             res.resultado.id = 0;
             res.resultado.mensaje = "OK";
             return res;
         }
 
-        // Si el usuario no completa NADA → devolver todos
         boolean algunCampo =
                 (filtro.nombre != null && !filtro.nombre.isEmpty()) ||
                         (filtro.apellido != null && !filtro.apellido.isEmpty()) ||
@@ -133,9 +132,7 @@ public class HuespedService implements IHuespedService {
             return res;
         }
 
-        // Filtrado
         for (Huesped h : todos) {
-
             boolean coincide = true;
 
             if (filtro.nombre != null && !filtro.nombre.isEmpty()) {
