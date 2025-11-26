@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 public class TipoDocumento {
 
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private String tipoDocumento;
 
     public TipoDocumento() {}
@@ -21,11 +21,14 @@ public class TipoDocumento {
         this.tipoDocumento = tipoDocumento;
     }
 
-    // === GETTERS ===
-    public String getTipoDocumento() { return tipoDocumento; }
+    public String getTipoDocumento() {
+        return tipoDocumento;
+    }
 
-    // === SETTERS ===
-    public void setTipoDocumento(String tipoDocumento) { this.tipoDocumento = tipoDocumento; }
+    public void setTipoDocumento(String tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
 
     // Soporta el JSON de tipoDocumento.json -> campo "id"
     @JsonProperty("id")

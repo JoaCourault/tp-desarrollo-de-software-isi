@@ -19,7 +19,7 @@ public class Huesped {
     @Column(name = "apellido")
     private String apellido;
 
-    @Column(name = "tipo_documento")
+    @Column(name = "tipo_doc")
     private String tipoDocumento;
 
     @Column(name = "num_doc")

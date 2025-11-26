@@ -13,10 +13,10 @@ import com.isi.desa.Config.CorsConfig;
 import java.util.TimeZone;
 
 @Import(CorsConfig.class)
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.isi.desa")
 public class App {
     public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("America/Argentina/Buenos_Aires"));
         SpringApplication.run(App.class, args);
     }
 }
+
