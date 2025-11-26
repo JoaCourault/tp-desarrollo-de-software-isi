@@ -12,112 +12,51 @@ import java.util.List;
 @Service
 public class DireccionValidator implements IDireccionValidator {
 
-    public DireccionValidator() {}
-
     @Override
     public Direccion create(DireccionDTO dto) {
         InvalidDirectionException validation = validate(dto);
         if (validation != null) throw validation;
 
-        return new Direccion(
-                dto.id,
-                dto.calle,
-                dto.numero,
-                dto.departamento,
-                dto.piso,
-                dto.codigoPostal,
-                dto.pais,
-                dto.provincia,
-                dto.localidad
-        );
+        Direccion d = new Direccion();
+        d.setIdDireccion(dto.id);
+        d.setCalle(dto.calle);
+        d.setNumero(dto.numero);
+        d.setDepartamento(dto.departamento);
+        d.setPiso(dto.piso);
+        d.setCp(dto.cp);
+        d.setLocalidad(dto.localidad);
+        d.setProvincia(dto.provincia);
+        d.setPais(dto.pais);
+
+        return d;
     }
 
     @Override
     public InvalidDirectionException validate(DireccionDTO dto) {
-
-        if (dto == null) {
+        if (dto == null)
             return new InvalidDirectionException("La dirección no puede ser nula");
-        }
 
         List<String> errores = new ArrayList<>();
 
-        String error;
+        if (isBlank(dto.pais)) errores.add("El país es obligatorio");
+        if (isBlank(dto.provincia)) errores.add("La provincia es obligatoria");
+        if (isBlank(dto.localidad)) errores.add("La localidad es obligatoria");
+        if (isBlank(dto.calle)) errores.add("La calle es obligatoria");
 
-        if ((error = validatePais(dto.pais)) != null) errores.add(error);
-        if ((error = validateProvincia(dto.provincia)) != null) errores.add(error);
-        if ((error = validateLocalidad(dto.localidad)) != null) errores.add(error);
-        if ((error = validateCodigoPostal(dto.codigoPostal)) != null) errores.add(error);
-        if ((error = validateCalle(dto.calle)) != null) errores.add(error);
-        if ((error = validateNumero(dto.numero)) != null) errores.add(error);
+        if (dto.numero == null || dto.numero <= 0)
+            errores.add("El número es obligatorio y debe ser positivo");
+
+        if (dto.cp == null || dto.cp <= 0)
+            errores.add("El código postal es obligatorio y debe ser positivo");
 
         if (!errores.isEmpty()) {
-            return new InvalidDirectionException(
-                    String.join(", ", errores)
-            );
+            return new InvalidDirectionException(String.join(", ", errores));
         }
 
         return null;
     }
 
-    // ============================================================
-    // VALIDACIONES INDIVIDUALES CORRECTAS
-    // ============================================================
-
-    private String validatePais(String pais) {
-        return (pais == null || pais.trim().isEmpty())
-                ? "El país es obligatorio"
-                : null;
-    }
-
-    private String validateProvincia(String provincia) {
-        return (provincia == null || provincia.trim().isEmpty())
-                ? "La provincia es obligatoria"
-                : null;
-    }
-
-    private String validateLocalidad(String localidad) {
-        return (localidad == null || localidad.trim().isEmpty())
-                ? "La localidad es obligatoria"
-                : null;
-    }
-
-    private String validateCodigoPostal(String codigoPostal) {
-        if (codigoPostal == null || codigoPostal.trim().isEmpty()) {
-            return "El código postal es obligatorio";
-        }
-
-        try {
-            int cp = Integer.parseInt(codigoPostal);
-            if (cp <= 0) {
-                return "El código postal debe ser un número positivo";
-            }
-        } catch (NumberFormatException e) {
-            return "El código postal debe ser numérico";
-        }
-
-        return null;
-    }
-
-    private String validateCalle(String calle) {
-        return (calle == null || calle.trim().isEmpty())
-                ? "La calle es obligatoria"
-                : null;
-    }
-
-    private String validateNumero(String numero) {
-        if (numero == null || numero.trim().isEmpty()) {
-            return "El número es obligatorio";
-        }
-
-        try {
-            int n = Integer.parseInt(numero);
-            if (n <= 0) {
-                return "El número debe ser positivo";
-            }
-        } catch (NumberFormatException e) {
-            return "El número debe ser numérico";
-        }
-
-        return null;
+    private boolean isBlank(String s) {
+        return (s == null || s.trim().isEmpty());
     }
 }

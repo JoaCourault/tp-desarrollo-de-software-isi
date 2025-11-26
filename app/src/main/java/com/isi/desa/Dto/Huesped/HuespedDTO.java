@@ -5,10 +5,10 @@ import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HuespedDTO {
+
     public String idHuesped;
     public String nombre;
     public String apellido;
@@ -21,7 +21,9 @@ public class HuespedDTO {
     public String email;
     public String ocupacion;
     public String nacionalidad;
-    public DireccionDTO direccion;
+
+    public DireccionDTO direccion;   // Corregido
+
     public List<EstadiaDTO> estadias;
     public boolean eliminado = false;
 }

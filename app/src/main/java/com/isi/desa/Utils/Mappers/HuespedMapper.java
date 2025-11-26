@@ -1,12 +1,12 @@
 package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
+import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
-import com.isi.desa.Dto.Direccion.DireccionDTO;
+import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
-import com.isi.desa.Model.Entities.Direccion.Direccion;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,9 +18,6 @@ public class HuespedMapper {
         this.tipoDocumentoDAO = tipoDocumentoDAO;
     }
 
-    // ======================================================
-    // ENTITY → DTO
-    // ======================================================
     public HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
 
@@ -44,23 +41,16 @@ public class HuespedMapper {
         tdDTO.tipoDocumento = td.getTipoDocumento();
         dto.tipoDocumento = tdDTO;
 
-        // ❗ Dirección no se obtiene aquí (mapper no hace queries)
-        dto.direccion = null;
-
-        // ❗ Estadías no se obtienen aquí
-        dto.estadias = null;
+        // Dirección
+        dto.direccion = DireccionMapper.entityToDto(h.getDireccion());
 
         return dto;
     }
 
-    // ======================================================
-    // DTO → ENTITY
-    // ======================================================
     public Huesped dtoToEntity(HuespedDTO dto) {
         if (dto == null) return null;
 
         Huesped h = new Huesped();
-
         h.setIdHuesped(dto.idHuesped);
         h.setNombre(dto.nombre);
         h.setApellido(dto.apellido);
@@ -78,6 +68,10 @@ public class HuespedMapper {
             TipoDocumento td = tipoDocumentoDAO.obtener(dto.tipoDocumento.tipoDocumento);
             h.setTipoDocumento(td.getTipoDocumento());
         }
+
+        // Dirección
+        Direccion direccion = DireccionMapper.dtoToEntity(dto.direccion);
+        h.setDireccion(direccion);
 
         return h;
     }

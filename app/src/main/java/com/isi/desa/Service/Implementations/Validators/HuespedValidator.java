@@ -42,21 +42,23 @@ public class HuespedValidator implements IHuespedValidator {
         Direccion direccion = DireccionMapper.dtoToEntity(dto.direccion);
         TipoDocumento tipoDocumento = new TipoDocumento(dto.tipoDocumento.tipoDocumento);
 
-        return new Huesped(
-                dto.nombre,
-                dto.apellido,
-                tipoDocumento,
-                dto.numDoc,
-                dto.posicionIva,
-                dto.cuit,
-                dto.fechaNacimiento,
-                dto.telefono,
-                dto.email,
-                dto.ocupacion,
-                dto.nacionalidad,
-                direccion,
-                dto.idHuesped
-        );
+        // ✅ Crear huésped usando setters (constructor vacío)
+        Huesped h = new Huesped();
+        h.setIdHuesped(dto.idHuesped);
+        h.setNombre(dto.nombre);
+        h.setApellido(dto.apellido);
+        h.setTipoDocumento(tipoDocumento.getTipoDocumento());
+        h.setNumDoc(dto.numDoc);
+        h.setPosicionIva(dto.posicionIva);
+        h.setCuit(dto.cuit);
+        h.setFechaNac(dto.fechaNacimiento);
+        h.setTelefono(dto.telefono);
+        h.setEmail(dto.email);
+        h.setOcupacion(dto.ocupacion);
+        h.setNacionalidad(dto.nacionalidad);
+        h.setEliminado(false);
+
+        return h;
     }
 
     @Override

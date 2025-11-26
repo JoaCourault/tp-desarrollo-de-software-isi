@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service("direccionDAO")
 public class DireccionDAO implements IDireccionDAO {
 
@@ -25,7 +23,6 @@ public class DireccionDAO implements IDireccionDAO {
     @Transactional
     public Direccion crear(DireccionDTO dto) {
 
-        // El ID SIEMPRE se genera aquí, no aceptamos uno del front
         dto.id = java.util.UUID.randomUUID().toString();
 
         Direccion nueva = DireccionMapper.dtoToEntity(dto);
@@ -85,20 +82,6 @@ public class DireccionDAO implements IDireccionDAO {
     }
 
     // ============================================================
-    // ===============  OBTENER POR ID HUESPED  ===================
+    // ===  (RETIRADO) OBTENER POR ID HUESPED — YA NO EXISTE   ====
     // ============================================================
-
-    @Override
-    @Transactional(readOnly = true)
-    public Direccion obtenerDireccionDeHuespedPorId(String idHuesped) {
-
-        if (idHuesped == null || idHuesped.isBlank()) {
-            throw new RuntimeException("El ID del huésped no puede ser nulo");
-        }
-
-        return repository.findByIdHuesped(idHuesped)
-                .orElseThrow(() -> new RuntimeException(
-                        "No se encontró dirección para el huésped con ID: " + idHuesped
-                ));
-    }
 }
