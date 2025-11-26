@@ -12,6 +12,7 @@ import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -25,22 +26,29 @@ public class HuespedService implements IHuespedService {
     @Autowired
     private IHuespedValidator validator;
 
-    @Qualifier("huespedDAO")
     @Autowired
+    @Qualifier("huespedDAO")
     private IHuespedDAO dao;
 
     @Autowired
     private DireccionDAO direccionDAO;
 
     @Autowired
-    private HuespedMapper mapper; // ✔ CORREGIDO → mapper Bean
+    private HuespedMapper mapper;
 
+    // ============================================================
+    //                      ALTA HUESPED
+    // ============================================================
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
 
+        // 1) Validación básica
         CannotCreateHuespedException validation = validator.validateCreate(huespedDTO);
-        if (validation != null) throw validation;
+        if (validation != null) {
+            throw validation;
+        }
 
+        // 2) Validación duplicado (tipoDocumento + numDoc)
         boolean duplicado = dao.leerHuespedes().stream()
                 .filter(h -> h != null && !h.isEliminado())
                 .anyMatch(h ->
@@ -52,25 +60,33 @@ public class HuespedService implements IHuespedService {
                                 h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
                 );
 
-        if (duplicado)
-            throw new HuespedDuplicadoException("Ya existe un huésped con ese tipo y número de documento.");
+        if (duplicado) {
+            throw new HuespedDuplicadoException(
+                    "Ya existe un huésped con ese tipo y número de documento."
+            );
+        }
 
+        // 3) Guardar dirección
         try {
             direccionDAO.obtener(huespedDTO.direccion);
         } catch (Exception e) {
             direccionDAO.crear(huespedDTO.direccion);
         }
 
+        // 4) Crear huésped
         Huesped creado = dao.crear(huespedDTO);
-        return mapper.entityToDTO(creado); // ✔ CORREGIDO
+
+        // 5) Devolver DTO con mapper
+        return mapper.entityToDTO(creado);
     }
 
+    // ============================================================
+    //                      BAJA HUESPED
+    // ============================================================
     @Override
     public BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO requestDTO) {
         BajaHuespedResultDTO res = new BajaHuespedResultDTO();
-
-        res.resultado.id = 0;
-        res.resultado.mensaje = "Huesped eliminado exitosamente.";
+        res.resultado = new Resultado();
 
         RuntimeException validation = validator.validateDelete(requestDTO.idHuesped);
         if (validation != null) {
@@ -83,14 +99,20 @@ public class HuespedService implements IHuespedService {
 
         if (eliminado == null) {
             res.resultado.id = 1;
-            res.resultado.mensaje = "No se pudo eliminar el huesped.";
+            res.resultado.mensaje = "No se pudo eliminar el huésped.";
             return res;
         }
 
-        res.huesped = mapper.entityToDTO(eliminado); // ✔ CORREGIDO
+        res.resultado.id = 0;
+        res.resultado.mensaje = "Huésped eliminado exitosamente.";
+        res.huesped = mapper.entityToDTO(eliminado);
+
         return res;
     }
 
+    // ============================================================
+    //                     BUSCAR HUESPED
+    // ============================================================
     @Override
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO req) {
 
@@ -122,7 +144,6 @@ public class HuespedService implements IHuespedService {
         }
 
         for (Huesped h : todos) {
-
             boolean coincide = true;
 
             if (filtro.nombre != null && !filtro.nombre.isEmpty()) {
@@ -153,18 +174,20 @@ public class HuespedService implements IHuespedService {
         return res;
     }
 
+    // ============================================================
+    //                     MODIFICAR HUESPED
+    // ============================================================
     @Override
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
 
         ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
         res.resultado = new Resultado();
-        res.resultado.id = 1;
 
         try {
 
             if (request == null || request.huesped == null) {
                 res.resultado.id = 2;
-                res.resultado.mensaje = "Solicitud inválida: no se enviaron datos.";
+                res.resultado.mensaje = "Solicitud inválida.";
                 return res;
             }
 
@@ -195,12 +218,6 @@ public class HuespedService implements IHuespedService {
             }
 
             Huesped modificado = dao.modificar(dto);
-
-            if (modificado == null) {
-                res.resultado.id = 1;
-                res.resultado.mensaje = "Error interno.";
-                return res;
-            }
 
             res.resultado.id = 0;
             res.resultado.mensaje = "Operación exitosa.";

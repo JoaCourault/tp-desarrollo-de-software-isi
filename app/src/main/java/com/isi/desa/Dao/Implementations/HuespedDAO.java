@@ -1,7 +1,6 @@
 package com.isi.desa.Dao.Implementations;
 
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
-import com.isi.desa.Dao.Repositories.EstadiaRepository;
 import com.isi.desa.Dao.Repositories.HuespedRepository;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Exceptions.Huesped.HuespedConEstadiaAsociadasException;
@@ -10,9 +9,11 @@ import com.isi.desa.Exceptions.Huesped.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,113 +30,141 @@ public class HuespedDAO implements IHuespedDAO {
     private HuespedRepository repository;
 
     @Autowired
-    private EstadiaRepository estadiaRepository;
+    private HuespedMapper mapper;
 
-    @Autowired
-    private HuespedMapper mapper; // ✔ CORREGIDO – ahora se inyecta el mapper Bean
-
+    // ============================================================
+    // CREAR HUESPED
+    // ============================================================
     @Override
     @Transactional
-    public Huesped crear(HuespedDTO huesped) throws HuespedDuplicadoException {
+    public Huesped crear(HuespedDTO dto) throws HuespedDuplicadoException {
 
-        if (huesped.idHuesped != null && repository.existsById(huesped.idHuesped)) {
-            throw new HuespedDuplicadoException("Ya existe un huesped con el ID: " + huesped.idHuesped);
+        // Si ya existe ID → error
+        if (dto.idHuesped != null && repository.existsById(dto.idHuesped)) {
+            throw new HuespedDuplicadoException("Ya existe un huesped con el ID: " + dto.idHuesped);
         }
 
-        if (huesped.idHuesped == null || huesped.idHuesped.isBlank()) {
+        // Generar ID automático HU-###
+        if (dto.idHuesped == null || dto.idHuesped.isBlank()) {
             long count = repository.count();
-            huesped.idHuesped = String.format("HU-%03d", count + 1);
+            dto.idHuesped = String.format("HU-%03d", count + 1);
         }
 
-        Huesped nuevo = mapper.dtoToEntity(huesped); // ✔ CORREGIDO (YA NO ES STATIC)
+        // Mapear DTO a entidad
+        Huesped nuevo = mapper.dtoToEntity(dto);
         nuevo.setEliminado(false);
 
         return repository.save(nuevo);
     }
 
+    // ============================================================
+    // MODIFICAR HUESPED
+    // ============================================================
     @Override
     @Transactional
     public Huesped modificar(HuespedDTO dto) {
 
         Huesped existente = repository.findById(dto.idHuesped)
-                .orElseThrow(() ->
-                        new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
 
-        Huesped actualizado = mapper.dtoToEntity(dto); // ✔ CORREGIDO
+        Huesped actualizado = mapper.dtoToEntity(dto);
+
+        // Mantener valor de eliminado
         actualizado.setEliminado(existente.isEliminado());
 
         return repository.save(actualizado);
     }
 
+    // ============================================================
+    // ELIMINAR (SOFT DELETE)
+    // ============================================================
     @Override
     @Transactional
     public Huesped eliminar(String idHuesped) {
         Huesped existente = repository.findById(idHuesped)
-                .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped));
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontró huesped con ID: " + idHuesped));
 
+        // Validar que no tenga estadías
         if (!obtenerEstadiasDeHuesped(idHuesped).isEmpty()) {
             throw new HuespedConEstadiaAsociadasException(
-                    "El huesped tiene estadias asociadas y no puede eliminarse.");
+                    "El huésped tiene estadías asociadas y no puede eliminarse."
+            );
         }
 
         existente.setEliminado(true);
         return repository.save(existente);
     }
 
+    // ============================================================
+    // OBTENER POR DNI
+    // ============================================================
     @Override
     @Transactional(readOnly = true)
     public Huesped obtenerHuesped(String DNI) {
         return repository.findAll().stream()
                 .filter(h -> !h.isEliminado())
-                .filter(h -> DNI.equals(h.getNumDoc()))
+                .filter(h -> h.getNumDoc() != null && h.getNumDoc().equalsIgnoreCase(DNI))
                 .findFirst()
-                .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con DNI: " + DNI));
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontró huesped con DNI: " + DNI));
     }
 
+    // ============================================================
+    // LISTAR
+    // ============================================================
     @Override
     @Transactional(readOnly = true)
     public List<Huesped> leerHuespedes() {
-        return repository.findAll()
-                .stream()
+        return repository.findAll().stream()
                 .filter(h -> !h.isEliminado())
                 .toList();
     }
 
+    // ============================================================
+    // OBTENER POR ID
+    // ============================================================
     @Override
     @Transactional(readOnly = true)
     public Huesped getById(String id) {
         return repository.findById(id)
                 .filter(h -> !h.isEliminado())
-                .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + id));
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontró huesped con ID: " + id));
     }
 
+    // ============================================================
+    // ASOCIAR ESTADÍA
+    // ============================================================
     @Override
     @Transactional
     public void agregarEstadiaAHuesped(String idHuesped, String idEstadia) {
+
         String sql = """
-                INSERT INTO huesped_estadia (id_huesped, id_estadia)
-                VALUES (:idHuesped, :idEstadia)
+                INSERT INTO huesped_estadia(id_huesped, id_estadia)
+                VALUES(:idHuesped, :idEstadia)
                 """;
 
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("idHuesped", idHuesped);
-        query.setParameter("idEstadia", idEstadia);
-        query.executeUpdate();
+        Query q = entityManager.createNativeQuery(sql);
+        q.setParameter("idHuesped", idHuesped);
+        q.setParameter("idEstadia", idEstadia);
+        q.executeUpdate();
     }
 
+    // ============================================================
+    // OBTENER ESTADÍAS
+    // ============================================================
     @Override
     @Transactional(readOnly = true)
     public List<Estadia> obtenerEstadiasDeHuesped(String idHuesped) {
 
         String sql = """
-                SELECT e.* FROM estadia e
-                INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia
-                WHERE he.id_huesped = :idHuesped
-                """;
+            SELECT e.* 
+            FROM estadia e
+            INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia
+            WHERE he.id_huesped = :idHuesped
+        """;
 
-        Query query = entityManager.createNativeQuery(sql, Estadia.class);
-        query.setParameter("idHuesped", idHuesped);
+        Query q = entityManager.createNativeQuery(sql, Estadia.class);
+        q.setParameter("idHuesped", idHuesped);
 
-        return query.getResultList();
+        return q.getResultList();
     }
 }
