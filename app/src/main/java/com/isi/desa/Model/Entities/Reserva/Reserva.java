@@ -1,7 +1,6 @@
 package com.isi.desa.Model.Entities.Reserva;
 
-import com.isi.desa.Model.Entities.Huesped.Huesped;
-import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity; // Asegúrate de tener esta entidad
+import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -14,25 +13,10 @@ public class Reserva {
     @Column(name = "id_reserva", nullable = false)
     private String idReserva;
 
-    // RELACIONES (Foreign Keys)
-
-    // Mapea la columna "id_huesped" de tu tabla
+    // ---- FK ÚNICA obligatoria ----
     @ManyToOne
-    @JoinColumn(name = "id_huesped", referencedColumnName = "id_huesped")
-    private Huesped huesped;
-
-    // Mapea la columna "id_habitacion" de tu tabla
-    @ManyToOne
-    @JoinColumn(name = "id_habitacion", referencedColumnName = "id_habitacion") // Asumiendo que HabitacionEntity tiene este ID
+    @JoinColumn(name = "id_habitacion", referencedColumnName = "id_habitacion", nullable = false)
     private HabitacionEntity habitacion;
-
-    // CAMPOS DE FECHA Y ESTADO
-
-    @Column(name = "fecha_ingreso")
-    private LocalDate fechaIngreso;
-
-    @Column(name = "fecha_egreso")
-    private LocalDate fechaEgreso;
 
     @Column(name = "fecha_desde", nullable = false)
     private LocalDate fechaDesde;
@@ -40,45 +24,62 @@ public class Reserva {
     @Column(name = "fecha_hasta", nullable = false)
     private LocalDate fechaHasta;
 
+    @Column(name = "fecha_ingreso")
+    private LocalDate fechaIngreso;
+
+    @Column(name = "fecha_egreso")
+    private LocalDate fechaEgreso;
+
     @Column(name = "estado", nullable = false)
     private String estado;
 
+    // ============================
+    // NUEVOS CAMPOS AGREGADOS
+    // ============================
+    @Column(name = "nombre_responsable")
+    private String nombreResponsable;
 
-    // --- CONSTRUCTORES ---
+    @Column(name = "apellido_responsable")
+    private String apellidoResponsable;
+
+    @Column(name = "telefono_responsable")
+    private String telefonoResponsable;
+
+    // ---- Constructores ----
 
     public Reserva() {
-        // Generar ID automáticamente si está vacío al crear
         this.idReserva = UUID.randomUUID().toString();
     }
 
-    public Reserva(Huesped huesped, HabitacionEntity habitacion, LocalDate fechaDesde, LocalDate fechaHasta) {
+    public Reserva(HabitacionEntity habitacion,
+                   LocalDate fechaDesde,
+                   LocalDate fechaHasta,
+                   String nombre,
+                   String apellido,
+                   String telefono) {
+
         this.idReserva = UUID.randomUUID().toString();
-        this.huesped = huesped;
         this.habitacion = habitacion;
         this.fechaDesde = fechaDesde;
         this.fechaHasta = fechaHasta;
-        // Valores por defecto sugeridos para las otras columnas:
+
         this.fechaIngreso = fechaDesde;
         this.fechaEgreso = fechaHasta;
+
+        this.nombreResponsable = nombre;
+        this.apellidoResponsable = apellido;
+        this.telefonoResponsable = telefono;
+
         this.estado = "RESERVADA";
     }
 
-    // --- GETTERS Y SETTERS ---
+    // ---- Getters y Setters ----
 
     public String getIdReserva() { return idReserva; }
     public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
 
-    public Huesped getHuesped() { return huesped; }
-    public void setHuesped(Huesped huesped) { this.huesped = huesped; }
-
     public HabitacionEntity getHabitacion() { return habitacion; }
     public void setHabitacion(HabitacionEntity habitacion) { this.habitacion = habitacion; }
-
-    public LocalDate getFechaIngreso() { return fechaIngreso; }
-    public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
-
-    public LocalDate getFechaEgreso() { return fechaEgreso; }
-    public void setFechaEgreso(LocalDate fechaEgreso) { this.fechaEgreso = fechaEgreso; }
 
     public LocalDate getFechaDesde() { return fechaDesde; }
     public void setFechaDesde(LocalDate fechaDesde) { this.fechaDesde = fechaDesde; }
@@ -86,6 +87,21 @@ public class Reserva {
     public LocalDate getFechaHasta() { return fechaHasta; }
     public void setFechaHasta(LocalDate fechaHasta) { this.fechaHasta = fechaHasta; }
 
+    public LocalDate getFechaIngreso() { return fechaIngreso; }
+    public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+
+    public LocalDate getFechaEgreso() { return fechaEgreso; }
+    public void setFechaEgreso(LocalDate fechaEgreso) { this.fechaEgreso = fechaEgreso; }
+
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+
+    public String getNombreResponsable() { return nombreResponsable; }
+    public void setNombreResponsable(String nombreResponsable) { this.nombreResponsable = nombreResponsable; }
+
+    public String getApellidoResponsable() { return apellidoResponsable; }
+    public void setApellidoResponsable(String apellidoResponsable) { this.apellidoResponsable = apellidoResponsable; }
+
+    public String getTelefonoResponsable() { return telefonoResponsable; }
+    public void setTelefonoResponsable(String telefonoResponsable) { this.telefonoResponsable = telefonoResponsable; }
 }
