@@ -27,10 +27,9 @@ public class UsuarioService implements IUsuarioService {
     @Autowired
     private IUsuarioDAO usuarioDAO;
 
-    // Instancia unica (eager singleton)
+    // Instancia unica
     private static final UsuarioService INSTANCE = new UsuarioService();
 
-    // Metodo publico para obtener la instancia
     public static UsuarioService getInstance() {
         return INSTANCE;
     }
@@ -41,7 +40,7 @@ public class UsuarioService implements IUsuarioService {
             Usuario newUser = validator.create(usuarioDTO);
             return Optional.of(newUser); // Retornar el usuario creado envuelto en Optional.
         } catch (Exception e) {
-            throw e; // Propaga la excepcion para que el controlador la maneje.
+            throw e;
         }
     }
 

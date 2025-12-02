@@ -27,15 +27,12 @@ public class HuespedDAO implements IHuespedDAO {
     @Autowired
     private HuespedRepository repository;
 
-    // CORRECCIÓN: Se eliminó estadiaRepository porque no se usaba y generaba warning.
-
     @Override
     @Transactional
     public Huesped crear(HuespedDTO huesped) throws HuespedDuplicadoException {
         if (huesped.idHuesped != null && repository.existsById(huesped.idHuesped)) {
             throw new HuespedDuplicadoException("Ya existe un huesped con el ID: " + huesped.idHuesped);
         }
-        // Generar ID incremental si no viene (HU-###)
         if (huesped.idHuesped == null || huesped.idHuesped.isBlank()) {
             long count = repository.count();
             huesped.idHuesped = String.format("HU-%03d", count + 1);

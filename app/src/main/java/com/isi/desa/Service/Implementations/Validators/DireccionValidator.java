@@ -12,16 +12,10 @@ import java.util.List;
 @Service
 public class DireccionValidator implements IDireccionValidator {
 
-    // CORRECCIÓN: Eliminamos el Singleton manual (INSTANCE, constructor privado, getInstance)
-    // Spring manejará la instancia con @Autowired donde se necesite.
-
     public DireccionValidator() {
         // Constructor público vacío para Spring
     }
 
-    // pero lo ideal es usar inyección de dependencias.
-    // Si algún otro validator usa 'DireccionValidator.getInstance()', cámbialo a 'new DireccionValidator()'
-    // o inyéctalo con @Autowired.
     public static DireccionValidator getInstance() {
         return new DireccionValidator();
     }
@@ -46,13 +40,7 @@ public class DireccionValidator implements IDireccionValidator {
 
     @Override
     public InvalidDirectionException validate(DireccionDTO direccionDTO) {
-        // --- AGREGA ESTAS LINEAS PARA VER EN CONSOLA ---
-        System.out.println("--- VALIDANDO DIRECCION ---");
-        System.out.println("Calle recibida: '" + direccionDTO.calle + "'");
-        System.out.println("Numero recibido: '" + direccionDTO.numero + "'");
-        System.out.println("CP recibido: '" + direccionDTO.codigoPostal + "'");
-        System.out.println("---------------------------");
-        // -----------------------------------------------
+
         if (direccionDTO == null) {
             return new InvalidDirectionException("La direccion no puede ser nula");
         }

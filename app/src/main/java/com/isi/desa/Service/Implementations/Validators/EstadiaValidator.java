@@ -30,9 +30,7 @@ public class EstadiaValidator implements IEstadiaValidator {
             return new RuntimeException("El valor total de la estadía no puede ser negativo.");
         }
 
-        // Validar relaciones obligatorias según tu Entity (nullable = false)
-        // Nota: Depende de tu lógica de negocio si la factura se crea antes o después.
-        // Si es obligatoria al momento de crear la estadía:
+
         if (dto.idFactura == null || dto.idFactura.trim().isEmpty()) {
             return new RuntimeException("El ID de la factura es obligatorio.");
         }

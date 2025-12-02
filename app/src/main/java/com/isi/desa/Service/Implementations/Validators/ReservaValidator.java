@@ -73,8 +73,7 @@ public class ReservaValidator implements IReservaValidator {
                     detalle.fechaHasta
             );
 
-            // Filtramos para ignorar reservas canceladas si tuvieras ese estado
-            // Por ahora asumimos que si está en BD y choca fechas, es conflicto.
+            // Filtramos para ignorar reservas canceladas
             boolean ocupada = coincidencias.stream()
                     .anyMatch(r -> !"CANCELADA".equalsIgnoreCase(r.getEstado()));
 

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
-@Component // 1. Convertimos la clase en un Bean de Spring
+@Component
 public class HuespedMapper {
 
     // Variables estáticas para uso interno en métodos estáticos
@@ -23,7 +23,7 @@ public class HuespedMapper {
     private static IDireccionDAO staticDireccionDAO;
     private static IHuespedDAO staticHuespedDAO;
 
-    // 2. Inyectamos las dependencias en variables de instancia normales
+
     @Autowired
     private ITipoDocumentoDAO tipoDocumentoDAO;
 
@@ -42,7 +42,7 @@ public class HuespedMapper {
         staticHuespedDAO = this.huespedDAO;
     }
 
-    // --- MÉTODOS ESTÁTICOS (Tu lógica original, usando las variables "static...") ---
+    //  MÉTODOS ESTÁTICOS
 
     public static HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
@@ -73,12 +73,9 @@ public class HuespedMapper {
         dto.eliminado = h.isEliminado();
 
         // Direccion
-        // Nota: Asegúrate de que IDireccionDAO tenga este método implementado.
-        // Si no lo tiene, tendrás que ajustarlo o manejar el null.
         try {
             Direccion dEntity = staticDireccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
             if (dEntity != null) {
-                // Lógica de recarga si falta la calle (Opcional, la simplifiqué para seguridad)
                 dto.direccion = DireccionMapper.entityToDto(dEntity);
             } else {
                 dto.direccion = null;
@@ -122,8 +119,6 @@ public class HuespedMapper {
             if (td != null) {
                 h.setTipoDocumento(td.getTipoDocumento());
             } else {
-                // Fallback: Si no lo encuentra, asignamos el string directo (si tu lógica lo permite)
-                // O lanzamos excepción si es estricto. Por ahora asigno el ID.
                 h.setTipoDocumento(tipoDocId);
             }
         }

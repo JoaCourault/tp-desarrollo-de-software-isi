@@ -62,7 +62,6 @@ public class HabitacionService implements IHabitacionService {
 
         long dias = ChronoUnit.DAYS.between(desde, hasta) + 1;
 
-        // Convertimos LocalDate a LocalDateTime para la consulta de Estadia (que usa timestamp)
         LocalDateTime desdeTime = desde.atStartOfDay();
         LocalDateTime hastaTime = hasta.atTime(LocalTime.MAX);
 
@@ -71,10 +70,8 @@ public class HabitacionService implements IHabitacionService {
             fila.habitacion = h;
             fila.disponibilidad = new ArrayList<>();
 
-            // 1. Buscar Reservas (Amarillo)
             List<Reserva> reservasEnRango = reservaRepo.findReservasEnRango(h.id_habitacion, desde, hasta);
 
-            // 2. Buscar Estadías (Rojo - Check-in realizado)
             List<Estadia> estadiasEnRango = estadiaRepo.findEstadiasEnRango(h.id_habitacion, desdeTime, hastaTime);
 
             for (int i = 0; i < dias; i++) {
@@ -85,8 +82,6 @@ public class HabitacionService implements IHabitacionService {
                 // --- LÓGICA DE PRIORIDAD DE ESTADOS ---
 
                 // PRIORIDAD 1: Bloqueo Global (Mantenimiento)
-                // Solo si es Mantenimiento o Fuera de Servicio bloqueamos todo.
-                // Ignoramos si dice "OCUPADA" globalmente para permitir la lógica dinámica.
                 if (h.estado != null &&
                         (h.estado.name().equals("MANTENIMIENTO") || h.estado.name().equals("FUERA_DE_SERVICIO"))) {
                     dia.estado = h.estado.name();
@@ -96,7 +91,7 @@ public class HabitacionService implements IHabitacionService {
                     boolean hayEstadia = estadiasEnRango.stream().anyMatch(estadia -> {
                         LocalDate checkIn = estadia.getCheckIn().toLocalDate();
                         LocalDate checkOut = estadia.getCheckOut().toLocalDate();
-                        // El día cuenta si es >= checkIn y < checkOut (habitualmente el dia de salida queda libre a la tarde)
+                        // el dia cuenta si es >= checkIn y < checkOut
                         // O <= checkOut si queremos marcar el dia de salida tambien.
                         return !fechaActual.isBefore(checkIn) && !fechaActual.isAfter(checkOut);
                     });

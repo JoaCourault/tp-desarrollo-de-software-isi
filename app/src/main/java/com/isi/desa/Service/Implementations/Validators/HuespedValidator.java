@@ -1,7 +1,7 @@
 package com.isi.desa.Service.Implementations.Validators;
 
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
-import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO; // Asegúrate de importar la interfaz
+import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
@@ -29,19 +29,14 @@ public class HuespedValidator implements IHuespedValidator {
     private IHuespedDAO dao;
 
     @Autowired
-    private ITipoDocumentoDAO tipoDocumentoDAO; // Spring inyectará esto con el repositorio listo
+    private ITipoDocumentoDAO tipoDocumentoDAO;
 
-    // Nota: Si DireccionValidator es un @Service, deberías inyectarlo con @Autowired también.
-    // Si es una clase estática o singleton manual, déjalo así, pero lo ideal es inyectarlo.
     private final IDireccionValidator direccionValidator;
 
-    // 2. Constructor público para que Spring pueda instanciarlo (o autowiring en campos)
+
     public HuespedValidator() {
         this.direccionValidator = DireccionValidator.getInstance();
     }
-
-    // --- ELIMINADO EL SINGLETON MANUAL (getInstance, INSTANCE, private constructor) ---
-    // Spring maneja el ciclo de vida ahora.
 
     @Override
     public Huesped create(HuespedDTO huespedDTO) {
@@ -167,8 +162,6 @@ public class HuespedValidator implements IHuespedValidator {
     }
 
     private String validateTipoDocumento(TipoDocumentoDTO tipoDocumentoDTO) {
-        // CORRECCIÓN CRÍTICA: NO HACER new TipoDocumentoDAO();
-        // Usamos la instancia inyectada por Spring.
 
         if (tipoDocumentoDTO == null) {
             return "El tipo de documento es obligatorio";
@@ -180,7 +173,6 @@ public class HuespedValidator implements IHuespedValidator {
             return "El nombre del tipo de documento es obligatorio";
         }
 
-        // Usamos el bean inyectado 'this.tipoDocumentoDAO'
         TipoDocumento tipodocumentoencontrado = this.tipoDocumentoDAO.obtener(tipo);
 
         if(tipodocumentoencontrado == null) {

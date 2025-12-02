@@ -71,7 +71,7 @@ public class EstadiaService implements IEstadiaService {
                     .orElse(null);
 
             if (reservaEfectiva != null) {
-                // CASO: CHECK-IN DE RESERVA (Fulfillment)
+                // CASO: CHECK-IN DE RESERVA
                 estadia.setIdReserva(reservaEfectiva.getIdReserva());
 
                 // Efectivizamos la reserva para que ya no figure pendiente
@@ -81,7 +81,6 @@ public class EstadiaService implements IEstadiaService {
                 // CASO: WALK-IN (Sin reserva previa)
                 estadia.setIdReserva(null);
             }
-            // ----------------------------------------
 
             estadia.setIdFactura(null);
             estadiaDAO.save(estadia);
