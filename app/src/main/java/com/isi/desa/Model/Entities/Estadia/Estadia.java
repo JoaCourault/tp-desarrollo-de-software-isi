@@ -28,8 +28,11 @@ public class Estadia {
     @Column(name = "id_reserva")
     private String idReserva;
 
-    @Column(name = "id_factura", nullable = false)
+    @Column(name = "id_factura")
     private String idFactura;
+
+    @Column(name = "id_habitacion")
+    private String idHabitacion;
 
     public Estadia() {}
 
@@ -54,4 +57,7 @@ public class Estadia {
 
     public String getIdFactura() { return idFactura; }
     public void setIdFactura(String idFactura) { this.idFactura = idFactura; }
+
+    public String getIdHabitacion() { return idHabitacion; }
+    public void setIdHabitacion(String idHabitacion) { this.idHabitacion = idHabitacion; }
 }

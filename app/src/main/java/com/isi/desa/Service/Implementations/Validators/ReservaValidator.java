@@ -3,6 +3,7 @@ package com.isi.desa.Service.Implementations.Validators;
 import com.isi.desa.Dao.Repositories.HabitacionRepository;
 import com.isi.desa.Dao.Repositories.ReservaRepository;
 import com.isi.desa.Dto.Reserva.CrearReservaRequestDTO;
+import com.isi.desa.Dto.Reserva.ReservaDetalleDTO;
 import com.isi.desa.Model.Entities.Reserva.Reserva;
 import com.isi.desa.Service.Interfaces.Validators.IReservaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,44 +23,65 @@ public class ReservaValidator implements IReservaValidator {
 
     @Override
     public void validateCreate(CrearReservaRequestDTO request) {
-        // 1. Validar Datos básicos
+
+        // 1. Validar Objeto principal
         if (request == null) {
             throw new IllegalArgumentException("La solicitud no puede ser nula.");
         }
-        if (request.idsHabitaciones == null || request.idsHabitaciones.isEmpty()) {
+
+        // 2. Validar Datos del Cliente
+        if (request.nombreCliente == null || request.nombreCliente.trim().isEmpty() ||
+                request.apellidoCliente == null || request.apellidoCliente.trim().isEmpty()) {
+            throw new IllegalArgumentException("Faltan datos del huésped (Nombre y Apellido son obligatorios).");
+        }
+
+        // 3. Validar Lista de Reservas (El error que te salía antes)
+        if (request.reservas == null || request.reservas.isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos una habitación.");
         }
-        if (request.nombreCliente == null || request.apellidoCliente == null) {
-            throw new IllegalArgumentException("Faltan datos del huésped.");
-        }
 
-        // 2. Validar Fechas
+        // 4. Validar CADA reserva individualmente (Fechas y Disponibilidad)
         LocalDate hoy = LocalDate.now();
-        if (request.fechaIngreso.isBefore(hoy)) {
-            // Opcional: Permitir reservas pasadas si es un registro histórico
-            // throw new IllegalArgumentException("La fecha de ingreso no puede ser en el pasado.");
-        }
-        if (request.fechaEgreso.isBefore(request.fechaIngreso)) {
-            throw new IllegalArgumentException("La fecha de egreso debe ser posterior a la de ingreso.");
-        }
 
-        // 3. Validar Disponibilidad de la Habitación
-        String idHabitacion = request.idsHabitaciones.get(0);
+        for (ReservaDetalleDTO detalle : request.reservas) {
 
-        // A. ¿Existe la habitación?
-        if (!habitacionRepo.existsById(idHabitacion)) {
-            throw new IllegalArgumentException("La habitación seleccionada no existe.");
-        }
+            // A. Validar integridad de datos por ítem
+            if (detalle.idHabitacion == null) {
+                throw new IllegalArgumentException("Hay una reserva sin habitación seleccionada.");
+            }
+            if (detalle.fechaDesde == null || detalle.fechaHasta == null) {
+                throw new IllegalArgumentException("Las fechas de reserva son obligatorias.");
+            }
 
-        // B. ¿Está ocupada en esas fechas? (Usamos la query que creamos antes)
-        List<Reserva> coincidencias = reservaRepo.findReservasEnRango(
-                idHabitacion,
-                request.fechaIngreso,
-                request.fechaEgreso
-        );
+            // B. Validar Lógica de Fechas
+            if (detalle.fechaDesde.isBefore(hoy)) {
+                // throw new IllegalArgumentException("No se puede reservar en el pasado (Habitación " + detalle.idHabitacion + ").");
+            }
+            if (detalle.fechaHasta.isBefore(detalle.fechaDesde) || detalle.fechaHasta.isEqual(detalle.fechaDesde)) {
+                throw new IllegalArgumentException("La fecha de salida debe ser posterior a la de entrada.");
+            }
 
-        if (!coincidencias.isEmpty()) {
-            throw new IllegalArgumentException("La habitación ya se encuentra reservada en el rango de fechas seleccionado.");
+            // C. Validar Existencia de Habitación
+            if (!habitacionRepo.existsById(detalle.idHabitacion)) {
+                throw new IllegalArgumentException("La habitación con ID " + detalle.idHabitacion + " no existe.");
+            }
+
+            // D. Validar Disponibilidad en BD (Solapamiento)
+            List<Reserva> coincidencias = reservaRepo.findReservasEnRango(
+                    detalle.idHabitacion,
+                    detalle.fechaDesde,
+                    detalle.fechaHasta
+            );
+
+            // Filtramos para ignorar reservas canceladas si tuvieras ese estado
+            // Por ahora asumimos que si está en BD y choca fechas, es conflicto.
+            boolean ocupada = coincidencias.stream()
+                    .anyMatch(r -> !"CANCELADA".equalsIgnoreCase(r.getEstado()));
+
+            if (ocupada) {
+                throw new IllegalArgumentException("La habitación " + detalle.idHabitacion +
+                        " no está disponible entre " + detalle.fechaDesde + " y " + detalle.fechaHasta);
+            }
         }
     }
 }

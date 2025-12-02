@@ -9,4 +9,6 @@ public class EstadiaDTO {
     public LocalDateTime checkIn;
     public LocalDateTime checkOut;
     public Integer cantNoches;
+    public String idFactura;
+  public String idReserva;
 }

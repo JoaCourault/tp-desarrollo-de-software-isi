@@ -20,7 +20,6 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
 
     @Override
     public TipoDocumento obtener(String id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se encontro TipoDocumento con id: " + id));
+        return repo.findById(id).orElse(null);
     }
 }

@@ -1,18 +1,23 @@
 package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Interfaces.IHabitacionDAO;
+import com.isi.desa.Dao.Repositories.EstadiaRepository;
 import com.isi.desa.Dao.Repositories.ReservaRepository;
 import com.isi.desa.Dto.Habitacion.DisponibilidadDiaDTO;
 import com.isi.desa.Dto.Habitacion.HabitacionDTO;
 import com.isi.desa.Dto.Habitacion.HabitacionDisponibilidadDTO;
+import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
 import com.isi.desa.Model.Entities.Reserva.Reserva;
+import com.isi.desa.Model.Enums.EstadoHabitacion;
 import com.isi.desa.Service.Interfaces.IHabitacionService;
 import com.isi.desa.Utils.Mappers.HabitacionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +30,9 @@ public class HabitacionService implements IHabitacionService {
 
     @Autowired
     private ReservaRepository reservaRepo;
+
+    @Autowired
+    private EstadiaRepository estadiaRepo;
 
     @Override
     public HabitacionDTO crear(HabitacionDTO dto) {
@@ -49,47 +57,69 @@ public class HabitacionService implements IHabitacionService {
 
     @Override
     public List<HabitacionDisponibilidadDTO> obtenerDisponibilidad(LocalDate desde, LocalDate hasta) {
-        // 1. Obtenemos todas las habitaciones del hotel
         List<HabitacionDTO> habitaciones = this.listar();
         List<HabitacionDisponibilidadDTO> resultado = new ArrayList<>();
 
-        // 2. Calculamos la duración del rango de búsqueda (incluyendo el día final)
         long dias = ChronoUnit.DAYS.between(desde, hasta) + 1;
 
-        // 3. Procesamos cada habitación
+        // Convertimos LocalDate a LocalDateTime para la consulta de Estadia (que usa timestamp)
+        LocalDateTime desdeTime = desde.atStartOfDay();
+        LocalDateTime hastaTime = hasta.atTime(LocalTime.MAX);
+
         for (HabitacionDTO h : habitaciones) {
             HabitacionDisponibilidadDTO fila = new HabitacionDisponibilidadDTO();
             fila.habitacion = h;
             fila.disponibilidad = new ArrayList<>();
 
-            // 4. Consultamos a la BD solo las reservas que afecten a ESTA habitación en ESTE rango
+            // 1. Buscar Reservas (Amarillo)
             List<Reserva> reservasEnRango = reservaRepo.findReservasEnRango(h.id_habitacion, desde, hasta);
 
-            // 5. Generamos la celda para cada día del rango solicitado
+            // 2. Buscar Estadías (Rojo - Check-in realizado)
+            List<Estadia> estadiasEnRango = estadiaRepo.findEstadiasEnRango(h.id_habitacion, desdeTime, hastaTime);
+
             for (int i = 0; i < dias; i++) {
                 DisponibilidadDiaDTO dia = new DisponibilidadDiaDTO();
                 LocalDate fechaActual = desde.plusDays(i);
                 dia.fecha = fechaActual;
 
-                // --- LÓGICA DE DETERMINACIÓN DE ESTADO ---
-                if (h.estado != null && !h.estado.name().equals("DISPONIBLE")) {
+                // --- LÓGICA DE PRIORIDAD DE ESTADOS ---
+
+                // PRIORIDAD 1: Bloqueo Global (Mantenimiento)
+                // Solo si es Mantenimiento o Fuera de Servicio bloqueamos todo.
+                // Ignoramos si dice "OCUPADA" globalmente para permitir la lógica dinámica.
+                if (h.estado != null &&
+                        (h.estado.name().equals("MANTENIMIENTO") || h.estado.name().equals("FUERA_DE_SERVICIO"))) {
                     dia.estado = h.estado.name();
                 }
-                // CASO B: La habitación está operativa, verificamos si hay reserva para hoy
                 else {
-                    boolean estaReservada = reservasEnRango.stream().anyMatch(reserva ->
-                            // Verificamos si la fecha actual cae dentro del rango [Inicio, Fin] de la reserva
-                            (fechaActual.isEqual(reserva.getFechaDesde()) || fechaActual.isAfter(reserva.getFechaDesde())) &&
-                                    (fechaActual.isEqual(reserva.getFechaHasta()) || fechaActual.isBefore(reserva.getFechaHasta()))
-                    );
+                    // PRIORIDAD 2: Estadía (Check-In activo) -> "OCUPADA"
+                    boolean hayEstadia = estadiasEnRango.stream().anyMatch(estadia -> {
+                        LocalDate checkIn = estadia.getCheckIn().toLocalDate();
+                        LocalDate checkOut = estadia.getCheckOut().toLocalDate();
+                        // El día cuenta si es >= checkIn y < checkOut (habitualmente el dia de salida queda libre a la tarde)
+                        // O <= checkOut si queremos marcar el dia de salida tambien.
+                        return !fechaActual.isBefore(checkIn) && !fechaActual.isAfter(checkOut);
+                    });
 
-                    if (estaReservada) {
-                        dia.estado = "RESERVADA";
-                    } else {
-                        dia.estado = "DISPONIBLE";
+                    if (hayEstadia) {
+                        dia.estado = "OCUPADA";
+                    }
+                    else {
+                        // PRIORIDAD 3: Reserva -> "RESERVADA"
+                        boolean hayReserva = reservasEnRango.stream().anyMatch(reserva ->
+                                (fechaActual.isEqual(reserva.getFechaDesde()) || fechaActual.isAfter(reserva.getFechaDesde())) &&
+                                        (fechaActual.isEqual(reserva.getFechaHasta()) || fechaActual.isBefore(reserva.getFechaHasta())) &&
+                                        "RESERVADA".equalsIgnoreCase(reserva.getEstado()) // Solo mostramos si sigue reservada, no cancelada o efectivizada
+                        );
+
+                        if (hayReserva) {
+                            dia.estado = "RESERVADA";
+                        } else {
+                            // PRIORIDAD 4: Libre
+                            dia.estado = "DISPONIBLE";
+                        }
                     }
                 }
-
                 fila.disponibilidad.add(dia);
             }
             resultado.add(fila);
