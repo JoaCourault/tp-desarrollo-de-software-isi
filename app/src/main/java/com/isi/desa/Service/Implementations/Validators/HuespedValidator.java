@@ -1,9 +1,7 @@
 package com.isi.desa.Service.Implementations.Validators;
 
-import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
-import com.isi.desa.Dao.Implementations.HuespedDAO;
-import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
+import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO; // Asegúrate de importar la interfaz
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
@@ -13,8 +11,9 @@ import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
-import com.isi.desa.Utils.Format.DateFormat;
 import com.isi.desa.Utils.Mappers.DireccionMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,23 +22,28 @@ import java.util.List;
 
 @Service
 public class HuespedValidator implements IHuespedValidator {
+
+    // 1. Inyectamos los DAOs y Validadores necesarios
+    @Autowired
+    @Qualifier("huespedDAO")
+    private IHuespedDAO dao;
+
+    @Autowired
+    private ITipoDocumentoDAO tipoDocumentoDAO; // Spring inyectará esto con el repositorio listo
+
+    // Nota: Si DireccionValidator es un @Service, deberías inyectarlo con @Autowired también.
+    // Si es una clase estática o singleton manual, déjalo así, pero lo ideal es inyectarlo.
     private final IDireccionValidator direccionValidator;
-    private final IHuespedDAO dao;
 
-    // Instancia unica (eager singleton)
-    private static final HuespedValidator INSTANCE = new HuespedValidator();
-
-    // Constructor privado
-    private HuespedValidator() {
-        this.dao = new HuespedDAO();
+    // 2. Constructor público para que Spring pueda instanciarlo (o autowiring en campos)
+    public HuespedValidator() {
         this.direccionValidator = DireccionValidator.getInstance();
     }
 
-    // Metodo publico para obtener la instancia
-    public static HuespedValidator getInstance() {
-        return INSTANCE;
-    }
+    // --- ELIMINADO EL SINGLETON MANUAL (getInstance, INSTANCE, private constructor) ---
+    // Spring maneja el ciclo de vida ahora.
 
+    @Override
     public Huesped create(HuespedDTO huespedDTO) {
         CannotCreateHuespedException errorValidacion = validateCreate(huespedDTO);
         if (errorValidacion != null) throw errorValidacion;
@@ -89,8 +93,8 @@ public class HuespedValidator implements IHuespedValidator {
 
         if (!errores.isEmpty()) {
             return new CannotCreateHuespedException(errores.stream().map(
-                    RuntimeException::getMessage).reduce(
-                    (a, b) -> a + "; " + b)
+                            RuntimeException::getMessage).reduce(
+                            (a, b) -> a + "; " + b)
                     .orElse("")
             );
         }
@@ -128,7 +132,7 @@ public class HuespedValidator implements IHuespedValidator {
         if (dto == null) {
             errores.add(new IllegalArgumentException("No se han proporcionado datos del huesped a modificar."));
             return new CannotModifyHuespedEsception(errores.stream().map(
-                    RuntimeException::getMessage).reduce(
+                            RuntimeException::getMessage).reduce(
                             (a, b) -> a + "; " + b)
                     .orElse("")
             );
@@ -163,7 +167,9 @@ public class HuespedValidator implements IHuespedValidator {
     }
 
     private String validateTipoDocumento(TipoDocumentoDTO tipoDocumentoDTO) {
-        TipoDocumentoDAO dao = new TipoDocumentoDAO();
+        // CORRECCIÓN CRÍTICA: NO HACER new TipoDocumentoDAO();
+        // Usamos la instancia inyectada por Spring.
+
         if (tipoDocumentoDTO == null) {
             return "El tipo de documento es obligatorio";
         }
@@ -174,7 +180,9 @@ public class HuespedValidator implements IHuespedValidator {
             return "El nombre del tipo de documento es obligatorio";
         }
 
-        TipoDocumento tipodocumentoencontrado = dao.obtener(tipo);
+        // Usamos el bean inyectado 'this.tipoDocumentoDAO'
+        TipoDocumento tipodocumentoencontrado = this.tipoDocumentoDAO.obtener(tipo);
+
         if(tipodocumentoencontrado == null) {
             return "El tipo de documento ingresado no existe";
         }
@@ -184,7 +192,6 @@ public class HuespedValidator implements IHuespedValidator {
 
 
     private String validateCuit(String cuit) {
-        // validar formato CUIT: XX-XXXXXXXX-X
         if (cuit != null && !cuit.trim().isEmpty()) {
             String regex = "\\d{2}-\\d{8}-\\d{1}";
             if (!cuit.matches(regex)) {
@@ -205,7 +212,6 @@ public class HuespedValidator implements IHuespedValidator {
         return null;
     }
 
-    // Helper
     private boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }

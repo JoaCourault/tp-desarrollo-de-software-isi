@@ -11,15 +11,19 @@ import java.util.List;
 
 @Service
 public class DireccionValidator implements IDireccionValidator {
-    // Instancia unica (eager singleton)
-    private static final DireccionValidator INSTANCE = new DireccionValidator();
 
-    // Constructor privado
-    private DireccionValidator() {}
+    // CORRECCIÓN: Eliminamos el Singleton manual (INSTANCE, constructor privado, getInstance)
+    // Spring manejará la instancia con @Autowired donde se necesite.
 
-    // Metodo publico para obtener la instancia
+    public DireccionValidator() {
+        // Constructor público vacío para Spring
+    }
+
+    // pero lo ideal es usar inyección de dependencias.
+    // Si algún otro validator usa 'DireccionValidator.getInstance()', cámbialo a 'new DireccionValidator()'
+    // o inyéctalo con @Autowired.
     public static DireccionValidator getInstance() {
-        return INSTANCE;
+        return new DireccionValidator();
     }
 
     @Override
@@ -39,16 +43,23 @@ public class DireccionValidator implements IDireccionValidator {
                 direccionDTO.localidad
         );
     }
-    
+
     @Override
     public InvalidDirectionException validate(DireccionDTO direccionDTO) {
+        // --- AGREGA ESTAS LINEAS PARA VER EN CONSOLA ---
+        System.out.println("--- VALIDANDO DIRECCION ---");
+        System.out.println("Calle recibida: '" + direccionDTO.calle + "'");
+        System.out.println("Numero recibido: '" + direccionDTO.numero + "'");
+        System.out.println("CP recibido: '" + direccionDTO.codigoPostal + "'");
+        System.out.println("---------------------------");
+        // -----------------------------------------------
         if (direccionDTO == null) {
-
             return new InvalidDirectionException("La direccion no puede ser nula");
         }
 
         List<RuntimeException> errores = new ArrayList<>();
         String error;
+
         if ((error = validatePais(direccionDTO.pais)) != null) {
             errores.add(new InvalidDirectionException(error));
         }
@@ -91,7 +102,9 @@ public class DireccionValidator implements IDireccionValidator {
     }
 
     private String validateCodigoPostal(String codigoPostal) {
-        return (codigoPostal == null || !codigoPostal.isEmpty()) ? "El codigo postal es obligatorio y debe ser positivo" : null;
+        // CORREGIDO: Antes tenías !codigoPostal.isEmpty() (Si NO está vacío = error).
+        // AHORA: Si es null O está vacío = error.
+        return (codigoPostal == null || codigoPostal.trim().isEmpty()) ? "El codigo postal es obligatorio y debe ser positivo" : null;
     }
 
     private String validateCalle(String calle) {
@@ -99,6 +112,7 @@ public class DireccionValidator implements IDireccionValidator {
     }
 
     private String validateNumero(String numero) {
-        return (numero == null || !numero.isEmpty()) ? "El numero es obligatorio y debe ser positivo" : null;
+        // CORREGIDO: Igual que el CP, eliminamos el '!' y agregamos trim().
+        return (numero == null || numero.trim().isEmpty()) ? "El numero es obligatorio y debe ser positivo" : null;
     }
 }

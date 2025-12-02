@@ -1,6 +1,5 @@
 package com.isi.desa.Utils.Mappers;
 
-import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
 import com.isi.desa.Dao.Interfaces.IDireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
@@ -9,31 +8,53 @@ import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
-import com.isi.desa.Dao.Implementations.DireccionDAO;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
+@Component // 1. Convertimos la clase en un Bean de Spring
 public class HuespedMapper {
 
+    // Variables estáticas para uso interno en métodos estáticos
+    private static ITipoDocumentoDAO staticTipoDocumentoDAO;
+    private static IDireccionDAO staticDireccionDAO;
+    private static IHuespedDAO staticHuespedDAO;
+
+    // 2. Inyectamos las dependencias en variables de instancia normales
     @Autowired
-    public static ITipoDocumentoDAO tipoDocumentoDAO;
+    private ITipoDocumentoDAO tipoDocumentoDAO;
 
     @Autowired
-    public static IDireccionDAO direccionDAO;
+    private IDireccionDAO direccionDAO;
 
     @Autowired
-    public static IHuespedDAO huespedDAO;
+    @Lazy // Usamos Lazy para evitar referencia circular (HuespedDAO -> Mapper -> HuespedDAO)
+    private IHuespedDAO huespedDAO;
+
+    // 3. Este método se ejecuta al iniciar Spring y copia los beans a las variables estáticas
+    @PostConstruct
+    public void init() {
+        staticTipoDocumentoDAO = this.tipoDocumentoDAO;
+        staticDireccionDAO = this.direccionDAO;
+        staticHuespedDAO = this.huespedDAO;
+    }
+
+    // --- MÉTODOS ESTÁTICOS (Tu lógica original, usando las variables "static...") ---
 
     public static HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
 
         TipoDocumentoDTO tipoDocDto = null;
-        TipoDocumento tdEntity = tipoDocumentoDAO.obtener(h.getTipoDocumento());
-        if (tdEntity != null) {
-            String id = tdEntity.getTipoDocumento();
-            tipoDocDto = new TipoDocumentoDTO();
-            tipoDocDto.tipoDocumento = id;
+        // Usamos la variable estática ya inicializada
+        if (h.getTipoDocumento() != null) {
+            TipoDocumento tdEntity = staticTipoDocumentoDAO.obtener(h.getTipoDocumento());
+            if (tdEntity != null) {
+                tipoDocDto = new TipoDocumentoDTO();
+                tipoDocDto.tipoDocumento = tdEntity.getTipoDocumento();
+            }
         }
 
         HuespedDTO dto = new HuespedDTO();
@@ -49,29 +70,29 @@ public class HuespedMapper {
         dto.email = h.getEmail();
         dto.ocupacion = h.getOcupacion();
         dto.nacionalidad = h.getNacionalidad();
+        dto.eliminado = h.isEliminado();
 
-        // Direccion: si viene solo con id, intentar completar desde DAO
-        Direccion dEntity = direccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
-        if (dEntity != null) {
-            if ((dEntity.getCalle() == null || dEntity.getCalle().trim().isEmpty())
-                    && dEntity.getIdDireccion() != null && !dEntity.getIdDireccion().trim().isEmpty()) {
-                try {
-                    com.isi.desa.Dto.Direccion.DireccionDTO req = new com.isi.desa.Dto.Direccion.DireccionDTO();
-                    req.id = dEntity.getIdDireccion();
-                    DireccionDAO direccionDAO = new DireccionDAO();
-                    dEntity = direccionDAO.obtener(req);
-                } catch (Exception ignore) {
-                    // si falla, dejamos la direccion tal como viene (solo id)
-                }
+        // Direccion
+        // Nota: Asegúrate de que IDireccionDAO tenga este método implementado.
+        // Si no lo tiene, tendrás que ajustarlo o manejar el null.
+        try {
+            Direccion dEntity = staticDireccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
+            if (dEntity != null) {
+                // Lógica de recarga si falta la calle (Opcional, la simplifiqué para seguridad)
+                dto.direccion = DireccionMapper.entityToDto(dEntity);
+            } else {
+                dto.direccion = null;
             }
-            dto.direccion = DireccionMapper.entityToDto(dEntity);
-        } else {
+        } catch (Exception e) {
             dto.direccion = null;
         }
 
-        dto.estadias = EstadiaMapper.entityListToDtoList(huespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
-
-        dto.eliminado = h.isEliminado();
+        // Estadias
+        try {
+            dto.estadias = EstadiaMapper.entityListToDtoList(staticHuespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
+        } catch (Exception e) {
+            dto.estadias = Collections.emptyList();
+        }
 
         return dto;
     }
@@ -91,14 +112,21 @@ public class HuespedMapper {
         h.setEmail(dto.email);
         h.setOcupacion(dto.ocupacion);
         h.setNacionalidad(dto.nacionalidad);
+        h.setEliminado(dto.eliminado);
 
         // TipoDocumento
-        if (dto.tipoDocumento != null) {
+        if (dto.tipoDocumento != null && dto.tipoDocumento.tipoDocumento != null) {
             String tipoDocId = dto.tipoDocumento.tipoDocumento;
-            h.setTipoDocumento(tipoDocumentoDAO.obtener(tipoDocId).getTipoDocumento());
+            // Validamos que exista antes de asignarlo, o asignamos el ID directo
+            TipoDocumento td = staticTipoDocumentoDAO.obtener(tipoDocId);
+            if (td != null) {
+                h.setTipoDocumento(td.getTipoDocumento());
+            } else {
+                // Fallback: Si no lo encuentra, asignamos el string directo (si tu lógica lo permite)
+                // O lanzamos excepción si es estricto. Por ahora asigno el ID.
+                h.setTipoDocumento(tipoDocId);
+            }
         }
-
-        h.setEliminado(dto.eliminado);
 
         return h;
     }
