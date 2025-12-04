@@ -8,3 +8,4 @@ build
 # Ignore IDE-specific files
 /.idea
 /.vscode
+app/src/main/resources/application.properties
