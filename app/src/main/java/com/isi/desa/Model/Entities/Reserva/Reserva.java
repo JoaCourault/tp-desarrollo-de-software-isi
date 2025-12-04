@@ -1,26 +1,51 @@
 package com.isi.desa.Model.Entities.Reserva;
 
+import com.isi.desa.Model.Entities.Habitacion.Habitacion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@Entity
+@Table(name = "Reserva")
 public class Reserva {
-    private Huesped titularReserva;
+    @Id
+    @GeneratedValue(generator = "id_reserva")
+    @GenericGenerator(name = "id_reserva", strategy = "uuid2")
+    private String idReserva;
+    @Column(name = "fechaIngreso")
     private LocalDateTime fechaIngreso;
+    @Column(name = "fechaEgreso")
     private LocalDateTime fechaEgreso;
+    @Column(name = "nombre_huesped")
+    private String nombreHuesped;
+    @Column(name = "apellido_huesped")
+    private String apellidoHuesped;
+    @Column(name = "telefono_huesped")
+    private String telefonoHuesped;
+    @ManyToOne
+    @JoinColumn(name = "id_habitacion", referencedColumnName = "id_habitacion", nullable = false)
+    private Habitacion habitacion;
 
     public Reserva() {}
 
-    public Reserva(Huesped titularReserva, LocalDateTime fechaIngreso, LocalDateTime fechaEgreso) {
-        this.titularReserva = titularReserva;
+    public Reserva(LocalDateTime fechaIngreso, LocalDateTime fechaEgreso) {
         this.fechaIngreso = fechaIngreso;
         this.fechaEgreso = fechaEgreso;
     }
 
-    public Huesped getTitularReserva() { return this.titularReserva; }
-    public void setTitularReserva(Huesped titularReserva) { this.titularReserva = titularReserva; }
     public LocalDateTime getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDateTime fechaIngreso) { this.fechaIngreso = fechaIngreso; }
     public LocalDateTime getFechaEgreso() { return fechaEgreso; }
     public void setFechaEgreso(LocalDateTime fechaEgreso) { this.fechaEgreso = fechaEgreso; }
+    public String getNombreHuesped() { return nombreHuesped; }
+    public void setNombreHuesped(String nombreHuesped) { this.nombreHuesped = nombreHuesped; }
+    public String getApellidoHuesped() { return apellidoHuesped; }
+    public void setApellidoHuesped(String apellidoHuesped) { this.apellidoHuesped = apellidoHuesped; }
+    public String getTelefonoHuesped() { return telefonoHuesped; }
+    public void setTelefonoHuesped(String telefonoHuesped) { this.telefonoHuesped = telefonoHuesped; }
+    public Habitacion getHabitacion() { return habitacion; }
+    public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
 }

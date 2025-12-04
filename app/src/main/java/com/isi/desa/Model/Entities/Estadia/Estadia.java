@@ -1,15 +1,20 @@
 package com.isi.desa.Model.Entities.Estadia;
 
+import com.isi.desa.Model.Entities.Reserva.Reserva;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "estadia")
+@Table(name = "Estadia")
 public class Estadia {
 
     @Id
+    @GeneratedValue(generator = "id_estadia")
+    @GenericGenerator(name = "id_estadia", strategy = "uuid2")
     @Column(name = "id_estadia", nullable = false)
     private String idEstadia;
 
@@ -25,8 +30,10 @@ public class Estadia {
     @Column(name = "cant_noches")
     private Integer cantNoches;
 
-    @Column(name = "id_reserva")
-    private String idReserva;
+    @OneToOne
+    @JoinColumn(name = "id_reserva", referencedColumnName = "id_reserva")
+    @Column(name = "id_reserva", nullable = true)
+    private Reserva reserva;
 
     @Column(name = "id_factura", nullable = false)
     private String idFactura;

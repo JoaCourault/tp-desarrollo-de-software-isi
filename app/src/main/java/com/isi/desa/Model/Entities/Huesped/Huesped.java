@@ -4,6 +4,8 @@ import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -11,6 +13,8 @@ import java.util.ArrayList;
 @Table(name = "huesped")
 public class Huesped {
     @Id
+    @GeneratedValue(generator = "id_huesped")
+    @GenericGenerator(name = "id_huesped", strategy = "uuid2")
     @Column(name = "id_huesped", nullable = false)
     private String idHuesped;
 

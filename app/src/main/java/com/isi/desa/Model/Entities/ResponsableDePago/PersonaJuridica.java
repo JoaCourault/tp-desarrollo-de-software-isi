@@ -1,18 +1,27 @@
 package com.isi.desa.Model.Entities.ResponsableDePago;
 
 import com.isi.desa.Model.Entities.Direccion.Direccion;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
+
+@Entity
+@Table(name = "ResponsableDePago")
 public class PersonaJuridica extends ResponsableDePago {
+    @Column(name = "cuit", nullable = false, unique = true)
+    private String cuit;
+    @Column(name = "telefono", nullable = false)
     private String telefono;
+    @Column(name = "razon_social", nullable = false)
     private String razonSocial;
-    private Direccion direccion;
 
     public PersonaJuridica() {}
 
-    public PersonaJuridica(String telefono, String razonSocial, Direccion direccion) {
+    public PersonaJuridica(String cuit, String telefono, String razonSocial, Direccion direccion) {
+        this.cuit = cuit;
         this.telefono = telefono;
         this.razonSocial = razonSocial;
-        this.direccion = direccion;
     }
 
     public String getTelefono() { return telefono; }
@@ -21,6 +30,6 @@ public class PersonaJuridica extends ResponsableDePago {
     public String getRazonSocial() { return razonSocial; }
     public void setRazonSocial(String razonSocial) { this.razonSocial = razonSocial; }
 
-    public Direccion getDireccion() { return direccion; }
-    public void setDireccion(Direccion direccion) { this.direccion = direccion; }
+    public String getCuit() { return cuit; }
+    public void setCuit(String cuit) { this.cuit = cuit; }
 }

@@ -1,13 +1,17 @@
 package com.isi.desa.Model.Entities.Direccion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.isi.desa.Model.Entities.Huesped.Huesped;
+import com.isi.desa.Model.Entities.ResponsableDePago.PersonaJuridica;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "direccion")
+@Table(name = "Direccion")
 public class Direccion {
     @Id
-    @Column(name = "id_direccion", nullable = false)
+    @GeneratedValue(generator = "id_direccion")
+    @GenericGenerator(name = "id_direccion", strategy = "uuid2")
     private String idDireccion;
 
     @Column(name = "calle")
@@ -34,17 +38,15 @@ public class Direccion {
     @Column(name = "pais")
     private String pais;
 
-    @Column(name = "id_huesped", unique = true)
-    private String idHuesped;
+    @OneToOne(optional = true)
+    @JoinColumn(name = "id_huesped", referencedColumnName = "id_huesped", unique = true)
+    private Huesped huesped;
 
-    @Column(name = "cuit", unique = true)
-    private String cuit;
+    @OneToOne(optional = true)
+    @JoinColumn(name = "cuitPersonaJuridica", referencedColumnName = "cuit", unique = true)
+    private PersonaJuridica personaJuridica;
 
     public Direccion() {}
-
-    public Direccion(String idDireccion) {
-        this.idDireccion = idDireccion;
-    }
 
     public Direccion(String id,String calle, String numero, String departamento, Integer piso, String cp, String localidad, String provincia, String pais) {
         this.idDireccion = id;
@@ -90,9 +92,9 @@ public class Direccion {
         this.idDireccion = idDireccion;
     }
 
-    public String getIdHuesped() { return idHuesped; }
-    public void setIdHuesped(String idHuesped) { this.idHuesped = idHuesped; }
+    public Huesped getHuesped() { return huesped; }
+    public void setHuesped(Huesped huesped) { this.huesped = huesped; }
 
-    public String getCuit() { return cuit; }
-    public void setCuit(String cuit) { this.cuit = cuit; }
+    public PersonaJuridica getPersonaJuridica() { return personaJuridica; }
+    public void setPersonaJuridica(PersonaJuridica personaJuridica) { this.personaJuridica = personaJuridica; }
 }
