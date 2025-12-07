@@ -1,9 +1,8 @@
 package com.isi.desa.Service.Implementations.Validators;
 
-import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
-import com.isi.desa.Dao.Implementations.HuespedDAO;
-import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
+import com.isi.desa.Dao.Interfaces.IDireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
+import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
@@ -13,67 +12,73 @@ import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
-import com.isi.desa.Utils.Format.DateFormat;
 import com.isi.desa.Utils.Mappers.DireccionMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class HuespedValidator implements IHuespedValidator {
-    private final IDireccionValidator direccionValidator;
-    private final IHuespedDAO dao;
 
-    // Instancia unica (eager singleton)
-    private static final HuespedValidator INSTANCE = new HuespedValidator();
+    @Autowired
+    private IDireccionValidator direccionValidator;
 
-    // Constructor privado
-    private HuespedValidator() {
-        this.dao = new HuespedDAO();
-        this.direccionValidator = DireccionValidator.getInstance();
-    }
+    @Autowired
+    @Qualifier("huespedDAO")
+    private IHuespedDAO dao;
 
-    // Metodo publico para obtener la instancia
-    public static HuespedValidator getInstance() {
-        return INSTANCE;
-    }
+    @Autowired
+    private ITipoDocumentoDAO tipoDocumentoDAO;
 
-    public Huesped create(HuespedDTO huespedDTO) {
-        CannotCreateHuespedException errorValidacion = validateCreate(huespedDTO);
-        if (errorValidacion != null) throw errorValidacion;
-
-        Direccion direccion = DireccionMapper.dtoToEntity(huespedDTO.direccion);
-        TipoDocumento tipoDocumento = new TipoDocumento(huespedDTO.tipoDocumento.tipoDocumento);
-        LocalDate fechaNacimiento = huespedDTO.fechaNacimiento;
-        return new Huesped(
-                huespedDTO.nombre,
-                huespedDTO.apellido,
-                tipoDocumento,
-                huespedDTO.numDoc,
-                huespedDTO.posicionIva,
-                huespedDTO.cuit,
-                fechaNacimiento,
-                huespedDTO.telefono,
-                huespedDTO.email,
-                huespedDTO.ocupacion,
-                huespedDTO.nacionalidad,
-                direccion,
-                huespedDTO.idHuesped
-        );
-    }
+    // REGEX: Permite letras (mayús/minús), vocales con tilde, ñ y espacios.
+    // Rechaza números y símbolos (.,-/)
+    private static final String TEXT_ONLY_REGEX = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$";
+    private static final Pattern TEXT_PATTERN = Pattern.compile(TEXT_ONLY_REGEX);
 
     @Override
     public CannotCreateHuespedException validateCreate(HuespedDTO huespedDTO) {
         List<RuntimeException> errores = new ArrayList<>();
 
-        if (isBlank(huespedDTO.nombre)) errores.add(new IllegalArgumentException("El nombre es obligatorio"));
-        if (isBlank(huespedDTO.apellido)) errores.add(new IllegalArgumentException("El apellido es obligatorio"));
+        // 1. Validar Nombre (Obligatorio + Solo Texto)
+        if (isBlank(huespedDTO.nombre)) {
+            errores.add(new IllegalArgumentException("El nombre es obligatorio"));
+        } else if (!isValidText(huespedDTO.nombre)) {
+            errores.add(new IllegalArgumentException("El nombre contiene caracteres inválidos (solo letras y espacios)"));
+        }
+
+        // 2. Validar Apellido (Obligatorio + Solo Texto)
+        if (isBlank(huespedDTO.apellido)) {
+            errores.add(new IllegalArgumentException("El apellido es obligatorio"));
+        } else if (!isValidText(huespedDTO.apellido)) {
+            errores.add(new IllegalArgumentException("El apellido contiene caracteres inválidos"));
+        }
+
+        // 3. Validar Nacionalidad (Solo Texto)
+        if (!isBlank(huespedDTO.nacionalidad) && !isValidText(huespedDTO.nacionalidad)) {
+            errores.add(new IllegalArgumentException("La nacionalidad contiene caracteres inválidos"));
+        }
+
+        // 4. Validar Ocupación (Solo Texto)
+        if (!isBlank(huespedDTO.ocupacion) && !isValidText(huespedDTO.ocupacion)) {
+            errores.add(new IllegalArgumentException("La ocupación contiene caracteres inválidos"));
+        }
+
         if (isBlank(huespedDTO.numDoc)) errores.add(new IllegalArgumentException("El numero de documento es obligatorio"));
 
         String tipoDocumentoError = validateTipoDocumento(huespedDTO.tipoDocumento);
         if (tipoDocumentoError != null) errores.add(new IllegalArgumentException(tipoDocumentoError));
+
+        // Validación Responsable Inscripto
+        if ("Responsable Inscripto".equalsIgnoreCase(huespedDTO.posicionIva)) {
+            if (isBlank(huespedDTO.cuit)) {
+                errores.add(new IllegalArgumentException("El CUIT es obligatorio para la condición 'Responsable Inscripto'"));
+            }
+        }
 
         if(huespedDTO.cuit != null) {
             String cuitError = validateCuit(huespedDTO.cuit);
@@ -83,14 +88,15 @@ public class HuespedValidator implements IHuespedValidator {
         String fechaNacimientoError = validateFechaNacimiento(huespedDTO.fechaNacimiento);
         if (fechaNacimientoError != null) errores.add(new IllegalArgumentException(fechaNacimientoError));
 
-        InvalidDirectionException direccionValidationError = direccionValidator.validate(huespedDTO.direccion);
-        if (direccionValidationError != null) errores.add(direccionValidationError);
-
+        if (huespedDTO.direccion != null) {
+            InvalidDirectionException direccionValidationError = direccionValidator.validate(huespedDTO.direccion);
+            if (direccionValidationError != null) errores.add(direccionValidationError);
+        }
 
         if (!errores.isEmpty()) {
             return new CannotCreateHuespedException(errores.stream().map(
-                    RuntimeException::getMessage).reduce(
-                    (a, b) -> a + "; " + b)
+                            RuntimeException::getMessage).reduce(
+                            (a, b) -> a + "; " + b)
                     .orElse("")
             );
         }
@@ -117,7 +123,6 @@ public class HuespedValidator implements IHuespedValidator {
                             .getMessage()
             );
         }
-
         return null;
     }
 
@@ -127,11 +132,7 @@ public class HuespedValidator implements IHuespedValidator {
 
         if (dto == null) {
             errores.add(new IllegalArgumentException("No se han proporcionado datos del huesped a modificar."));
-            return new CannotModifyHuespedEsception(errores.stream().map(
-                    RuntimeException::getMessage).reduce(
-                            (a, b) -> a + "; " + b)
-                    .orElse("")
-            );
+            return new CannotModifyHuespedEsception("Datos nulos");
         }
 
         String tipoDocumentoError = validateTipoDocumento(dto.tipoDocumento);
@@ -162,51 +163,43 @@ public class HuespedValidator implements IHuespedValidator {
         return null;
     }
 
-    private String validateTipoDocumento(TipoDocumentoDTO tipoDocumentoDTO) {
-        TipoDocumentoDAO dao = new TipoDocumentoDAO();
-        if (tipoDocumentoDTO == null) {
-            return "El tipo de documento es obligatorio";
-        }
-
-        String tipo = tipoDocumentoDTO.tipoDocumento;
-
-        if (isBlank(tipo)) {
-            return "El nombre del tipo de documento es obligatorio";
-        }
-
-        TipoDocumento tipodocumentoencontrado = dao.obtener(tipo);
-        if(tipodocumentoencontrado == null) {
-            return "El tipo de documento ingresado no existe";
-        }
-
+    // Helper para crear entidad (si se necesita aquí)
+    public Huesped create(HuespedDTO huespedDTO) {
+        // Lógica de mapeo básica si es requerida por la interfaz
         return null;
     }
 
+    // --- MÉTODOS PRIVADOS ---
+
+    private String validateTipoDocumento(TipoDocumentoDTO tipoDocumentoDTO) {
+        if (tipoDocumentoDTO == null) return "El tipo de documento es obligatorio";
+        String tipo = tipoDocumentoDTO.tipoDocumento;
+        if (isBlank(tipo)) return "El nombre del tipo de documento es obligatorio";
+        TipoDocumento tipodocumentoencontrado = tipoDocumentoDAO.obtener(tipo);
+        if(tipodocumentoencontrado == null) return "El tipo de documento ingresado no existe";
+        return null;
+    }
 
     private String validateCuit(String cuit) {
-        // validar formato CUIT: XX-XXXXXXXX-X
         if (cuit != null && !cuit.trim().isEmpty()) {
             String regex = "\\d{2}-\\d{8}-\\d{1}";
-            if (!cuit.matches(regex)) {
-                return "El CUIT debe tener el formato XX-XXXXXXXX-X";
-            }
+            if (!cuit.matches(regex)) return "El CUIT debe tener el formato XX-XXXXXXXX-X";
         }
         return null;
     }
 
     private String validateFechaNacimiento(LocalDate fechaNacimiento) {
-        if (fechaNacimiento == null) {
-            return "La fecha de nacimiento es obligatoria";
-        }
-        if (fechaNacimiento.isAfter(LocalDate.now())) {
-            return "La fecha de nacimiento no puede ser futura";
-        }
-
+        if (fechaNacimiento == null) return "La fecha de nacimiento es obligatoria";
+        if (fechaNacimiento.isAfter(LocalDate.now())) return "La fecha de nacimiento no puede ser futura";
         return null;
     }
 
-    // Helper
     private boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
+    }
+
+    // NUEVO: Validación de caracteres especiales
+    private boolean isValidText(String text) {
+        return text != null && TEXT_PATTERN.matcher(text).matches();
     }
 }

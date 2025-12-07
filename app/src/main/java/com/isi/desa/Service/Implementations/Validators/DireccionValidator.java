@@ -4,101 +4,100 @@ import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Component
 public class DireccionValidator implements IDireccionValidator {
-    // Instancia unica (eager singleton)
-    private static final DireccionValidator INSTANCE = new DireccionValidator();
-
-    // Constructor privado
-    private DireccionValidator() {}
-
-    // Metodo publico para obtener la instancia
-    public static DireccionValidator getInstance() {
-        return INSTANCE;
-    }
 
     @Override
-    public Direccion create(DireccionDTO direccionDTO) {
-        InvalidDirectionException validationError = validate(direccionDTO);
+    public Direccion create(DireccionDTO dto) {
+        InvalidDirectionException validationError = validate(dto);
         if (validationError != null) throw validationError;
 
+        // Nota: Asegúrate de usar los Getters del DTO
         return new Direccion(
-                direccionDTO.id,
-                direccionDTO.calle,
-                direccionDTO.numero,
-                direccionDTO.departamento,
-                direccionDTO.piso,
-                direccionDTO.codigoPostal,
-                direccionDTO.pais,
-                direccionDTO.provincia,
-                direccionDTO.localidad
+                dto.getId(),
+                dto.getCalle(),
+                dto.getNumero(),
+                dto.getDepartamento(),
+                // Conversión segura de Piso (String -> Integer) si lo necesitas como Int en la entidad
+                (dto.getPiso() != null && dto.getPiso().matches("\\d+")) ? Integer.parseInt(dto.getPiso()) : null,
+                dto.getCodigoPostal(),
+                dto.getLocalidad(),
+                dto.getProvincia(),
+                dto.getPais()
         );
     }
-    
-    @Override
-    public InvalidDirectionException validate(DireccionDTO direccionDTO) {
-        if (direccionDTO == null) {
 
+    @Override
+    public InvalidDirectionException validate(DireccionDTO dto) {
+        if (dto == null) {
             return new InvalidDirectionException("La direccion no puede ser nula");
         }
 
-        List<RuntimeException> errores = new ArrayList<>();
-        String error;
-        if ((error = validatePais(direccionDTO.pais)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateProvincia(direccionDTO.provincia)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateLocalidad(direccionDTO.localidad)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateCodigoPostal(direccionDTO.codigoPostal)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateCalle(direccionDTO.calle)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateNumero(direccionDTO.numero)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
+        List<String> errores = new ArrayList<>();
 
-        if (!errores.isEmpty()) return new InvalidDirectionException(
-                errores.stream()
-                        .map(RuntimeException::getMessage)
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse("")
-        );
+        // Usamos los Getters del DTO
+        String error;
+        if ((error = validatePais(dto.getPais())) != null) errores.add(error);
+        if ((error = validateProvincia(dto.getProvincia())) != null) errores.add(error);
+        if ((error = validateLocalidad(dto.getLocalidad())) != null) errores.add(error);
+        if ((error = validateCodigoPostal(dto.getCodigoPostal())) != null) errores.add(error);
+        if ((error = validateCalle(dto.getCalle())) != null) errores.add(error);
+        if ((error = validateNumero(dto.getNumero())) != null) errores.add(error);
+
+        if (!errores.isEmpty()) {
+            return new InvalidDirectionException(String.join(", ", errores));
+        }
 
         return null;
     }
 
+    // --- MÉTODOS DE VALIDACIÓN CORREGIDOS ---
+
     private String validatePais(String pais) {
-        return (pais == null || pais.trim().isEmpty()) ? "El pais es obligatorio" : null;
+        return isBlank(pais) ? "El país es obligatorio" : null;
     }
 
     private String validateProvincia(String provincia) {
-        return (provincia == null || provincia.trim().isEmpty()) ? "La provincia es obligatoria" : null;
+        return isBlank(provincia) ? "La provincia es obligatoria" : null;
     }
 
     private String validateLocalidad(String localidad) {
-        return (localidad == null || localidad.trim().isEmpty()) ? "La localidad es obligatoria" : null;
+        return isBlank(localidad) ? "La localidad es obligatoria" : null;
     }
 
     private String validateCodigoPostal(String codigoPostal) {
-        return (codigoPostal == null || !codigoPostal.isEmpty()) ? "El codigo postal es obligatorio y debe ser positivo" : null;
+        if (isBlank(codigoPostal)) {
+            return "El código postal es obligatorio";
+        }
+        // Validamos que sea numérico (regex para solo dígitos)
+        if (!codigoPostal.matches("\\d+")) {
+            return "El código postal debe contener solo números positivos";
+        }
+        return null;
     }
 
     private String validateCalle(String calle) {
-        return (calle == null || calle.trim().isEmpty()) ? "La calle es obligatoria" : null;
+        return isBlank(calle) ? "La calle es obligatoria" : null;
     }
 
     private String validateNumero(String numero) {
-        return (numero == null || !numero.isEmpty()) ? "El numero es obligatorio y debe ser positivo" : null;
+        if (isBlank(numero)) {
+            return "El número es obligatorio";
+        }
+        // Validamos que sea numérico
+        if (!numero.matches("\\d+")) {
+            return "El número de calle debe ser un valor positivo";
+        }
+        return null;
+    }
+
+    // Helper para verificar nulos o vacíos
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
     }
 }

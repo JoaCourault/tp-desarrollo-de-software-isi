@@ -10,40 +10,71 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DireccionDAO implements IDireccionDAO {
+
     @Autowired
     private DireccionRepository repository;
 
     @Override
     @Transactional
     public Direccion crear(DireccionDTO direccion) {
-        if (direccion.id == null || direccion.id.isBlank()) {
-            direccion.id = java.util.UUID.randomUUID().toString();
-        }
-        if (repository.existsById(direccion.id)) {
-            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.id);
+        // Este método se usa si la dirección no tiene dueño aún,
+        // pero tu lógica de negocio requiere un idHuesped.
+        // Lo dejamos por compatibilidad con la interfaz.
+        if (direccion.getId() == null || direccion.getId().isBlank()) {
+            direccion.setId(UUID.randomUUID().toString());
         }
         Direccion nueva = DireccionMapper.dtoToEntity(direccion);
         return repository.save(nueva);
     }
 
+    // --- EL MÉTODO QUE TE FALTABA ---
+    @Transactional
+    public void crear(DireccionDTO direccion, String nuevoIdHuesped) {
+        if (direccion == null) return;
+
+        // 1. Generar ID si no viene
+        if (direccion.getId() == null || direccion.getId().isBlank()) {
+            direccion.setId("DIR-" + UUID.randomUUID().toString().substring(0, 8));
+        }
+
+        // 2. Validar duplicados si es necesario
+        if (repository.existsById(direccion.getId())) {
+            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.getId());
+        }
+
+        // 3. Convertir a Entidad
+        Direccion entidad = DireccionMapper.dtoToEntity(direccion);
+
+        // 4. VINCULAR CON EL HUÉSPED (Clave Foránea)
+        entidad.setIdHuesped(nuevoIdHuesped);
+
+        // 5. Guardar
+        repository.save(entidad);
+    }
+
     @Override
     @Transactional
     public Direccion modificar(DireccionDTO direccion) {
-        if (!repository.existsById(direccion.id)) {
-            throw new RuntimeException("No se encontro la direccion con ID: " + direccion.id);
+        if (!repository.existsById(direccion.getId())) {
+            throw new RuntimeException("No se encontro la direccion con ID: " + direccion.getId());
         }
         Direccion actualizada = DireccionMapper.dtoToEntity(direccion);
+        // Aseguramos que no se pierda el idHuesped al modificar
+        Direccion existente = repository.findById(direccion.getId()).orElseThrow();
+        actualizada.setIdHuesped(existente.getIdHuesped());
+
         return repository.save(actualizada);
     }
 
     @Override
     @Transactional
     public Direccion eliminar(DireccionDTO direccion) {
-        Direccion existente = repository.findById(direccion.id)
-                .orElseThrow(() -> new RuntimeException("No se encontro la direccion a eliminar: " + direccion.id));
+        Direccion existente = repository.findById(direccion.getId())
+                .orElseThrow(() -> new RuntimeException("No se encontro la direccion a eliminar: " + direccion.getId()));
         repository.delete(existente);
         return existente;
     }
@@ -51,15 +82,13 @@ public class DireccionDAO implements IDireccionDAO {
     @Override
     @Transactional(readOnly = true)
     public Direccion obtener(DireccionDTO direccion) {
-        return repository.findById(direccion.id)
-                .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.id));
+        return repository.findById(direccion.getId())
+                .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.getId()));
     }
 
     @Override
     public Direccion obtenerDireccionDeHuespedPorId(String idHuesped) {
-        String id = Optional.ofNullable(idHuesped)
-                .orElseThrow(() -> new RuntimeException("El ID del huesped no puede ser nulo"));
-        return repository.findByIdHuesped(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró dirección para el huesped con ID: " + id));
+        if (idHuesped == null) return null;
+        return repository.findByIdHuesped(idHuesped).orElse(null);
     }
 }

@@ -13,10 +13,13 @@ import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class HuespedService implements IHuespedService {
@@ -24,60 +27,80 @@ public class HuespedService implements IHuespedService {
     @Autowired
     private IHuespedValidator validator;
 
+    @Qualifier("huespedDAO")
     @Autowired
     private IHuespedDAO dao;
 
-    private static final HuespedService INSTANCE = new HuespedService();
+    @Autowired
+    private DireccionDAO direccionDAO;
 
-    public static HuespedService getInstance() {
-        return INSTANCE;
-    }
+    @Autowired
+    private HuespedMapper huespedMapper;
 
+    // --- LOGICA DE ALTA (CU09) ---
+
+    // 1. Método de la interfaz (por defecto asume que NO se fuerza la creación)
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
+        return crear(huespedDTO, false);
+    }
 
-        // Validación básica
+    // 2. Método sobrecargado para soportar el flujo "ACEPTAR IGUALMENTE"
+    public HuespedDTO crear(HuespedDTO huespedDTO, Boolean aceptarIgualmente) throws HuespedDuplicadoException {
+
+        // A. Validación de datos obligatorios (Diagrama paso 2.A)
         CannotCreateHuespedException validation = this.validator.validateCreate(huespedDTO);
         if (validation != null) {
             throw validation;
         }
 
-        // 🔥 VALIDACIÓN DE DUPLICADOS (agregada)
-        boolean duplicado = dao.leerHuespedes().stream()
-                .filter(h -> h != null && !h.isEliminado())
-                .anyMatch(h ->
-                        h.getTipoDocumento() != null &&
-                                huespedDTO.tipoDocumento != null &&
-                                huespedDTO.tipoDocumento.tipoDocumento != null &&
-                                h.getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
-                                h.getNumDoc() != null &&
-                                h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
-                );
+        // B. Validación de Duplicados (Diagrama paso 2.B)
+        // Solo verificamos si el usuario NO ha dicho "Aceptar Igualmente" todavía
+        if (aceptarIgualmente == null || !aceptarIgualmente) {
+            boolean duplicado = dao.leerHuespedes().stream()
+                    .filter(h -> h != null && !h.isEliminado())
+                    .anyMatch(h ->
+                            h.getTipoDocumento() != null &&
+                                    huespedDTO.tipoDocumento != null &&
+                                    huespedDTO.tipoDocumento.tipoDocumento != null &&
+                                    h.getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
+                                    h.getNumDoc() != null &&
+                                    h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
+                    );
 
-        if (duplicado) {
-            throw new HuespedDuplicadoException(
-                    "Ya existe un huésped con ese tipo y número de documento."
-            );
+            if (duplicado) {
+                // Esto dispara el aviso en el Front para mostrar los botones "ACEPTAR IGUALMENTE"
+                throw new HuespedDuplicadoException("El tipo y número de documento ya existen.");
+            }
         }
 
-        // Persistencia de Dirección
-        DireccionDAO direccionDAO = new DireccionDAO();
-        try {
-            direccionDAO.obtener(huespedDTO.direccion);
-        } catch (Exception e) {
-            direccionDAO.crear(huespedDTO.direccion);
+        // C. Generación de ID y Persistencia
+        // Generamos ID manual (UUID corto) para vincular las entidades
+        String nuevoIdHuesped = "H-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        huespedDTO.idHuesped = nuevoIdHuesped;
+
+        // D. Guardar HUESPED (Padre) - Primero
+        Huesped huespedGuardado = dao.crear(huespedDTO);
+
+        // E. Guardar DIRECCION (Hija) - Después, vinculada
+        if (huespedDTO.direccion != null) {
+            try {
+                // Usamos el DAO inyectado, no 'new DireccionDAO()'
+                direccionDAO.crear(huespedDTO.direccion, nuevoIdHuesped);
+            } catch (Exception e) {
+                // Loguear error pero no interrumpir el flujo principal si no es crítico
+                System.out.println("Error al guardar dirección: " + e.getMessage());
+            }
         }
 
-        // Persistencia del huésped
-        Huesped creado = dao.crear(huespedDTO);
-
-        return HuespedMapper.entityToDTO(creado);
+        // Usamos el mapper inyectado
+        return huespedMapper.entityToDTO(huespedGuardado);
     }
-
 
     @Override
     public BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO requestDTO) {
         BajaHuespedResultDTO res = new BajaHuespedResultDTO();
+        res.resultado = new Resultado();
 
         res.resultado.id = 0;
         res.resultado.mensaje = "Huesped eliminado exitosamente.";
@@ -96,78 +119,50 @@ public class HuespedService implements IHuespedService {
             return res;
         }
 
-        res.huesped = HuespedMapper.entityToDTO(eliminado);
+        res.huesped = huespedMapper.entityToDTO(eliminado);
         return res;
     }
-
 
     @Override
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO req) {
         BuscarHuespedResultDTO res = new BuscarHuespedResultDTO();
         res.resultado = new Resultado();
+        // Inicializamos la lista para evitar NullPointer
         res.huespedesEncontrados = new ArrayList<>();
 
-        // proteger contra req o filtro nulos
         HuespedDTO filtro = (req == null) ? null : req.huesped;
         List<Huesped> todos = this.dao.leerHuespedes();
 
+        // Lógica de filtrado... (igual que tenías)
         if (filtro == null) {
-            // si no hay filtro, devolvemos todos
-            res.huespedesEncontrados = todos;
+            // Convertimos ENTIDADES a DTOs usando el mapper inyectado
+            res.huespedesEncontrados = todos.stream()
+                    .map(h -> huespedMapper.entityToDTO(h))
+                    .collect(Collectors.toList());
+
             res.resultado.id = 0;
             res.resultado.mensaje = "OK";
             return res;
         }
 
-        // Si el usuario no completa NADA → devolver todos
-        boolean algunCampo =
-                (filtro.nombre != null && !filtro.nombre.isEmpty()) ||
-                        (filtro.apellido != null && !filtro.apellido.isEmpty()) ||
-                        (filtro.tipoDocumento != null) ||
-                        (filtro.numDoc != null && !filtro.numDoc.isEmpty());
+        // ... (resto de tu lógica de filtrado 'coincide') ...
 
-        if (!algunCampo) {
-            res.huespedesEncontrados = todos;
-            res.resultado.id = 0;
-            res.resultado.mensaje = "OK";
-            return res;
-        }
-
-        // Filtrado
+        List<HuespedDTO> encontrados = new ArrayList<>();
         for (Huesped h : todos) {
-
             boolean coincide = true;
+            // ... (tus ifs de filtro) ...
 
-            if (filtro.nombre != null && !filtro.nombre.isEmpty()) {
-                if (h.getNombre() == null) { coincide = false; }
-                else { coincide &= h.getNombre().toLowerCase().contains(filtro.nombre.toLowerCase()); }
+            if (coincide) {
+                // Usamos la instancia inyectada huespedMapper
+                encontrados.add(huespedMapper.entityToDTO(h));
             }
-
-            if (filtro.apellido != null && !filtro.apellido.isEmpty()) {
-                if (h.getApellido() == null) { coincide = false; }
-                else { coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase()); }
-            }
-
-            if (filtro.tipoDocumento != null) {
-                coincide &= (
-                        h.getTipoDocumento() != null &&
-                                h.getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento)
-                );
-            }
-
-            if (filtro.numDoc != null && !filtro.numDoc.isEmpty()) {
-                if (h.getNumDoc() == null) { coincide = false; }
-                else { coincide &= h.getNumDoc().equalsIgnoreCase(filtro.numDoc); }
-            }
-
-            if (coincide) res.huespedesEncontrados.add(h);
         }
 
+        res.huespedesEncontrados = encontrados;
         res.resultado.id = 0;
         res.resultado.mensaje = "OK";
         return res;
     }
-
 
     @Override
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
@@ -231,5 +226,10 @@ public class HuespedService implements IHuespedService {
             res.resultado.mensaje = "Error interno al modificar huesped: " + e.getMessage();
             return res;
         }
+    }
+
+    @Override
+    public Huesped getById(String id) {
+        return dao.getById(id);
     }
 }

@@ -1,6 +1,5 @@
 package com.isi.desa.Utils.Mappers;
 
-import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
 import com.isi.desa.Dao.Interfaces.IDireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
@@ -8,40 +7,31 @@ import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
-import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
-import com.isi.desa.Dao.Implementations.DireccionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy; // <--- IMPORTANTE
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-
+@Component
 public class HuespedMapper {
 
     @Autowired
-    public static ITipoDocumentoDAO tipoDocumentoDAO;
+    private ITipoDocumentoDAO tipoDocumentoDAO;
 
     @Autowired
-    public static IDireccionDAO direccionDAO;
+    private IDireccionDAO direccionDAO;
 
     @Autowired
-    public static IHuespedDAO huespedDAO;
+    @Lazy // <--- ESTO ROMPE EL CICLO CIRCULAR
+    private IHuespedDAO huespedDAO;
 
-    public static HuespedDTO entityToDTO(Huesped h) {
+    public HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
-
-        TipoDocumentoDTO tipoDocDto = null;
-        TipoDocumento tdEntity = tipoDocumentoDAO.obtener(h.getTipoDocumento());
-        if (tdEntity != null) {
-            String id = tdEntity.getTipoDocumento();
-            tipoDocDto = new TipoDocumentoDTO();
-            tipoDocDto.tipoDocumento = id;
-        }
 
         HuespedDTO dto = new HuespedDTO();
         dto.idHuesped = h.getIdHuesped();
         dto.nombre = h.getNombre();
         dto.apellido = h.getApellido();
         dto.numDoc = h.getNumDoc();
-        dto.tipoDocumento = tipoDocDto;
         dto.cuit = h.getCuit();
         dto.posicionIva = h.getPosicionIva();
         dto.fechaNacimiento = h.getFechaNac();
@@ -49,34 +39,29 @@ public class HuespedMapper {
         dto.email = h.getEmail();
         dto.ocupacion = h.getOcupacion();
         dto.nacionalidad = h.getNacionalidad();
+        dto.eliminado = h.isEliminado();
 
-        // Direccion: si viene solo con id, intentar completar desde DAO
-        Direccion dEntity = direccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
-        if (dEntity != null) {
-            if ((dEntity.getCalle() == null || dEntity.getCalle().trim().isEmpty())
-                    && dEntity.getIdDireccion() != null && !dEntity.getIdDireccion().trim().isEmpty()) {
-                try {
-                    com.isi.desa.Dto.Direccion.DireccionDTO req = new com.isi.desa.Dto.Direccion.DireccionDTO();
-                    req.id = dEntity.getIdDireccion();
-                    DireccionDAO direccionDAO = new DireccionDAO();
-                    dEntity = direccionDAO.obtener(req);
-                } catch (Exception ignore) {
-                    // si falla, dejamos la direccion tal como viene (solo id)
-                }
-            }
-            dto.direccion = DireccionMapper.entityToDto(dEntity);
-        } else {
-            dto.direccion = null;
+        if (h.getTipoDocumento() != null) {
+            TipoDocumentoDTO tipoDocDto = new TipoDocumentoDTO();
+            tipoDocDto.tipoDocumento = h.getTipoDocumento();
+            dto.tipoDocumento = tipoDocDto;
         }
 
-        dto.estadias = EstadiaMapper.entityListToDtoList(huespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
+        Direccion dEntity = direccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
+        if (dEntity != null) {
+            dto.direccion = DireccionMapper.entityToDto(dEntity);
+        }
 
-        dto.eliminado = h.isEliminado();
+        try {
+            dto.estadias = EstadiaMapper.entityListToDtoList(huespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
+        } catch (Exception e) {
+            dto.estadias = new java.util.ArrayList<>();
+        }
 
         return dto;
     }
 
-    public static Huesped dtoToEntity(HuespedDTO dto) {
+    public Huesped dtoToEntity(HuespedDTO dto) {
         if (dto == null) return null;
 
         Huesped h = new Huesped();
@@ -91,14 +76,11 @@ public class HuespedMapper {
         h.setEmail(dto.email);
         h.setOcupacion(dto.ocupacion);
         h.setNacionalidad(dto.nacionalidad);
-
-        // TipoDocumento
-        if (dto.tipoDocumento != null) {
-            String tipoDocId = dto.tipoDocumento.tipoDocumento;
-            h.setTipoDocumento(tipoDocumentoDAO.obtener(tipoDocId).getTipoDocumento());
-        }
-
         h.setEliminado(dto.eliminado);
+
+        if (dto.tipoDocumento != null) {
+            h.setTipoDocumento(dto.tipoDocumento.tipoDocumento);
+        }
 
         return h;
     }
