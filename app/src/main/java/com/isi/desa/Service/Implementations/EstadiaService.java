@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Service
 public class EstadiaService implements IEstadiaService {
-
+//arreglando
     @Autowired private IEstadiaDAO estadiaDAO;
     @Autowired private IHabitacionDAO habitacionDAO;
     @Autowired private IHuespedDAO huespedDAO;
