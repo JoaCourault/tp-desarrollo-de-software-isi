@@ -12,5 +12,6 @@ public class HabitacionDTO {
     public String detalles;
     public Integer cantidadCamasIndividual;
     public Integer cantidadCamasDobles;
+    public String tipoHabitacion;
     public Integer cantidadCamasKingSize;
 }

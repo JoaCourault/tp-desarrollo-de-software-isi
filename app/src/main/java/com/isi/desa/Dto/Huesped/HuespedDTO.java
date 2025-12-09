@@ -1,6 +1,7 @@
 package com.isi.desa.Dto.Huesped;
 
 import com.isi.desa.Dto.Direccion.DireccionDTO;
+import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 
 import java.time.LocalDate;
@@ -21,6 +22,6 @@ public class HuespedDTO {
     public String ocupacion;
     public String nacionalidad;
     public DireccionDTO direccion;
-    public List<String> idsEstadias;
+    public List<EstadiaDTO> estadias;
     public boolean eliminado = false;
 }

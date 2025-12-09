@@ -4,19 +4,20 @@ import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class DireccionValidator implements IDireccionValidator {
-    // Instancia unica (eager singleton)
-    private static final DireccionValidator INSTANCE = new DireccionValidator();
 
-    // Constructor privado
-    private DireccionValidator() {}
+    public DireccionValidator() {
+        // Constructor público vacío para Spring
+    }
 
-    // Metodo publico para obtener la instancia
     public static DireccionValidator getInstance() {
-        return INSTANCE;
+        return new DireccionValidator();
     }
 
     @Override
@@ -36,16 +37,17 @@ public class DireccionValidator implements IDireccionValidator {
                 direccionDTO.localidad
         );
     }
-    
+
     @Override
     public InvalidDirectionException validate(DireccionDTO direccionDTO) {
-        if (direccionDTO == null) {
 
+        if (direccionDTO == null) {
             return new InvalidDirectionException("La direccion no puede ser nula");
         }
 
         List<RuntimeException> errores = new ArrayList<>();
         String error;
+
         if ((error = validatePais(direccionDTO.pais)) != null) {
             errores.add(new InvalidDirectionException(error));
         }
@@ -87,15 +89,18 @@ public class DireccionValidator implements IDireccionValidator {
         return (localidad == null || localidad.trim().isEmpty()) ? "La localidad es obligatoria" : null;
     }
 
-    private String validateCodigoPostal(Integer codigoPostal) {
-        return (codigoPostal == null || codigoPostal <= 0) ? "El codigo postal es obligatorio y debe ser positivo" : null;
+    private String validateCodigoPostal(String codigoPostal) {
+        // CORREGIDO: Antes tenías !codigoPostal.isEmpty() (Si NO está vacío = error).
+        // AHORA: Si es null O está vacío = error.
+        return (codigoPostal == null || codigoPostal.trim().isEmpty()) ? "El codigo postal es obligatorio y debe ser positivo" : null;
     }
 
     private String validateCalle(String calle) {
         return (calle == null || calle.trim().isEmpty()) ? "La calle es obligatoria" : null;
     }
 
-    private String validateNumero(Integer numero) {
-        return (numero == null || numero <= 0) ? "El numero es obligatorio y debe ser positivo" : null;
+    private String validateNumero(String numero) {
+        // CORREGIDO: Igual que el CP, eliminamos el '!' y agregamos trim().
+        return (numero == null || numero.trim().isEmpty()) ? "El numero es obligatorio y debe ser positivo" : null;
     }
 }

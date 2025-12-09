@@ -12,30 +12,24 @@ import com.isi.desa.Service.Interfaces.ILogger;
 import com.isi.desa.Service.Interfaces.IUsuarioService;
 import com.isi.desa.Service.Interfaces.Validators.IUsuarioValidator;
 import com.isi.desa.Utils.Mappers.UsuarioMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-// @Service //Descomentar para correr con Spring Boot
+@Service
 public class UsuarioService implements IUsuarioService {
-    //@Autowired //Descomentar para correr con Spring Boot
+    @Autowired
     private IUsuarioValidator validator;
-    //@Autowired //Descomentar para correr con Spring Boot
+    @Autowired
     private ILogger logger;
 
-    //@Autowired //Descomentar para correr con Spring Boot
+    @Autowired
     private IUsuarioDAO usuarioDAO;
 
-    // Instancia unica (eager singleton)
+    // Instancia unica
     private static final UsuarioService INSTANCE = new UsuarioService();
 
-    // Constructor privado para inyeccion de dependencias manual
-    private UsuarioService() {
-        this.validator = UsuarioValidator.getInstance();
-        this.logger = Logger.getInstance();
-        this.usuarioDAO = new UsuarioDAO();
-    }
-
-    // Metodo publico para obtener la instancia
     public static UsuarioService getInstance() {
         return INSTANCE;
     }
@@ -46,7 +40,7 @@ public class UsuarioService implements IUsuarioService {
             Usuario newUser = validator.create(usuarioDTO);
             return Optional.of(newUser); // Retornar el usuario creado envuelto en Optional.
         } catch (Exception e) {
-            throw e; // Propaga la excepcion para que el controlador la maneje.
+            throw e;
         }
     }
 

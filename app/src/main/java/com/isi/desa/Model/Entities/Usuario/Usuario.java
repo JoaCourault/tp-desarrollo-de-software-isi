@@ -1,9 +1,26 @@
 package com.isi.desa.Model.Entities.Usuario;
 
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "usuario")
 public class Usuario {
+
+    @Id
+    @Column(name = "idusuario", nullable = false, length = 255)
     private String idUsuario;
+
+    @Column(name = "contrasenia", nullable = false, length = 255)
     private String contrasenia;
+
+    @Column(name = "nombre", nullable = false, length = 255)
     private String nombre;
+
+    @Column(name = "apellido", nullable = false, length = 255)
     private String apellido;
 
     public Usuario() {}

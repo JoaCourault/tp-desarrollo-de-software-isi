@@ -1,12 +1,9 @@
 package com.isi.desa.Dao.Interfaces;
 
-import com.isi.desa.Dto.Usuario.UsuarioDTO;
 import com.isi.desa.Model.Entities.Usuario.Usuario;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface IUsuarioDAO {
-    Usuario crear(UsuarioDTO dto);
-    Usuario modificar(UsuarioDTO dto);
-    Usuario obtener(String idUsuario);
-    Usuario eliminar(UsuarioDTO dto);
     Usuario login(String nombre, String apellido, String contrasenia);
 }

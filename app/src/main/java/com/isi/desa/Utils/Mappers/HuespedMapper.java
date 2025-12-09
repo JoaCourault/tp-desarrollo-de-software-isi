@@ -1,25 +1,60 @@
 package com.isi.desa.Utils.Mappers;
 
+import com.isi.desa.Dao.Interfaces.IDireccionDAO;
+import com.isi.desa.Dao.Interfaces.IHuespedDAO;
+import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
-import com.isi.desa.Dao.Implementations.DireccionDAO;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
+@Component
 public class HuespedMapper {
+
+    // Variables estáticas para uso interno en métodos estáticos
+    private static ITipoDocumentoDAO staticTipoDocumentoDAO;
+    private static IDireccionDAO staticDireccionDAO;
+    private static IHuespedDAO staticHuespedDAO;
+
+
+    @Autowired
+    private ITipoDocumentoDAO tipoDocumentoDAO;
+
+    @Autowired
+    private IDireccionDAO direccionDAO;
+
+    @Autowired
+    @Lazy // Usamos Lazy para evitar referencia circular (HuespedDAO -> Mapper -> HuespedDAO)
+    private IHuespedDAO huespedDAO;
+
+    // 3. Este método se ejecuta al iniciar Spring y copia los beans a las variables estáticas
+    @PostConstruct
+    public void init() {
+        staticTipoDocumentoDAO = this.tipoDocumentoDAO;
+        staticDireccionDAO = this.direccionDAO;
+        staticHuespedDAO = this.huespedDAO;
+    }
+
+    //  MÉTODOS ESTÁTICOS
 
     public static HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
 
         TipoDocumentoDTO tipoDocDto = null;
-        TipoDocumento tdEntity = h.getTipoDocumento();
-        if (tdEntity != null) {
-            String id = tdEntity.getTipoDocumento();
-            tipoDocDto = new TipoDocumentoDTO();
-            tipoDocDto.tipoDocumento = id;
+        // Usamos la variable estática ya inicializada
+        if (h.getTipoDocumento() != null) {
+            TipoDocumento tdEntity = staticTipoDocumentoDAO.obtener(h.getTipoDocumento());
+            if (tdEntity != null) {
+                tipoDocDto = new TipoDocumentoDTO();
+                tipoDocDto.tipoDocumento = tdEntity.getTipoDocumento();
+            }
         }
 
         HuespedDTO dto = new HuespedDTO();
@@ -30,35 +65,31 @@ public class HuespedMapper {
         dto.tipoDocumento = tipoDocDto;
         dto.cuit = h.getCuit();
         dto.posicionIva = h.getPosicionIva();
-        dto.fechaNacimiento = h.getFechaNacimiento();
+        dto.fechaNacimiento = h.getFechaNac();
         dto.telefono = h.getTelefono();
         dto.email = h.getEmail();
         dto.ocupacion = h.getOcupacion();
         dto.nacionalidad = h.getNacionalidad();
+        dto.eliminado = h.isEliminado();
 
-        // Direccion: si viene solo con id, intentar completar desde DAO
-        Direccion dEntity = h.getDireccion();
-        if (dEntity != null) {
-            if ((dEntity.getCalle() == null || dEntity.getCalle().trim().isEmpty())
-                    && dEntity.getIdDireccion() != null && !dEntity.getIdDireccion().trim().isEmpty()) {
-                try {
-                    com.isi.desa.Dto.Direccion.DireccionDTO req = new com.isi.desa.Dto.Direccion.DireccionDTO();
-                    req.id = dEntity.getIdDireccion();
-                    DireccionDAO direccionDAO = new DireccionDAO();
-                    dEntity = direccionDAO.obtener(req);
-                } catch (Exception ignore) {
-                    // si falla, dejamos la direccion tal como viene (solo id)
-                }
+        // Direccion
+        try {
+            Direccion dEntity = staticDireccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
+            if (dEntity != null) {
+                dto.direccion = DireccionMapper.entityToDto(dEntity);
+            } else {
+                dto.direccion = null;
             }
-            dto.direccion = DireccionMapper.entityToDto(dEntity);
-        } else {
+        } catch (Exception e) {
             dto.direccion = null;
         }
 
-        dto.idsEstadias = (h.getIdsEstadias() != null)
-                ? new ArrayList<>(h.getIdsEstadias())
-                : new ArrayList<>();
-        dto.eliminado = h.isEliminado();
+        // Estadias
+        try {
+            dto.estadias = EstadiaMapper.entityListToDtoList(staticHuespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
+        } catch (Exception e) {
+            dto.estadias = Collections.emptyList();
+        }
 
         return dto;
     }
@@ -73,26 +104,25 @@ public class HuespedMapper {
         h.setNumDoc(dto.numDoc);
         h.setPosicionIva(dto.posicionIva);
         h.setCuit(dto.cuit);
-        h.setFechaNacimiento(dto.fechaNacimiento);
+        h.setFechaNac(dto.fechaNacimiento);
         h.setTelefono(dto.telefono);
         h.setEmail(dto.email);
         h.setOcupacion(dto.ocupacion);
         h.setNacionalidad(dto.nacionalidad);
+        h.setEliminado(dto.eliminado);
 
         // TipoDocumento
-        if (dto.tipoDocumento != null) {
-            TipoDocumento td = new TipoDocumento();
-            td.setTipoDocumento(dto.tipoDocumento.tipoDocumento);
-            h.setTipoDocumento(td);
+        if (dto.tipoDocumento != null && dto.tipoDocumento.tipoDocumento != null) {
+            String tipoDocId = dto.tipoDocumento.tipoDocumento;
+            // Validamos que exista antes de asignarlo, o asignamos el ID directo
+            TipoDocumento td = staticTipoDocumentoDAO.obtener(tipoDocId);
+            if (td != null) {
+                h.setTipoDocumento(td.getTipoDocumento());
+            } else {
+                h.setTipoDocumento(tipoDocId);
+            }
         }
-
-        h.setDireccion(DireccionMapper.dtoToEntity(dto.direccion));
-        h.setIdsEstadias(
-                dto.idsEstadias != null ? new ArrayList<>(dto.idsEstadias) : new ArrayList<>()
-        );
-        h.setEliminado(dto.eliminado);
 
         return h;
     }
-
 }

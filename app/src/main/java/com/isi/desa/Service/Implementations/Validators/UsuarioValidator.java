@@ -6,22 +6,18 @@ import com.isi.desa.Dto.Usuario.UsuarioDTO;
 import com.isi.desa.Model.Entities.Usuario.Usuario;
 import com.isi.desa.Service.Interfaces.Validators.IUsuarioValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//@Service //Descomentar para correr con Spring Boot
+@Service
 public class UsuarioValidator implements IUsuarioValidator {
-    //@Autowired //Descomentar para correr con Spring Boot
-    private final IUsuarioDAO usuarioDAO;
+    @Autowired
+    private IUsuarioDAO usuarioDAO;
 
     // Instancia unica (eager singleton)
     private static final UsuarioValidator INSTANCE = new UsuarioValidator();
-
-    // Constructor privado para inyeccion de dependencias manual
-    private UsuarioValidator() {
-        this.usuarioDAO = new UsuarioDAO();
-    }
 
     // Metodo publico para obtener la instancia
     public static UsuarioValidator getInstance() {

@@ -1,31 +1,54 @@
 package com.isi.desa.Model.Entities.Huesped;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
+import com.isi.desa.Model.Entities.Estadia.Estadia;
+import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
+@Entity
+@Table(name = "huesped")
 public class Huesped {
-    @JsonProperty("id")
+    @Id
+    @Column(name = "id_huesped", nullable = false)
     private String idHuesped;
 
-    private String nombre;
-    private String apellido;
-    private TipoDocumento tipoDocumento;
+    @Column(name = "num_doc", nullable = false)
     private String numDoc;
+
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "apellido")
+    private String apellido;
+
+    @Column(name = "tipo_doc")
+    private String tipoDoc;
+
+    @Column(name = "posicion_iva")
     private String posicionIva;
+
+    @Column(name = "cuit")
     private String cuit;
-    private LocalDate fechaNacimiento;
+
+    @Column(name = "fecha_nac")
+    private LocalDate fechaNac;
+
+    @Column(name = "telefono")
     private String telefono;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "ocupacion")
     private String ocupacion;
+
+    @Column(name = "nacionalidad")
     private String nacionalidad;
-    private Direccion direccion;
-    private List<String> idsEstadias;
-    private boolean eliminado = false;
+
+    @Column(name = "eliminado")
+    private boolean eliminado;
 
     public Huesped() {}
 
@@ -34,23 +57,23 @@ public class Huesped {
                    Direccion direccion, String idHuesped) {
         this.nombre = nombre;
         this.apellido = apellido;
-        this.tipoDocumento = tipoDocumento;
+        this.tipoDoc = tipoDocumento.getTipoDocumento();
         this.numDoc = numDoc;
         this.posicionIva = posicionIva;
         this.cuit = cuit;
-        this.fechaNacimiento = fechaNacimiento;
+        this.fechaNac = fechaNacimiento;
         this.telefono = telefono;
         this.email = email;
         this.ocupacion = ocupacion;
         this.nacionalidad = nacionalidad;
-        this.direccion = direccion;
         this.idHuesped = idHuesped;
-        this.idsEstadias = new ArrayList<>();
     }
-
-    // === Getters & Setters ===
+    // Getters y setters
     public String getIdHuesped() { return idHuesped; }
     public void setIdHuesped(String idHuesped) { this.idHuesped = idHuesped; }
+
+    public String getNumDoc() { return numDoc; }
+    public void setNumDoc(String numDoc) { this.numDoc = numDoc; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -58,11 +81,8 @@ public class Huesped {
     public String getApellido() { return apellido; }
     public void setApellido(String apellido) { this.apellido = apellido; }
 
-    public TipoDocumento getTipoDocumento() { return tipoDocumento; }
-    public void setTipoDocumento(TipoDocumento tipoDocumento) { this.tipoDocumento = tipoDocumento; }
-
-    public String getNumDoc() { return numDoc; }
-    public void setNumDoc(String numDoc) { this.numDoc = numDoc; }
+    public String getTipoDocumento() { return tipoDoc; }
+    public void setTipoDocumento(String tipoDoc) { this.tipoDoc = tipoDoc; }
 
     public String getPosicionIva() { return posicionIva; }
     public void setPosicionIva(String posicionIva) { this.posicionIva = posicionIva; }
@@ -70,8 +90,8 @@ public class Huesped {
     public String getCuit() { return cuit; }
     public void setCuit(String cuit) { this.cuit = cuit; }
 
-    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+    public LocalDate getFechaNac() { return fechaNac; }
+    public void setFechaNac(LocalDate fechaNac) { this.fechaNac = fechaNac; }
 
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
@@ -85,62 +105,6 @@ public class Huesped {
     public String getNacionalidad() { return nacionalidad; }
     public void setNacionalidad(String nacionalidad) { this.nacionalidad = nacionalidad; }
 
-    public Direccion getDireccion() { return direccion; }
-    public void setDireccion(Direccion direccion) { this.direccion = direccion; }
-
-    public List<String> getIdsEstadias() { return idsEstadias; }
-    public void setIdsEstadias(List<String> idsEstadias) {
-        this.idsEstadias = (idsEstadias != null) ? idsEstadias : new ArrayList<>();
-    }
-
     public boolean isEliminado() { return eliminado; }
     public void setEliminado(boolean eliminado) { this.eliminado = eliminado; }
-
-    public void agregarEstadia(String idEstadia) {
-        if (idEstadia != null && !idsEstadias.contains(idEstadia)) {
-            idsEstadias.add(idEstadia);
-        }
-    }
-
-    public void eliminarEstadia(String idEstadia) {
-        if (idEstadia != null) {
-            idsEstadias.remove(idEstadia);
-        }
-    }
-
-    // === Mapeo con IDs del JSON ===
-    @JsonProperty("idTipoDocumento")
-    public void setIdTipoDocumento(String idTipoDocumento) {
-        this.tipoDocumento = new TipoDocumento();
-        this.tipoDocumento.setTipoDocumento(idTipoDocumento);
-    }
-
-    @JsonProperty("idDireccion")
-    public void setIdDireccion(String idDireccion) {
-        this.direccion = new Direccion();
-        this.direccion.setIdDireccion(idDireccion);
-    }
-
-    @JsonProperty("idTipoDocumento")
-    public String getIdTipoDocumento() {
-        return (tipoDocumento != null) ? tipoDocumento.getTipoDocumento() : null;
-    }
-
-    @JsonProperty("idDireccion")
-    public String getIdDireccion() {
-        return (direccion != null) ? direccion.getIdDireccion() : null;
-    }
-
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Huesped)) return false;
-        Huesped otro = (Huesped) o;
-        return idHuesped != null && idHuesped.equalsIgnoreCase(otro.idHuesped);
-    }
-
-    public int hashCode() {
-        return Objects.hash(idHuesped != null ? idHuesped.toLowerCase() : null);
-    }
-
-
 }

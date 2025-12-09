@@ -1,131 +1,65 @@
 package com.isi.desa.Dao.Implementations;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isi.desa.Dao.Interfaces.IDireccionDAO;
+import com.isi.desa.Dao.Repositories.DireccionRepository;
 import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
+import com.isi.desa.Utils.Mappers.DireccionMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static com.isi.desa.Utils.Mappers.DireccionMapper.dtoToEntity;
-
+@Service
 public class DireccionDAO implements IDireccionDAO {
+    @Autowired
+    private DireccionRepository repository;
 
-    private static final String RES_DIR = "app/src/main/resources/jsonDataBase";
-    private static final String JSON_FILE = "direccion.json";
-
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    // Helpers de ruta (solo build)
-    private File getJsonFile() {
-        try {
-            File dir = new File(RES_DIR);
-            if (!dir.exists()) dir.mkdirs();
-
-            File file = new File(dir, JSON_FILE);
-            if (!file.exists()) file.createNewFile();
-            return file;
-        } catch (IOException e) {
-            throw new RuntimeException("No se pudo acceder o crear el archivo JSON de huespedes.", e);
-        }
-    }
-
-    // === IO ===
-    private List<Direccion> leerDirecciones() {
-        File file = getJsonFile();
-        try {
-            if (file.length() == 0) return new ArrayList<>();
-            return mapper.readValue(file, new TypeReference<List<Direccion>>() {});
-        } catch (IOException e) {
-            throw new RuntimeException("Error al leer el archivo JSON de direcciones: " + file.getAbsolutePath(), e);
-        }
-    }
-
-    private void guardarDirecciones(List<Direccion> direcciones) {
-        File file = getJsonFile();
-        try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(file, direcciones);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al guardar " + JSON_FILE, e);
-        }
-    }
-
-    // ==== Implementacion IDireccionDAO ====
     @Override
+    @Transactional
     public Direccion crear(DireccionDTO direccion) {
-        List<Direccion> direcciones = leerDirecciones();
-
-        // Generar ID incremental si no viene (DI-###)
         if (direccion.id == null || direccion.id.isBlank()) {
-            int max = 0;
-            for (Direccion d : direcciones) {
-                String id = d.getIdDireccion();
-                if (id != null && id.startsWith("DI-")) {
-                    try {
-                        int n = Integer.parseInt(id.substring(3));
-                        if (n > max) max = n;
-                    } catch (NumberFormatException ignored) {}
-                }
-            }
-            direccion.id = String.format("DI-%03d", max + 1);
+            direccion.id = java.util.UUID.randomUUID().toString();
         }
-
-        boolean existe = direcciones.stream()
-                .anyMatch(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id));
-        if (existe) {
+        if (repository.existsById(direccion.id)) {
             throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.id);
         }
-
-        Direccion nueva = dtoToEntity(direccion);
-        direcciones.add(nueva);
-        guardarDirecciones(direcciones);
-        return nueva;
+        Direccion nueva = DireccionMapper.dtoToEntity(direccion);
+        return repository.save(nueva);
     }
 
     @Override
+    @Transactional
     public Direccion modificar(DireccionDTO direccion) {
-        List<Direccion> direcciones = leerDirecciones();
-
-        Optional<Direccion> existente = direcciones.stream()
-                .filter(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id))
-                .findFirst();
-
-        if (existente.isEmpty()) {
+        if (!repository.existsById(direccion.id)) {
             throw new RuntimeException("No se encontro la direccion con ID: " + direccion.id);
         }
-
-        Direccion actualizada = dtoToEntity(direccion);
-        direcciones.set(direcciones.indexOf(existente.get()), actualizada);
-        guardarDirecciones(direcciones);
-        return actualizada;
+        Direccion actualizada = DireccionMapper.dtoToEntity(direccion);
+        return repository.save(actualizada);
     }
 
     @Override
+    @Transactional
     public Direccion eliminar(DireccionDTO direccion) {
-        List<Direccion> direcciones = leerDirecciones();
-
-        boolean eliminado = direcciones.removeIf(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id));
-        if (!eliminado) {
-            throw new RuntimeException("No se encontro la direccion a eliminar: " + direccion.id);
-        }
-
-        guardarDirecciones(direcciones);
-        return dtoToEntity(direccion);
+        Direccion existente = repository.findById(direccion.id)
+                .orElseThrow(() -> new RuntimeException("No se encontro la direccion a eliminar: " + direccion.id));
+        repository.delete(existente);
+        return existente;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Direccion obtener(DireccionDTO direccion) {
-        List<Direccion> direcciones = leerDirecciones();
-        return direcciones.stream()
-                .filter(d -> d.getIdDireccion().equalsIgnoreCase(direccion.id))
-                .findFirst()
+        return repository.findById(direccion.id)
                 .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.id));
+    }
+
+    @Override
+    public Direccion obtenerDireccionDeHuespedPorId(String idHuesped) {
+        String id = Optional.ofNullable(idHuesped)
+                .orElseThrow(() -> new RuntimeException("El ID del huesped no puede ser nulo"));
+        return repository.findByIdHuesped(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró dirección para el huesped con ID: " + id));
     }
 }

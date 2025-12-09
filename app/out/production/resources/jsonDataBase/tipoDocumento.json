@@ -1,0 +1,14 @@
+[
+  {
+    "tipoDocumento" : "DNI"
+  },
+  {
+    "tipoDocumento" : "LE"
+  },
+  {
+    "tipoDocumento" : "LC"
+  },
+  {
+    "tipoDocumento" : "Pasaporte"
+  }
+]
