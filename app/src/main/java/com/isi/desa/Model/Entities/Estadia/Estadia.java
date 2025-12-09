@@ -1,9 +1,12 @@
 package com.isi.desa.Model.Entities.Estadia;
 
+import com.isi.desa.Model.Entities.Habitacion.Habitacion;
+import com.isi.desa.Model.Entities.Huesped.Huesped;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalDateTime; // <--- USAMOS LocalDateTime
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "estadia")
@@ -28,12 +31,28 @@ public class Estadia {
     @Column(name = "id_reserva")
     private String idReserva;
 
-    @Column(name = "id_factura", nullable = false)
+    @Column(name = "id_factura", nullable = true)
     private String idFactura;
+
+    @ManyToMany
+    @JoinTable(
+            name = "habitacion_estadia",
+            joinColumns = @JoinColumn(name = "id_estadia"),
+            inverseJoinColumns = @JoinColumn(name = "id_habitacion")
+    )
+    private List<Habitacion> habitaciones = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "huesped_estadia",
+            joinColumns = @JoinColumn(name = "id_estadia"),
+            inverseJoinColumns = @JoinColumn(name = "id_huesped")
+    )
+    private List<Huesped> huespedes = new ArrayList<>();
 
     public Estadia() {}
 
-    // Getters y setters
+    // GETTERS Y SETTERS
     public String getIdEstadia() { return idEstadia; }
     public void setIdEstadia(String idEstadia) { this.idEstadia = idEstadia; }
 
@@ -54,4 +73,10 @@ public class Estadia {
 
     public String getIdFactura() { return idFactura; }
     public void setIdFactura(String idFactura) { this.idFactura = idFactura; }
+
+    public List<Habitacion> getHabitaciones() { return habitaciones; }
+    public void setHabitaciones(List<Habitacion> habitaciones) { this.habitaciones = habitaciones; }
+
+    public List<Huesped> getHuespedes() { return huespedes; }
+    public void setHuespedes(List<Huesped> huespedes) { this.huespedes = huespedes; }
 }
