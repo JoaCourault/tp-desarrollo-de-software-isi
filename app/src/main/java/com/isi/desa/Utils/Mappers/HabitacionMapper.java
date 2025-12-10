@@ -3,15 +3,21 @@ package com.isi.desa.Utils.Mappers;
 import com.isi.desa.Dto.Habitacion.HabitacionDTO;
 import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HabitacionMapper {
 
     public static HabitacionDTO entityToDTO(HabitacionEntity e) {
+        if (e == null) return null;
         HabitacionDTO dto = new HabitacionDTO();
 
+        // Usamos idHabitacion (camelCase)
         dto.id_habitacion = e.getIdHabitacion();
-        dto.precio = e.getPrecio() != null ? e.getPrecio().floatValue() : null;
+
+        // Asignación directa de BigDecimal (sin convertir a Float)
+        dto.precio = e.getPrecio();
+
         dto.numero = e.getNumero();
         dto.piso = e.getPiso();
         dto.capacidad = e.getCapacidad();
@@ -26,10 +32,14 @@ public class HabitacionMapper {
     }
 
     public static HabitacionEntity dtoToEntity(HabitacionDTO dto) {
+        if (dto == null) return null;
         HabitacionEntity e = new HabitacionEntity();
 
         e.setIdHabitacion(dto.id_habitacion);
-        e.setPrecio(dto.precio != null ? BigDecimal.valueOf(dto.precio) : null);
+
+        // Asignación directa de BigDecimal
+        e.setPrecio(dto.precio);
+
         e.setNumero(dto.numero);
         e.setPiso(dto.piso);
         e.setCapacidad(dto.capacidad);
@@ -41,5 +51,15 @@ public class HabitacionMapper {
         e.setEstado(dto.estado);
 
         return e;
+    }
+
+    // Método extra útil para listas
+    public static List<HabitacionDTO> entityListToDtoList(List<HabitacionEntity> entities) {
+        if (entities == null) return new ArrayList<>();
+        List<HabitacionDTO> dtos = new ArrayList<>();
+        for (HabitacionEntity h : entities) {
+            dtos.add(entityToDTO(h));
+        }
+        return dtos;
     }
 }

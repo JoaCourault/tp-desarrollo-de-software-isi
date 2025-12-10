@@ -12,9 +12,15 @@ import java.util.List;
 @Repository
 public interface EstadiaRepository extends JpaRepository<Estadia, String> {
 
-    // Buscamos estadías que se crucen con el rango solicitado
-    @Query("SELECT e FROM Estadia e WHERE e.idHabitacion = :idHabitacion " +
-            "AND e.checkIn <= :hasta AND e.checkOut >= :desde")
+    // Busca estadías que usen una habitación específica y se crucen con el rango dado
+    @Query("""
+           SELECT e
+           FROM Estadia e
+           JOIN e.listaHabitaciones h
+           WHERE h.idHabitacion = :idHabitacion
+             AND e.checkIn <= :hasta
+             AND e.checkOut >= :desde
+           """)
     List<Estadia> findEstadiasEnRango(@Param("idHabitacion") String idHabitacion,
                                       @Param("desde") LocalDateTime desde,
                                       @Param("hasta") LocalDateTime hasta);

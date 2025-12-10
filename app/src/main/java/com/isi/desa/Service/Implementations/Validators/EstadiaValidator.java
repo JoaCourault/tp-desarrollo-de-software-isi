@@ -4,40 +4,31 @@ import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Service.Interfaces.Validators.IEstadiaValidator;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-
 @Component
 public class EstadiaValidator implements IEstadiaValidator {
 
     @Override
     public RuntimeException validateCreate(EstadiaDTO dto) {
-        // Validar campos obligatorios básicos
+        // 1. Validar Fechas
         if (dto.checkIn == null) {
             return new RuntimeException("La fecha de Check-In es obligatoria.");
         }
 
+        // 2. Validar Noches
         if (dto.cantNoches == null || dto.cantNoches <= 0) {
             return new RuntimeException("La cantidad de noches debe ser mayor a 0.");
         }
 
-        // Validar coherencia de fechas (Si checkOut viene informado)
+        // 3. Validar Coherencia Fechas
         if (dto.checkOut != null && dto.checkIn.isAfter(dto.checkOut)) {
             return new RuntimeException("La fecha de Check-Out no puede ser anterior al Check-In.");
         }
 
-        // Validar montos (Si se informan al crear)
-        if (dto.valorTotalEstadia != null && dto.valorTotalEstadia.compareTo(BigDecimal.ZERO) < 0) {
+        // Verificamos que no sea nulo y que no sea negativo
+        if (dto.valorTotalEstadia != null && dto.valorTotalEstadia < 0) {
             return new RuntimeException("El valor total de la estadía no puede ser negativo.");
         }
 
-
-        if (dto.idFactura == null || dto.idFactura.trim().isEmpty()) {
-            return new RuntimeException("El ID de la factura es obligatorio.");
-        }
-
-        if (dto.idReserva == null || dto.idReserva.trim().isEmpty()) {
-            return new RuntimeException("El ID de la reserva es obligatorio.");
-        }
 
         return null;
     }
@@ -48,11 +39,6 @@ public class EstadiaValidator implements IEstadiaValidator {
         if (dto.idEstadia == null || dto.idEstadia.trim().isEmpty()) {
             return new RuntimeException("Debe indicar el ID de la estadía para modificarla.");
         }
-
-        // Validar coherencia si se intentan cambiar las fechas en el update
-        //if (dto.checkIn != null && dto.checkOut != null && dto.checkIn.isAfter(dto.checkOut)) {
-        //    return new RuntimeException("La fecha de Check-Out no puede ser anterior al Check-In.");
-        //}
 
         return null;
     }

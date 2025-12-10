@@ -1,7 +1,9 @@
 package com.isi.desa.Model.Entities.Reserva;
 
+import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore; // Importante
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -14,7 +16,13 @@ public class Reserva {
     @Column(name = "id_reserva", nullable = false)
     private String idReserva;
 
-    // Relación opcional (puede ser null)
+    // --- CORRECCIÓN DEL ERROR ---
+    // NO uses @JoinColumn aquí.
+    // Usa mappedBy apuntando al nombre de la variable en la clase Estadia ("reserva").
+    @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL)
+    @JsonIgnore // Evita bucle infinito si conviertes a JSON
+    private Estadia estadia;
+
     @ManyToOne
     @JoinColumn(name = "id_huesped", referencedColumnName = "id_huesped", nullable = true)
     private Huesped huesped;
@@ -23,20 +31,11 @@ public class Reserva {
     @JoinColumn(name = "id_habitacion", referencedColumnName = "id_habitacion")
     private HabitacionEntity habitacion;
 
-    // --- NUEVOS CAMPOS DE CONTACTO (Datos crudos) ---
-    @Column(name = "nombre_cliente")
-    private String nombreCliente;
-
-    @Column(name = "apellido_cliente")
-    private String apellidoCliente;
-
-    @Column(name = "telefono_cliente")
-    private String telefonoCliente;
-
-    @Column(name = "email_cliente")
-    private String emailCliente;
-
-    // Fechas y Estado
+    // ... resto de atributos y getters/setters ...
+    @Column(name = "nombre_cliente") private String nombreCliente;
+    @Column(name = "apellido_cliente") private String apellidoCliente;
+    @Column(name = "telefono_cliente") private String telefonoCliente;
+    @Column(name = "email_cliente") private String emailCliente;
     @Column(name = "fecha_desde") private LocalDate fechaDesde;
     @Column(name = "fecha_hasta") private LocalDate fechaHasta;
     @Column(name = "fecha_ingreso") private LocalDate fechaIngreso;
@@ -44,40 +43,36 @@ public class Reserva {
     @Column(name = "estado") private String estado;
 
     public Reserva() {
-        this.idReserva = "RES-" + UUID.randomUUID().toString().substring(0, 8);
     }
 
-    // --- GETTERS Y SETTERS ---
+    // Getters y Setters
     public String getIdReserva() { return idReserva; }
     public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
 
+    public Estadia getEstadia() { return estadia; }
+    public void setEstadia(Estadia estadia) { this.estadia = estadia; }
+
+    // ... resto de getters y setters
     public Huesped getHuesped() { return huesped; }
     public void setHuesped(Huesped huesped) { this.huesped = huesped; }
-
     public HabitacionEntity getHabitacion() { return habitacion; }
     public void setHabitacion(HabitacionEntity habitacion) { this.habitacion = habitacion; }
-
     public String getNombreCliente() { return nombreCliente; }
     public void setNombreCliente(String nombreCliente) { this.nombreCliente = nombreCliente; }
-
     public String getApellidoCliente() { return apellidoCliente; }
     public void setApellidoCliente(String apellidoCliente) { this.apellidoCliente = apellidoCliente; }
-
     public String getTelefonoCliente() { return telefonoCliente; }
     public void setTelefonoCliente(String telefonoCliente) { this.telefonoCliente = telefonoCliente; }
-
+    public String getEmailCliente() { return emailCliente; }
+    public void setEmailCliente(String emailCliente) { this.emailCliente = emailCliente; }
     public LocalDate getFechaDesde() { return fechaDesde; }
     public void setFechaDesde(LocalDate fechaDesde) { this.fechaDesde = fechaDesde; }
-
     public LocalDate getFechaHasta() { return fechaHasta; }
     public void setFechaHasta(LocalDate fechaHasta) { this.fechaHasta = fechaHasta; }
-
     public LocalDate getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
-
     public LocalDate getFechaEgreso() { return fechaEgreso; }
     public void setFechaEgreso(LocalDate fechaEgreso) { this.fechaEgreso = fechaEgreso; }
-
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
 }

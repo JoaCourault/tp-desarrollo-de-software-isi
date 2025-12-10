@@ -2,8 +2,12 @@ package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
+import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
+import com.isi.desa.Model.Entities.Huesped.Huesped;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EstadiaMapper {
 
@@ -15,8 +19,23 @@ public class EstadiaMapper {
         dto.checkIn = e.getCheckIn();
         dto.checkOut = e.getCheckOut();
         dto.cantNoches = e.getCantNoches();
-        dto.idReserva = e.getIdReserva();
         dto.idFactura = e.getIdFactura();
+
+        if (e.getReserva() != null) dto.idReserva = e.getReserva().getIdReserva();
+        if (e.getHuespedTitular() != null) dto.idHuespedTitular = e.getHuespedTitular().getIdHuesped();
+
+        // Huéspedes
+        if (e.getListaHuespedes() != null) {
+            dto.idsOcupantes = e.getListaHuespedes().stream()
+                    .map(Huesped::getIdHuesped).collect(Collectors.toList());
+        }
+
+        // Habitaciones
+        if (e.getListaHabitaciones() != null) {
+            dto.idsHabitaciones = e.getListaHabitaciones().stream()
+                    .map(HabitacionEntity::getIdHabitacion).collect(Collectors.toList());
+        }
+
         return dto;
     }
 
@@ -28,7 +47,6 @@ public class EstadiaMapper {
         e.setCheckIn(dto.checkIn);
         e.setCheckOut(dto.checkOut);
         e.setCantNoches(dto.cantNoches);
-        e.setIdReserva(dto.idReserva);
         e.setIdFactura(dto.idFactura);
         return e;
     }

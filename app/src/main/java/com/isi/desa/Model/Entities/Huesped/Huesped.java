@@ -1,15 +1,19 @@
 package com.isi.desa.Model.Entities.Huesped;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "huesped")
 public class Huesped {
+
     @Id
     @Column(name = "id_huesped", nullable = false)
     private String idHuesped;
@@ -50,6 +54,11 @@ public class Huesped {
     @Column(name = "eliminado")
     private boolean eliminado;
 
+    // 🔹 NUEVO: relación con Estadia (tabla huesped_estadia)
+    @ManyToMany(mappedBy = "listaHuespedes")
+    @JsonIgnore
+    private List<Estadia> estadias = new ArrayList<>();
+
     public Huesped() {}
 
     public Huesped(String nombre, String apellido, TipoDocumento tipoDocumento, String numDoc, String posicionIva, String cuit,
@@ -68,7 +77,9 @@ public class Huesped {
         this.nacionalidad = nacionalidad;
         this.idHuesped = idHuesped;
     }
-    // Getters y setters
+
+    // ===== Getters y Setters =====
+
     public String getIdHuesped() { return idHuesped; }
     public void setIdHuesped(String idHuesped) { this.idHuesped = idHuesped; }
 
@@ -107,4 +118,7 @@ public class Huesped {
 
     public boolean isEliminado() { return eliminado; }
     public void setEliminado(boolean eliminado) { this.eliminado = eliminado; }
+
+    public List<Estadia> getEstadias() { return estadias; }
+    public void setEstadias(List<Estadia> estadias) { this.estadias = estadias; }
 }
