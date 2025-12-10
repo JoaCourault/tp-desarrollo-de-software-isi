@@ -1,7 +1,15 @@
 package com.isi.desa.Model.Entities.Habitacion;
 
-public class DobleEstandar extends Habitacion {
+import jakarta.persistence.*;
+
+@Entity
+@DiscriminatorValue("Doble Estandar") // Este valor debe coincidir con el case del Mapper
+public class DobleEstandar extends HabitacionEntity {
+
+    @Column(name = "qcamindividual")
     private Integer cantidadCamasIndividual;
+
+    @Column(name = "qcamdobles")
     private Integer cantidadCamasDobles;
 
     public DobleEstandar() {}
@@ -11,12 +19,21 @@ public class DobleEstandar extends Habitacion {
         this.cantidadCamasDobles = cantidadCamasDobles;
     }
 
-    @Override
-    public void mostrarEstadoHabitaciones() {}
+    // --- Getters y Setters ---
 
-    public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
-    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
+    public Integer getCantidadCamasIndividual() {
+        return cantidadCamasIndividual;
+    }
 
-    public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
-    public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
+    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) {
+        this.cantidadCamasIndividual = cantidadCamasIndividual;
+    }
+
+    public Integer getCantidadCamasDobles() {
+        return cantidadCamasDobles;
+    }
+
+    public void setCantidadCamasDobles(Integer cantidadCamasDobles) {
+        this.cantidadCamasDobles = cantidadCamasDobles;
+    }
 }

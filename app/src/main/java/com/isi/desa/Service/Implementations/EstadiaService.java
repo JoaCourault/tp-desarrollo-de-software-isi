@@ -14,6 +14,7 @@ import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Reserva.Reserva;
 import com.isi.desa.Model.Enums.EstadoHabitacion;
 import com.isi.desa.Service.Interfaces.IEstadiaService;
+import com.isi.desa.Utils.Mappers.HabitacionMapper;
 import com.isi.desa.Utils.Mappers.ReservaMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class EstadiaService implements IEstadiaService {
@@ -37,24 +40,31 @@ public class EstadiaService implements IEstadiaService {
     @Transactional
     public void realizarCheckIn(CheckInRequestDTO request) {
 
-        // 1. Obtener titular
-        Huesped titular = huespedDAO.getById(request.huespedTitular.idHuesped);
+        // 1. Validar Habitaciones
+        if (request.habitaciones == null || request.habitaciones.isEmpty()) {
+            throw new RuntimeException("No se enviaron habitaciones para el check-in");
+        }
+
+        // 2. Validar Titular (CORRECCIÓN: Usamos request.idHuespedTitular)
+        Huesped titular = huespedDAO.getById(request.idHuespedTitular);
         if (titular == null) {
-            throw new RuntimeException("Huésped titular no encontrado: " + request.huespedTitular.idHuesped);
+            throw new RuntimeException("Huésped titular no encontrado con ID: " + request.idHuespedTitular);
         }
 
         // Acumuladores
         Float valorTotalAcumulado = 0.0f;
         List<String> habitacionesIdsParaEstadia = new ArrayList<>();
-        String idReservaEncontrada = null;
 
-        // Referencia de fechas (tomadas de la primera habitación)
-        if (request.habitaciones == null || request.habitaciones.isEmpty()) {
-            throw new RuntimeException("No se enviaron habitaciones para el check-in");
-        }
+        // Usamos un Set para evitar duplicados si la misma persona está en varias habitaciones (raro, pero posible)
+        Set<String> todosLosOcupantesIds = new HashSet<>();
+
+        // El titular siempre cuenta como ocupante (al menos administrativo)
+        todosLosOcupantesIds.add(titular.getIdHuesped());
+
+        String idReservaEncontrada = null;
         HabitacionCheckInDTO primeraHab = request.habitaciones.get(0);
 
-        // 2. Bucle de habitaciones
+        // --- BUCLE POR HABITACIÓN ---
         for (HabitacionCheckInDTO habDTO : request.habitaciones) {
 
             HabitacionEntity habitacion = habitacionDAO.obtener(habDTO.idHabitacion);
@@ -62,17 +72,24 @@ public class EstadiaService implements IEstadiaService {
                 throw new RuntimeException("Habitación no encontrada: " + habDTO.idHabitacion);
             }
 
-            // IDs para la ManyToMany en Estadia
             habitacionesIdsParaEstadia.add(habitacion.getIdHabitacion());
 
-            // Buscar (solo una vez) la reserva asociada en ese rango para esa habitación
+            // A. Recolectar Ocupantes de esta habitación
+            if (habDTO.acompanantesIds != null) {
+                for (String idOcupante : habDTO.acompanantesIds) {
+                    if (idOcupante != null && !idOcupante.isEmpty()) {
+                        todosLosOcupantesIds.add(idOcupante);
+                    }
+                }
+            }
+
+            // B. Buscar Reserva (Lógica existente)
             if (idReservaEncontrada == null) {
                 List<Reserva> reservas = reservaRepository.findReservasEnRango(
                         habDTO.idHabitacion,
                         habDTO.fechaDesde.toLocalDate(),
                         habDTO.fechaHasta.toLocalDate()
                 );
-
                 Reserva r = reservas.stream()
                         .filter(res -> "RESERVADA".equalsIgnoreCase(res.getEstado()))
                         .findFirst()
@@ -80,30 +97,25 @@ public class EstadiaService implements IEstadiaService {
 
                 if (r != null) {
                     r.setEstado("EFECTIVIZADA");
-                    reservaDAO.update(ReservaMapper.entityToDTO(r) );
+                    reservaDAO.update(ReservaMapper.entityToDTO(r));
                     idReservaEncontrada = r.getIdReserva();
                 }
             }
 
-            // Cálculo de noches
+            // C. Costos
             long noches = ChronoUnit.DAYS.between(habDTO.fechaDesde, habDTO.fechaHasta);
             if (noches <= 0) noches = 1;
 
-            // Precio por noche de la habitación
             Float precioNoche = habitacion.getPrecio() != null ? habitacion.getPrecio() : 0.0f;
+            valorTotalAcumulado += (precioNoche * noches);
 
-            // Subtotal de esta habitación
-            Float subtotal = precioNoche * noches;
-            valorTotalAcumulado += subtotal;
-
-            // Marcar habitación como OCUPADA
+            // D. Actualizar Estado Habitación
             habitacion.setEstado(EstadoHabitacion.OCUPADA);
-            habitacionDAO.modificar(habitacion);
+            habitacionDAO.modificar(HabitacionMapper.entityToDTO(habitacion));
         }
 
-        // 3. Crear EstadiaDTO
+        // --- CREAR ESTADÍA ---
         EstadiaDTO estadiaDTO = new EstadiaDTO();
-
         long count = estadiaRepository.count();
         estadiaDTO.idEstadia = String.format("EST-%03d", count + 1);
 
@@ -115,28 +127,13 @@ public class EstadiaService implements IEstadiaService {
 
         estadiaDTO.valorTotalEstadia = valorTotalAcumulado;
         estadiaDTO.idReserva = idReservaEncontrada;
-
-        // Titular
         estadiaDTO.idHuespedTitular = titular.getIdHuesped();
-
-        // Habitaciones de la estadía
         estadiaDTO.idsHabitaciones = habitacionesIdsParaEstadia;
 
-        // Ocupantes = titular + acompañantes
-        List<String> ocupantesIds = new ArrayList<>();
-        ocupantesIds.add(titular.getIdHuesped());
+        // Convertimos el Set acumulado a Lista para el DTO
+        estadiaDTO.idsOcupantes = new ArrayList<>(todosLosOcupantesIds);
 
-        if (request.acompanantesIds != null) {
-            for (String id : request.acompanantesIds) {
-                if (id != null && !id.equals(titular.getIdHuesped())) {
-                    ocupantesIds.add(id);
-                }
-            }
-        }
-
-        estadiaDTO.idsOcupantes = ocupantesIds;
-
-        // 4. Persistir la estadía completa
+        // --- PERSISTIR ---
         estadiaDAO.crear(estadiaDTO);
     }
 }

@@ -23,7 +23,6 @@ public class ReservaMapper {
         entity.setNombreCliente(dto.nombreCliente);
         entity.setApellidoCliente(dto.apellidoCliente);
         entity.setTelefonoCliente(dto.telefonoCliente);
-        entity.setEmailCliente(dto.emailCliente);
 
         entity.setEstado(dto.estado);
 
@@ -49,7 +48,6 @@ public class ReservaMapper {
         dto.nombreCliente = entity.getNombreCliente();
         dto.apellidoCliente = entity.getApellidoCliente();
         dto.telefonoCliente = entity.getTelefonoCliente();
-        dto.emailCliente = entity.getEmailCliente();
 
         dto.estado = entity.getEstado();
 
@@ -93,7 +91,6 @@ public class ReservaMapper {
         entity.setNombreCliente(dto.nombreCliente);
         entity.setApellidoCliente(dto.apellidoCliente);
         entity.setTelefonoCliente(dto.telefonoCliente);
-        entity.setEmailCliente(dto.emailCliente);
 
         entity.setEstado(dto.estado);
 
