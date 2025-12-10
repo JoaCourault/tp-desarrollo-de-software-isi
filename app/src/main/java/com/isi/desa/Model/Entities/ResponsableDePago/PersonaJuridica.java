@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "ResponsableDePago")
+@Table(name = "PersonaJuridica")
 public class PersonaJuridica extends ResponsableDePago {
     @Column(name = "cuit", nullable = false, unique = true)
     private String cuit;

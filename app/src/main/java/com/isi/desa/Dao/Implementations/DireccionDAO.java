@@ -59,7 +59,7 @@ public class DireccionDAO implements IDireccionDAO {
     public Direccion obtenerDireccionDeHuespedPorId(String idHuesped) {
         String id = Optional.ofNullable(idHuesped)
                 .orElseThrow(() -> new RuntimeException("El ID del huesped no puede ser nulo"));
-        return repository.findByIdHuesped(id)
+        return repository.findByHuesped_IdHuesped(id)
                 .orElseThrow(() -> new RuntimeException("No se encontró dirección para el huesped con ID: " + id));
     }
 }

@@ -29,7 +29,7 @@ public class HuespedMapper {
         if (h == null) return null;
 
         TipoDocumentoDTO tipoDocDto = null;
-        TipoDocumento tdEntity = tipoDocumentoDAO.obtener(h.getTipoDocumento());
+        TipoDocumento tdEntity = tipoDocumentoDAO.obtener(h.getTipoDoc().getTipoDocumento());
         if (tdEntity != null) {
             String id = tdEntity.getTipoDocumento();
             tipoDocDto = new TipoDocumentoDTO();
@@ -95,7 +95,7 @@ public class HuespedMapper {
         // TipoDocumento
         if (dto.tipoDocumento != null) {
             String tipoDocId = dto.tipoDocumento.tipoDocumento;
-            h.setTipoDocumento(tipoDocumentoDAO.obtener(tipoDocId).getTipoDocumento());
+            h.setTipoDoc(tipoDocumentoDAO.obtener(tipoDocId));
         }
 
         h.setEliminado(dto.eliminado);

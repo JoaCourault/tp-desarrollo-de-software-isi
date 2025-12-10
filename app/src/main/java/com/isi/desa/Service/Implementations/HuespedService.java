@@ -46,10 +46,10 @@ public class HuespedService implements IHuespedService {
         boolean duplicado = dao.leerHuespedes().stream()
                 .filter(h -> h != null && !h.isEliminado())
                 .anyMatch(h ->
-                        h.getTipoDocumento() != null &&
+                        h.getTipoDoc() != null &&
                                 huespedDTO.tipoDocumento != null &&
                                 huespedDTO.tipoDocumento.tipoDocumento != null &&
-                                h.getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
+                                h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
                                 h.getNumDoc() != null &&
                                 h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
                 );
@@ -150,8 +150,8 @@ public class HuespedService implements IHuespedService {
 
             if (filtro.tipoDocumento != null) {
                 coincide &= (
-                        h.getTipoDocumento() != null &&
-                                h.getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento)
+                        h.getTipoDoc() != null &&
+                                h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento)
                 );
             }
 
@@ -197,9 +197,9 @@ public class HuespedService implements IHuespedService {
                     .anyMatch(h ->
                             h.getIdHuesped() != null &&
                                     !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) &&
-                                    h.getTipoDocumento() != null &&
+                                    h.getTipoDoc() != null &&
                                     dto.tipoDocumento != null &&
-                                    h.getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
+                                    h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
                                     h.getNumDoc().equals(dto.numDoc)
                     );
 
