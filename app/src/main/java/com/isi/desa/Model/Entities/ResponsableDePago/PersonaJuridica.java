@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-
 @Entity
 @Table(name = "ResponsableDePago")
 public class PersonaJuridica extends ResponsableDePago {

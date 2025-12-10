@@ -1,22 +1,14 @@
 package com.isi.desa.Model.Entities.Habitacion;
 
+import com.isi.desa.Model.Enums.TipoHabitacion;
+import jakarta.persistence.Column;
+
 public class DobleEstandar extends Habitacion {
-    private Integer cantidadCamasIndividual;
-    private Integer cantidadCamasDobles;
 
-    public DobleEstandar() {}
-
-    public DobleEstandar(Integer cantidadCamasIndividual, Integer cantidadCamasDobles) {
-        this.cantidadCamasIndividual = cantidadCamasIndividual;
-        this.cantidadCamasDobles = cantidadCamasDobles;
+    public DobleEstandar() {
+        this.setTipoHabitacion(TipoHabitacion.DOBLE_ESTANDAR);
     }
 
     @Override
     public void mostrarEstadoHabitaciones() {}
-
-    public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
-    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
-
-    public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
-    public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
 }

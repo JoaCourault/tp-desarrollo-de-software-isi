@@ -7,52 +7,44 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "huesped")
+@Table(name = "Huesped")
 public class Huesped {
     @Id
     @GeneratedValue(generator = "id_huesped")
     @GenericGenerator(name = "id_huesped", strategy = "uuid2")
-    @Column(name = "id_huesped", nullable = false)
+    @Column(name = "id_huesped", nullable = false, updatable = false)
     private String idHuesped;
-
     @Column(name = "num_doc", nullable = false)
     private String numDoc;
-
     @Column(name = "nombre")
     private String nombre;
-
     @Column(name = "apellido")
     private String apellido;
-
-    @Column(name = "tipo_doc")
-    private String tipoDoc;
-
+    @ManyToOne
+    @JoinColumn(name = "tipo_doc", referencedColumnName = "tipoDocumento", nullable = false)
+    private TipoDocumento tipoDoc;
     @Column(name = "posicion_iva")
     private String posicionIva;
-
     @Column(name = "cuit")
     private String cuit;
-
     @Column(name = "fecha_nac")
     private LocalDate fechaNac;
-
     @Column(name = "telefono")
     private String telefono;
-
     @Column(name = "email")
     private String email;
-
     @Column(name = "ocupacion")
     private String ocupacion;
-
     @Column(name = "nacionalidad")
     private String nacionalidad;
-
     @Column(name = "eliminado")
     private boolean eliminado;
+
+    @ManyToMany(mappedBy = "huespedesHospedados")
+    private List<Estadia> estadiasDelHuesped;
 
     public Huesped() {}
 
@@ -61,7 +53,7 @@ public class Huesped {
                    Direccion direccion, String idHuesped) {
         this.nombre = nombre;
         this.apellido = apellido;
-        this.tipoDoc = tipoDocumento.getTipoDocumento();
+        this.tipoDoc = tipoDocumento;
         this.numDoc = numDoc;
         this.posicionIva = posicionIva;
         this.cuit = cuit;
@@ -85,8 +77,8 @@ public class Huesped {
     public String getApellido() { return apellido; }
     public void setApellido(String apellido) { this.apellido = apellido; }
 
-    public String getTipoDocumento() { return tipoDoc; }
-    public void setTipoDocumento(String tipoDoc) { this.tipoDoc = tipoDoc; }
+    public TipoDocumento getTipoDoc() { return tipoDoc; }
+    public void setTipoDoc(TipoDocumento tipoDoc) { this.tipoDoc = tipoDoc; }
 
     public String getPosicionIva() { return posicionIva; }
     public void setPosicionIva(String posicionIva) { this.posicionIva = posicionIva; }

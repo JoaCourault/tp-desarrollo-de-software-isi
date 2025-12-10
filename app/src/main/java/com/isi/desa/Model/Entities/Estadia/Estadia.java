@@ -1,12 +1,15 @@
 package com.isi.desa.Model.Entities.Estadia;
 
+import com.isi.desa.Model.Entities.Factura.Factura;
+import com.isi.desa.Model.Entities.Habitacion.Habitacion;
+import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Reserva.Reserva;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Estadia")
@@ -15,7 +18,7 @@ public class Estadia {
     @Id
     @GeneratedValue(generator = "id_estadia")
     @GenericGenerator(name = "id_estadia", strategy = "uuid2")
-    @Column(name = "id_estadia", nullable = false)
+    @Column(name = "id_estadia", nullable = false, updatable = false)
     private String idEstadia;
 
     @Column(name = "valor_total_estadia")
@@ -31,12 +34,27 @@ public class Estadia {
     private Integer cantNoches;
 
     @OneToOne
-    @JoinColumn(name = "id_reserva", referencedColumnName = "id_reserva")
-    @Column(name = "id_reserva", nullable = true)
+    @JoinColumn(name = "id_reserva", referencedColumnName = "id_reserva", nullable = false)
     private Reserva reserva;
 
-    @Column(name = "id_factura", nullable = false)
-    private String idFactura;
+    @ManyToMany(mappedBy = "estadias")
+    private List<Factura> facturas;
+
+    @ManyToMany
+    @JoinTable(
+            name = "Ocupacion_de_Habitacion",
+            joinColumns = @JoinColumn(name = "id_estadia"),
+            inverseJoinColumns = @JoinColumn(name = "id_habitacion")
+    )
+    private List<Habitacion> habitaciones;
+
+    @ManyToMany
+    @JoinTable(
+            name = "Huespedes_Hospedados_por_Estadia",
+            joinColumns = @JoinColumn(name = "id_estadia"),
+            inverseJoinColumns = @JoinColumn(name = "id_huesped")
+    )
+    private List<Huesped> huespedesHospedados;
 
     public Estadia() {}
 
@@ -56,9 +74,4 @@ public class Estadia {
     public Integer getCantNoches() { return cantNoches; }
     public void setCantNoches(Integer cantNoches) { this.cantNoches = cantNoches; }
 
-    public String getIdReserva() { return idReserva; }
-    public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
-
-    public String getIdFactura() { return idFactura; }
-    public void setIdFactura(String idFactura) { this.idFactura = idFactura; }
 }

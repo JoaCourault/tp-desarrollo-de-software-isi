@@ -1,12 +1,10 @@
 package com.isi.desa.Model.Entities.Reserva;
 
 import com.isi.desa.Model.Entities.Habitacion.Habitacion;
-import com.isi.desa.Model.Entities.Huesped.Huesped;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "Reserva")
@@ -14,6 +12,7 @@ public class Reserva {
     @Id
     @GeneratedValue(generator = "id_reserva")
     @GenericGenerator(name = "id_reserva", strategy = "uuid2")
+    @Column(name = "id_reserva", nullable = false, updatable = false)
     private String idReserva;
     @Column(name = "fechaIngreso")
     private LocalDateTime fechaIngreso;

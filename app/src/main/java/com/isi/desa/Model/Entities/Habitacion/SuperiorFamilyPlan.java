@@ -1,21 +1,12 @@
 package com.isi.desa.Model.Entities.Habitacion;
 
-public class SuperiorFamilyPlan extends Habitacion {
-    private Integer cantidadCamasIndividual;
-    private Integer cantidadCamasDobles;
+import com.isi.desa.Model.Enums.TipoHabitacion;
 
-    public SuperiorFamilyPlan() {}
-    public SuperiorFamilyPlan(Integer cantidadCamasIndividual, Integer cantidadCamasDobles) {
-        this.cantidadCamasIndividual = cantidadCamasIndividual;
-        this.cantidadCamasDobles = cantidadCamasDobles;
+public class SuperiorFamilyPlan extends Habitacion {
+    public SuperiorFamilyPlan() {
+        this.setTipoHabitacion(TipoHabitacion.SUPERIOR_FAMILY_PLAN);
     }
 
     @Override
     public void mostrarEstadoHabitaciones() {}
-
-    public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
-    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
-
-    public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
-    public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
 }

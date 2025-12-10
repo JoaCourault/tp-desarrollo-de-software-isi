@@ -1,6 +1,9 @@
 package com.isi.desa.Model.Entities.Pago;
 
+import com.isi.desa.Model.Entities.Factura.Factura;
 import com.isi.desa.Model.Entities.MetodoDePago.MetodoDePago;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,10 +11,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Entity
+@Table(name = "Pago")
 public class Pago {
+    @Id
+    @GeneratedValue(generator = "id_pago")
+    @GenericGenerator(name = "id_pago", strategy = "uuid2")
+    @Column(name = "id_pago", nullable = false, updatable = false)
+    private String idPago;
+    @Column(name = "valor")
     private BigDecimal valor;
+    @Column(name = "fecha")
     private LocalDateTime fecha;
+
+    @OneToMany
+    @JoinColumn(name = "id_pago")
     private List<MetodoDePago> metodosDePago;
+    @OneToOne
+    @JoinColumn(name = "id_factura", unique = true)
+    private Factura factura;
 
     public Pago() {}
     public Pago(BigDecimal valor, LocalDateTime fecha, ArrayList<MetodoDePago> metodosDePago) {

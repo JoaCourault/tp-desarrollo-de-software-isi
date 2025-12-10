@@ -2,10 +2,12 @@ package com.isi.desa.Model.Entities.Servicio;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "LavadoYPlanchado")
 public class LavadoYPlanchado extends Servicio {
 
     @Column(name = "cantidad_prendas")

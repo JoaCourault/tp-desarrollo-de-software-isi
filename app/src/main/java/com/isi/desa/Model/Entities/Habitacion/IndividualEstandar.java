@@ -1,16 +1,12 @@
 package com.isi.desa.Model.Entities.Habitacion;
 
-public class IndividualEstandar extends Habitacion {
-    private Integer cantidadCamasIndividual;
+import com.isi.desa.Model.Enums.TipoHabitacion;
 
-    public IndividualEstandar() {}
-    public IndividualEstandar(Integer cantidadCamasIndividual) {
-        this.cantidadCamasIndividual = cantidadCamasIndividual;
+public class IndividualEstandar extends Habitacion {
+    public IndividualEstandar() {
+        this.setTipoHabitacion(TipoHabitacion.INDIVIDUAL_ESTANDAR);
     }
 
     @Override
     public void mostrarEstadoHabitaciones() {}
-
-    public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
-    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
 }

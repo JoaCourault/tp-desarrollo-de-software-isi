@@ -1,17 +1,12 @@
 package com.isi.desa.Model.Entities.Habitacion;
 
+import com.isi.desa.Model.Enums.TipoHabitacion;
+
 public class SuiteDoble extends Habitacion {
-    private Integer cantidadCamasDobles;
-
-    public SuiteDoble() {}
-
-    public SuiteDoble(Integer cantidadCamasDobles) {
-        this.cantidadCamasDobles = cantidadCamasDobles;
+    public SuiteDoble() {
+        this.setTipoHabitacion(TipoHabitacion.SUITE_DOBLE);
     }
 
     @Override
     public void mostrarEstadoHabitaciones() {}
-
-    public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
-    public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
 }

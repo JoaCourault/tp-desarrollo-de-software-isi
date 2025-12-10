@@ -1,15 +1,28 @@
 package com.isi.desa.Model.Entities.NotaDeCredito;
 
 import com.isi.desa.Model.Entities.Factura.Factura;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
+import java.util.List;
+
+@Entity
+@Table(name = "NotaDeCredito")
 public class NotaDeCredito {
+    @Id
+    @GeneratedValue(generator = "cod_identificador")
+    @GenericGenerator(name = "cod_identificador", strategy = "uuid2")
     private String codigoIdentificador;
+    @Column(name = "cobrado")
     private boolean cobrado;
-    private Factura[] facturas;
+
+    @OneToMany(mappedBy = "notaDeCredito")
+    private List<Factura> facturas;   // muchas facturas pueden ser canceladas por la misma nota
+
 
     public NotaDeCredito() {}
 
-    public NotaDeCredito(String codigoIdentificador, boolean cobrado, Factura[] facturas) {
+    public NotaDeCredito(String codigoIdentificador, boolean cobrado, List<Factura> facturas) {
         this.codigoIdentificador = codigoIdentificador;
         this.cobrado = cobrado;
         this.facturas = facturas;
@@ -19,6 +32,6 @@ public class NotaDeCredito {
     public void setCodigoIdentificador(String codigoIdentificador) { this.codigoIdentificador = codigoIdentificador; }
     public boolean isCobrado() { return cobrado; }
     public void setCobrado(boolean cobrado) { this.cobrado = cobrado; }
-    public Factura[] getFacturas() { return facturas; }
-    public void setFacturas(Factura[] facturas) { this.facturas = facturas; }
+    public List<Factura> getFacturas() { return facturas; }
+    public void setFacturas(List<Factura> facturas) { this.facturas = facturas; }
 }
