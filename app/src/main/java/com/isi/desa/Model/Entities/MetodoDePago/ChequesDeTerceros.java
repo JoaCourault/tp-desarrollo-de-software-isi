@@ -1,22 +1,29 @@
 package com.isi.desa.Model.Entities.MetodoDePago;
 
-import java.math.BigDecimal;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "ChequesDeTerceros")
 public class ChequesDeTerceros extends MetodoDePago {
+    @Column(name = "num_cheque")
     private Integer numCheque;
+    @Column(name = "emisor")
     private String emisor;
+    @Column(name = "banco")
     private String banco;
-    private BigDecimal monto;
+    @Column(name = "fecha")
     private LocalDate fecha;
 
     public ChequesDeTerceros() {}
 
-    public ChequesDeTerceros(Integer numCheque, String emisor, String banco, BigDecimal monto, LocalDate fecha) {
+    public ChequesDeTerceros(Integer numCheque, String emisor, String banco, LocalDate fecha) {
         this.numCheque = numCheque;
         this.emisor = emisor;
         this.banco = banco;
-        this.monto = monto;
         this.fecha = fecha;
     }
 
@@ -28,9 +35,6 @@ public class ChequesDeTerceros extends MetodoDePago {
 
     public String getBanco() { return banco; }
     public void setBanco(String banco) { this.banco = banco; }
-
-    public BigDecimal getMonto() { return monto; }
-    public void setMonto(BigDecimal monto) { this.monto = monto; }
 
     public LocalDate getFecha() { return fecha; }
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }

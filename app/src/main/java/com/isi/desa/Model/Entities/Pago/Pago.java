@@ -24,18 +24,18 @@ public class Pago {
     @Column(name = "fecha")
     private LocalDateTime fecha;
 
-    @OneToMany
-    @JoinColumn(name = "id_pago")
-    private List<MetodoDePago> metodosDePago;
+    @OneToMany(mappedBy = "pago", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RegistroDePago> registrosDePago;
+
     @OneToOne
     @JoinColumn(name = "id_factura", unique = true)
     private Factura factura;
 
     public Pago() {}
-    public Pago(BigDecimal valor, LocalDateTime fecha, ArrayList<MetodoDePago> metodosDePago) {
+    public Pago(BigDecimal valor, LocalDateTime fecha, ArrayList<RegistroDePago> registrosDePago) {
         this.valor = valor;
         this.fecha = fecha;
-        this.metodosDePago = metodosDePago;
+        this.registrosDePago = registrosDePago;
     }
 
     public BigDecimal getValor() { return this.valor; }
@@ -44,7 +44,13 @@ public class Pago {
     public LocalDateTime getFecha() { return this.fecha; }
     public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
 
-    public List<MetodoDePago> getMetodosDePago() { return this.metodosDePago; }
-    public void setMetodosDePago(List<MetodoDePago> metodosDePago) { this.metodosDePago = metodosDePago; }
-    public void agregarMetodoDePago(MetodoDePago metodoDePago) { this.metodosDePago.add(metodoDePago); }
+    public List<RegistroDePago> getRegistrosDePago() { return this.registrosDePago; }
+    public void setRegistrosDePago(List<RegistroDePago> registrosDePago) { this.registrosDePago = registrosDePago; }
+    public void addRegistroDePago(RegistroDePago registro) {
+        this.registrosDePago.add(registro);
+    }
+
+    public Factura getFactura() { return this.factura; }
+    public void setFactura(Factura factura) { this.factura = factura; }
+
 }
