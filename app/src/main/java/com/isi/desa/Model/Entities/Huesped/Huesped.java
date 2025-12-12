@@ -43,6 +43,10 @@ public class Huesped {
     @Column(name = "eliminado")
     private boolean eliminado;
 
+    @OneToOne(optional = false)
+    @JoinColumn(name = "id_direccion", referencedColumnName = "id_direccion")
+    private Direccion direccion;
+
     @ManyToMany(mappedBy = "huespedesHospedados")
     private List<Estadia> estadiasDelHuesped;
 
@@ -62,6 +66,7 @@ public class Huesped {
         this.email = email;
         this.ocupacion = ocupacion;
         this.nacionalidad = nacionalidad;
+        this.direccion = direccion;
         this.idHuesped = idHuesped;
     }
     // Getters y setters
@@ -103,4 +108,7 @@ public class Huesped {
 
     public boolean isEliminado() { return eliminado; }
     public void setEliminado(boolean eliminado) { this.eliminado = eliminado; }
+
+    public Direccion getDireccion() { return direccion; }
+    public void setDireccion(Direccion direccion) { this.direccion = direccion; }
 }

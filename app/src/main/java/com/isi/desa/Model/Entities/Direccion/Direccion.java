@@ -30,14 +30,6 @@ public class Direccion {
     @Column(name = "pais")
     private String pais;
 
-    @OneToOne(optional = true)
-    @JoinColumn(name = "id_huesped", referencedColumnName = "id_huesped", unique = true)
-    private Huesped huesped;
-
-    @OneToOne(optional = true)
-    @JoinColumn(name = "cuitPersonaJuridica", referencedColumnName = "cuit", unique = true)
-    private PersonaJuridica personaJuridica;
-
     public Direccion() {}
 
     public Direccion(String id,String calle, String numero, String departamento, Integer piso, String cp, String localidad, String provincia, String pais) {
@@ -79,14 +71,7 @@ public class Direccion {
     public String getIdDireccion() {
         return idDireccion;
     }
-
     public void setIdDireccion(String idDireccion) {
         this.idDireccion = idDireccion;
     }
-
-    public Huesped getHuesped() { return huesped; }
-    public void setHuesped(Huesped huesped) { this.huesped = huesped; }
-
-    public PersonaJuridica getPersonaJuridica() { return personaJuridica; }
-    public void setPersonaJuridica(PersonaJuridica personaJuridica) { this.personaJuridica = personaJuridica; }
 }
