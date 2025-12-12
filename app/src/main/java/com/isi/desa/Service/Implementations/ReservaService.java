@@ -17,6 +17,8 @@ import com.isi.desa.Service.Interfaces.IReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.isi.desa.Dto.Reserva.ReservaListadoDTO;
+import com.isi.desa.Service.Interfaces.Validators.IReservaValidator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -38,6 +40,9 @@ public class ReservaService implements IReservaService {
     // INYECTAR EL REPOSITORIO DE ESTADÍAS
     @Autowired
     private EstadiaRepository estadiaRepository;
+
+    @Autowired
+    private IReservaValidator reservaValidator; // Inyectar Validator
 
     @Override
     @Transactional
@@ -157,6 +162,56 @@ public class ReservaService implements IReservaService {
         }
 
         return resultado;
+    }
+
+    @Override
+    public List<ReservaListadoDTO> buscarParaCancelar(String apellido, String nombre) {
+        // 1. Validación
+        RuntimeException error = reservaValidator.validateBuscar(apellido, nombre);
+        if (error != null) throw error;
+
+        // 2. Búsqueda
+        List<Reserva> reservas = reservaDAO.buscarPorHuesped(apellido, nombre);
+
+        // 3. Mapeo a DTO (Grid)
+        List<ReservaListadoDTO> dtos = new ArrayList<>();
+        for (Reserva r : reservas) {
+            ReservaListadoDTO dto = new ReservaListadoDTO();
+            dto.idReserva = r.getIdReserva();
+            dto.apellidoHuesped = r.getApellidoHuesped();
+            dto.nombreHuesped = r.getNombreHuesped();
+            dto.fechaIngreso = r.getFechaIngreso();
+            dto.fechaEgreso = r.getFechaEgreso();
+
+            // Accedemos a la habitación relacionada
+            if (r.getHabitacion() != null) {
+                dto.numeroHabitacion = r.getHabitacion().getNumero();
+                dto.tipoHabitacion = r.getHabitacion().getDetalles();
+            }
+            dtos.add(dto);
+        }
+
+        if (dtos.isEmpty()) {
+            // Opcional: lanzar error si el requerimiento dice "Mostrar error si no hay concordancia"
+            throw new RuntimeException("No existen reservas para los criterios de búsqueda");
+        }
+
+        return dtos;
+    }
+
+    @Override
+    @Transactional
+    public void cancelarReservas(List<String> idsReservas) {
+        if (idsReservas == null || idsReservas.isEmpty()) return;
+
+        for (String id : idsReservas) {
+            // Validar existencia
+            RuntimeException error = reservaValidator.validateEliminar(id);
+            if (error != null) throw error;
+
+            // Eliminar (Esto libera la habitación automáticamente para los algoritmos de disponibilidad)
+            reservaDAO.eliminar(id);
+        }
     }
 }
 
