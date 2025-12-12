@@ -37,8 +37,8 @@ public class Direccion {
     @Column(name = "id_huesped", unique = true)
     private String idHuesped;
 
-    @Column(name = "cuit", unique = true)
-    private String cuit;
+    //@Column(name = "cuit", unique = true)
+    //private String cuit;
 
     public Direccion() {}
 
@@ -93,6 +93,6 @@ public class Direccion {
     public String getIdHuesped() { return idHuesped; }
     public void setIdHuesped(String idHuesped) { this.idHuesped = idHuesped; }
 
-    public String getCuit() { return cuit; }
-    public void setCuit(String cuit) { this.cuit = cuit; }
+    //public String getCuit() { return cuit; }
+    //public void setCuit(String cuit) { this.cuit = cuit; }
 }

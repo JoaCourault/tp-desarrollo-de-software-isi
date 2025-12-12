@@ -31,8 +31,8 @@ public class Estadia {
     @Column(name = "id_reserva")
     private String idReserva;
 
-    @Column(name = "id_factura", nullable = true)
-    private String idFactura;
+    //@Column(name = "id_factura", nullable = true)
+    //private String idFactura;
 
     @ManyToMany
     @JoinTable(
@@ -71,8 +71,8 @@ public class Estadia {
     public String getIdReserva() { return idReserva; }
     public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
 
-    public String getIdFactura() { return idFactura; }
-    public void setIdFactura(String idFactura) { this.idFactura = idFactura; }
+    //public String getIdFactura() { return idFactura; }
+    //public void setIdFactura(String idFactura) { this.idFactura = idFactura; }
 
     public List<Habitacion> getHabitaciones() { return habitaciones; }
     public void setHabitaciones(List<Habitacion> habitaciones) { this.habitaciones = habitaciones; }

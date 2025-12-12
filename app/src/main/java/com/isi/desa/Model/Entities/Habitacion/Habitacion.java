@@ -32,15 +32,14 @@ public class Habitacion { // <--- YA NO ES ABSTRACT
     @Column(name = "detalles")
     private String detalles;
 
-    // Campos específicos que estaban en tu DTO y tabla, agrégalos aquí para evitar errores de mapeo
-    @Column(name = "qcamindividual")
-    private Integer cantidadCamasIndividual;
+    //@Column(name = "qcamindividual")
+    //private Integer cantidadCamasIndividual;
 
-    @Column(name = "qcamdobles")
-    private Integer cantidadCamasDobles;
+    //@Column(name = "qcamdobles")
+    //private Integer cantidadCamasDobles;
 
-    @Column(name = "qcamkingsize")
-    private Integer cantidadCamasKingSize;
+    //@Column(name = "qcamkingsize")
+    //private Integer cantidadCamasKingSize;
 
     // Constructor vacío obligatorio para JPA
     public Habitacion() {}
@@ -72,12 +71,12 @@ public class Habitacion { // <--- YA NO ES ABSTRACT
     public String getDetalles() { return detalles; }
     public void setDetalles(String detalles) { this.detalles = detalles; }
 
-    public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
-    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
+    //public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
+    //public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
 
-    public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
-    public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
+    //public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
+    //public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
 
-    public Integer getCantidadCamasKingSize() { return cantidadCamasKingSize; }
-    public void setCantidadCamasKingSize(Integer cantidadCamasKingSize) { this.cantidadCamasKingSize = cantidadCamasKingSize; }
+    //public Integer getCantidadCamasKingSize() { return cantidadCamasKingSize; }
+    //public void setCantidadCamasKingSize(Integer cantidadCamasKingSize) { this.cantidadCamasKingSize = cantidadCamasKingSize; }
 }
