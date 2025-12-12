@@ -12,5 +12,4 @@ public interface IDireccionDAO {
 
     Direccion obtener(DireccionDTO direccion);
 
-    Direccion obtenerDireccionDeHuespedPorId(String idHuesped);
 }

@@ -49,25 +49,7 @@ public class HuespedMapper {
         dto.email = h.getEmail();
         dto.ocupacion = h.getOcupacion();
         dto.nacionalidad = h.getNacionalidad();
-
-        // Direccion: si viene solo con id, intentar completar desde DAO
-        Direccion dEntity = direccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
-        if (dEntity != null) {
-            if ((dEntity.getCalle() == null || dEntity.getCalle().trim().isEmpty())
-                    && dEntity.getIdDireccion() != null && !dEntity.getIdDireccion().trim().isEmpty()) {
-                try {
-                    com.isi.desa.Dto.Direccion.DireccionDTO req = new com.isi.desa.Dto.Direccion.DireccionDTO();
-                    req.id = dEntity.getIdDireccion();
-                    DireccionDAO direccionDAO = new DireccionDAO();
-                    dEntity = direccionDAO.obtener(req);
-                } catch (Exception ignore) {
-                    // si falla, dejamos la direccion tal como viene (solo id)
-                }
-            }
-            dto.direccion = DireccionMapper.entityToDto(dEntity);
-        } else {
-            dto.direccion = null;
-        }
+        dto.direccion = DireccionMapper.entityToDto(h.getDireccion());
 
         dto.estadias = EstadiaMapper.entityListToDtoList(huespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
 

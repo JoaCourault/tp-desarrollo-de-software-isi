@@ -54,12 +54,4 @@ public class DireccionDAO implements IDireccionDAO {
         return repository.findById(direccion.id)
                 .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.id));
     }
-
-    @Override
-    public Direccion obtenerDireccionDeHuespedPorId(String idHuesped) {
-        String id = Optional.ofNullable(idHuesped)
-                .orElseThrow(() -> new RuntimeException("El ID del huesped no puede ser nulo"));
-        return repository.findByHuesped_IdHuesped(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró dirección para el huesped con ID: " + id));
-    }
 }
