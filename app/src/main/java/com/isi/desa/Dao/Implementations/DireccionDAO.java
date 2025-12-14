@@ -54,4 +54,10 @@ public class DireccionDAO implements IDireccionDAO {
         return repository.findById(direccion.idDireccion)
                 .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.idDireccion));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<Direccion> obtenerTodas() {
+        return repository.findAll();
+    }
 }
