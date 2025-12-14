@@ -30,4 +30,15 @@ public class RegistroDePago {
 
     @Column(name = "monto")
     private BigDecimal monto;
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public Pago getPago() { return pago; }
+    public void setPago(Pago pago) { this.pago = pago; }
+    public MetodoDePago getMetodoDePago() { return metodoDePago; }
+    public void setMetodoDePago(MetodoDePago metodoDePago) { this.metodoDePago = metodoDePago; }
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public BigDecimal getMonto() { return monto; }
+    public void setMonto(BigDecimal monto) { this.monto = monto; }
 }

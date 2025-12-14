@@ -45,8 +45,8 @@ public class HuespedValidator implements IHuespedValidator {
         if (errorValidacion != null) throw errorValidacion;
 
         Direccion direccion = DireccionMapper.dtoToEntity(huespedDTO.direccion);
-        TipoDocumento tipoDocumento = new TipoDocumento(huespedDTO.tipoDocumento.tipoDocumento);
-        LocalDate fechaNacimiento = huespedDTO.fechaNacimiento;
+        TipoDocumento tipoDocumento = new TipoDocumento(huespedDTO.tipoDoc.tipoDocumento);
+        LocalDate fechaNacimiento = huespedDTO.fechaNac;
         return new Huesped(
                 huespedDTO.nombre,
                 huespedDTO.apellido,
@@ -72,7 +72,7 @@ public class HuespedValidator implements IHuespedValidator {
         if (isBlank(huespedDTO.apellido)) errores.add(new IllegalArgumentException("El apellido es obligatorio"));
         if (isBlank(huespedDTO.numDoc)) errores.add(new IllegalArgumentException("El numero de documento es obligatorio"));
 
-        String tipoDocumentoError = validateTipoDocumento(huespedDTO.tipoDocumento);
+        String tipoDocumentoError = validateTipoDocumento(huespedDTO.tipoDoc);
         if (tipoDocumentoError != null) errores.add(new IllegalArgumentException(tipoDocumentoError));
 
         if(huespedDTO.cuit != null) {
@@ -80,7 +80,7 @@ public class HuespedValidator implements IHuespedValidator {
             if (cuitError != null) errores.add(new IllegalArgumentException(cuitError));
         }
 
-        String fechaNacimientoError = validateFechaNacimiento(huespedDTO.fechaNacimiento);
+        String fechaNacimientoError = validateFechaNacimiento(huespedDTO.fechaNac);
         if (fechaNacimientoError != null) errores.add(new IllegalArgumentException(fechaNacimientoError));
 
         InvalidDirectionException direccionValidationError = direccionValidator.validate(huespedDTO.direccion);
@@ -134,7 +134,7 @@ public class HuespedValidator implements IHuespedValidator {
             );
         }
 
-        String tipoDocumentoError = validateTipoDocumento(dto.tipoDocumento);
+        String tipoDocumentoError = validateTipoDocumento(dto.tipoDoc);
         if (tipoDocumentoError != null) errores.add(new IllegalArgumentException(tipoDocumentoError));
 
         if(!isBlank(dto.cuit)) {

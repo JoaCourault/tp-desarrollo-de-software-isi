@@ -111,4 +111,11 @@ public class Huesped {
 
     public Direccion getDireccion() { return direccion; }
     public void setDireccion(Direccion direccion) { this.direccion = direccion; }
+
+    public int getEdad() {
+        if (this.fechaNac == null) {
+            return 0;
+        }
+        return LocalDate.now().getYear() - this.fechaNac.getYear();
+    }
 }

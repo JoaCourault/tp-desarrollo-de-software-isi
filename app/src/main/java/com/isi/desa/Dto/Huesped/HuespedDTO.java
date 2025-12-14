@@ -10,18 +10,17 @@ import java.util.List;
 
 public class HuespedDTO {
     public String idHuesped;
+    public String numDoc;
     public String nombre;
     public String apellido;
-    public TipoDocumentoDTO tipoDocumento;
-    public String numDoc;
+    public TipoDocumentoDTO tipoDoc;
     public String posicionIva;
     public String cuit;
-    public LocalDate fechaNacimiento;
+    public LocalDate fechaNac;
     public String telefono;
     public String email;
     public String ocupacion;
     public String nacionalidad;
+    public boolean eliminado;
     public DireccionDTO direccion;
-    public List<EstadiaDTO> estadias;
-    public boolean eliminado = false;
 }

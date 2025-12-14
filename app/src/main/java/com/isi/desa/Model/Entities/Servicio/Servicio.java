@@ -43,4 +43,7 @@ public abstract class Servicio {
 
     public  List<Factura> getFacturas() { return facturas; }
     public void setFacturas(List<Factura> facturas) { this.facturas = facturas; }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 }

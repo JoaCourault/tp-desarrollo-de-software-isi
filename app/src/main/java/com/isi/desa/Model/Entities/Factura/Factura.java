@@ -1,7 +1,6 @@
 package com.isi.desa.Model.Entities.Factura;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.isi.desa.Model.Entities.Estadia.Estadia;
@@ -86,4 +85,7 @@ public class Factura {
 
     public List<Estadia> getEstadias() { return estadias; }
     public void setEstadias(List<Estadia> estadias) { this.estadias = estadias; }
+
+    public String getIdFactura() { return idFactura; }
+    public void setIdFactura(String idFactura) { this.idFactura = idFactura; }
 }

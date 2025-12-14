@@ -74,4 +74,9 @@ public class Estadia {
     public Integer getCantNoches() { return cantNoches; }
     public void setCantNoches(Integer cantNoches) { this.cantNoches = cantNoches; }
 
+    public List<Huesped> getHuespedesHospedados() { return huespedesHospedados; }
+    public void setHuespedesHospedados(List<Huesped> huespedesHospedados) { this.huespedesHospedados = huespedesHospedados; }
+
+    public List<Factura> getFacturas() { return facturas; }
+    public void setFacturas(List<Factura> facturas) { this.facturas = facturas; }
 }

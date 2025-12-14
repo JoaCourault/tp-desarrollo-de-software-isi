@@ -56,4 +56,7 @@ public class TarjetaDeDebito extends MetodoDePago {
 
     public String getCorreo() { return correo; }
     public void setCorreo(String correo) { this.correo = correo; }
+
+    public String getIdMetodoDePago() { return super.getIdMetodoDePago(); }
+    public void setIdMetodoDePago(String idMetodoDePago) { super.setIdMetodoDePago(idMetodoDePago); }
 }

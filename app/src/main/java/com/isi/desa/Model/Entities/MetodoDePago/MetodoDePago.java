@@ -20,5 +20,7 @@ public abstract class MetodoDePago {
     private List<RegistroDePago> registros;
 
     // Clase abstracta base para metodos de pago
-}
 
+    public String getIdMetodoDePago() { return idMetodoDePago; }
+    public void setIdMetodoDePago(String idMetodoDePago) { this.idMetodoDePago = idMetodoDePago; }
+}

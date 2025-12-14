@@ -47,9 +47,9 @@ public class HuespedService implements IHuespedService {
                 .filter(h -> h != null && !h.isEliminado())
                 .anyMatch(h ->
                         h.getTipoDoc() != null &&
-                                huespedDTO.tipoDocumento != null &&
-                                huespedDTO.tipoDocumento.tipoDocumento != null &&
-                                h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
+                                huespedDTO.tipoDoc.tipoDocumento != null &&
+                                huespedDTO.tipoDoc.tipoDocumento != null &&
+                                h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDoc.tipoDocumento) &&
                                 h.getNumDoc() != null &&
                                 h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
                 );
@@ -123,7 +123,7 @@ public class HuespedService implements IHuespedService {
         boolean algunCampo =
                 (filtro.nombre != null && !filtro.nombre.isEmpty()) ||
                         (filtro.apellido != null && !filtro.apellido.isEmpty()) ||
-                        (filtro.tipoDocumento != null) ||
+                        (filtro.tipoDoc.tipoDocumento != null) ||
                         (filtro.numDoc != null && !filtro.numDoc.isEmpty());
 
         if (!algunCampo) {
@@ -148,10 +148,10 @@ public class HuespedService implements IHuespedService {
                 else { coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase()); }
             }
 
-            if (filtro.tipoDocumento != null) {
+            if (filtro.tipoDoc.tipoDocumento != null) {
                 coincide &= (
                         h.getTipoDoc() != null &&
-                                h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(filtro.tipoDocumento.tipoDocumento)
+                                h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(filtro.tipoDoc.tipoDocumento)
                 );
             }
 
@@ -198,8 +198,8 @@ public class HuespedService implements IHuespedService {
                             h.getIdHuesped() != null &&
                                     !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) &&
                                     h.getTipoDoc() != null &&
-                                    dto.tipoDocumento != null &&
-                                    h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
+                                    dto.tipoDoc.tipoDocumento != null &&
+                                    h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(dto.tipoDoc.tipoDocumento) &&
                                     h.getNumDoc().equals(dto.numDoc)
                     );
 

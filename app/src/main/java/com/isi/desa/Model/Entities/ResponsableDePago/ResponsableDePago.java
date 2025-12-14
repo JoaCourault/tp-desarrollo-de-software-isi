@@ -19,4 +19,12 @@ public abstract class ResponsableDePago {
     private List<Factura> facturas;
 
     // Clase abstracta base para responsables de pago
+
+    public String getIdResponsableDePago() {
+        return idResponsableDePago;
+    }
+
+    public void setIdResponsableDePago(String idResponsableDePago) {
+        this.idResponsableDePago = idResponsableDePago;
+    }
 }

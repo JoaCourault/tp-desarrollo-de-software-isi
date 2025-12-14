@@ -55,4 +55,7 @@ public class TarjetaDeCredito extends MetodoDePago {
 
     public Integer getCuotas() { return cuotas; }
     public void setCuotas(Integer cuotas) { this.cuotas = cuotas; }
+
+    public String getIdMetodoDePago() { return super.getIdMetodoDePago(); }
+    public void setIdMetodoDePago(String idMetodoDePago) { super.setIdMetodoDePago(idMetodoDePago); }
 }

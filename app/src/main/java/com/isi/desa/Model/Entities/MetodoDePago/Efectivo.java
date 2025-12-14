@@ -22,5 +22,6 @@ public class Efectivo extends MetodoDePago {
     public void setDivisa(String divisa) { this.divisa = divisa; }
     public BigDecimal getTipoDeCambio() { return this.tipoDeCambio; }
     public void setTipoDeCambio(BigDecimal tipoDeCambio) { this.tipoDeCambio = tipoDeCambio; }
+    public String getIdMetodoDePago() { return super.getIdMetodoDePago(); }
+    public void setIdMetodoDePago(String idMetodoDePago) { super.setIdMetodoDePago(idMetodoDePago); }
 }
-

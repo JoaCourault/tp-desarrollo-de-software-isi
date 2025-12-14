@@ -45,4 +45,7 @@ public class ChequesPropios extends MetodoDePago {
 
     public LocalDate getFecha() { return fecha; }
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+
+    public String getIdMetodoDePago() { return super.getIdMetodoDePago(); }
+    public void setIdMetodoDePago(String idMetodoDePago) { super.setIdMetodoDePago(idMetodoDePago); }
 }

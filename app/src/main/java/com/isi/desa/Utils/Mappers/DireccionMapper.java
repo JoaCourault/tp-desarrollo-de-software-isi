@@ -6,11 +6,11 @@ import com.isi.desa.Model.Entities.Direccion.Direccion;
 public class DireccionMapper {
     public static DireccionDTO entityToDto(Direccion d) {
         DireccionDTO dto = new DireccionDTO();
-        dto.id = d.getIdDireccion();
+        dto.idDireccion= d.getIdDireccion();
         dto.pais = d.getPais();
         dto.provincia = d.getProvincia();
         dto.localidad = d.getLocalidad();
-        dto.codigoPostal = d.getCp();
+        dto.cp = d.getCp();
         dto.calle = d.getCalle();
         dto.numero = d.getNumero();
         dto.departamento = d.getDepartamento();
@@ -19,11 +19,11 @@ public class DireccionMapper {
     }
     public static Direccion dtoToEntity(DireccionDTO dto) {
         Direccion d = new Direccion();
-        d.setIdDireccion(dto.id);
+        d.setIdDireccion(dto.idDireccion);
         d.setPais(dto.pais);
         d.setProvincia(dto.provincia);
         d.setLocalidad(dto.localidad);
-        d.setCp(dto.codigoPostal);
+        d.setCp(dto.cp);
         d.setCalle(dto.calle);
         d.setNumero(dto.numero);
         d.setDepartamento(dto.departamento);

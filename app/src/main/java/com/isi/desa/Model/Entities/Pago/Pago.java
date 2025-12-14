@@ -53,4 +53,6 @@ public class Pago {
     public Factura getFactura() { return this.factura; }
     public void setFactura(Factura factura) { this.factura = factura; }
 
+    public String getIdPago() { return this.idPago; }
+
 }

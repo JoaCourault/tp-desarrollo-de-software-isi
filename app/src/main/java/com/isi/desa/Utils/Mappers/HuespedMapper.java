@@ -41,17 +41,15 @@ public class HuespedMapper {
         dto.nombre = h.getNombre();
         dto.apellido = h.getApellido();
         dto.numDoc = h.getNumDoc();
-        dto.tipoDocumento = tipoDocDto;
+        dto.tipoDoc = tipoDocDto;
         dto.cuit = h.getCuit();
         dto.posicionIva = h.getPosicionIva();
-        dto.fechaNacimiento = h.getFechaNac();
+        dto.fechaNac = h.getFechaNac();
         dto.telefono = h.getTelefono();
         dto.email = h.getEmail();
         dto.ocupacion = h.getOcupacion();
         dto.nacionalidad = h.getNacionalidad();
         dto.direccion = DireccionMapper.entityToDto(h.getDireccion());
-
-        dto.estadias = EstadiaMapper.entityListToDtoList(huespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
 
         dto.eliminado = h.isEliminado();
 
@@ -68,15 +66,15 @@ public class HuespedMapper {
         h.setNumDoc(dto.numDoc);
         h.setPosicionIva(dto.posicionIva);
         h.setCuit(dto.cuit);
-        h.setFechaNac(dto.fechaNacimiento);
+        h.setFechaNac(dto.fechaNac);
         h.setTelefono(dto.telefono);
         h.setEmail(dto.email);
         h.setOcupacion(dto.ocupacion);
         h.setNacionalidad(dto.nacionalidad);
 
         // TipoDocumento
-        if (dto.tipoDocumento != null) {
-            String tipoDocId = dto.tipoDocumento.tipoDocumento;
+        if (dto.tipoDoc != null) {
+            String tipoDocId = dto.tipoDoc.tipoDocumento;
             h.setTipoDoc(tipoDocumentoDAO.obtener(tipoDocId));
         }
 

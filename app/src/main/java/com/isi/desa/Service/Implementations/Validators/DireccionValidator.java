@@ -28,12 +28,12 @@ public class DireccionValidator implements IDireccionValidator {
         if (validationError != null) throw validationError;
 
         return new Direccion(
-                direccionDTO.id,
+                direccionDTO.idDireccion,
                 direccionDTO.calle,
                 direccionDTO.numero,
                 direccionDTO.departamento,
                 direccionDTO.piso,
-                direccionDTO.codigoPostal,
+                direccionDTO.cp,
                 direccionDTO.pais,
                 direccionDTO.provincia,
                 direccionDTO.localidad
@@ -58,7 +58,7 @@ public class DireccionValidator implements IDireccionValidator {
         if ((error = validateLocalidad(direccionDTO.localidad)) != null) {
             errores.add(new InvalidDirectionException(error));
         }
-        if ((error = validateCodigoPostal(direccionDTO.codigoPostal)) != null) {
+        if ((error = validateCodigoPostal(direccionDTO.cp)) != null) {
             errores.add(new InvalidDirectionException(error));
         }
         if ((error = validateCalle(direccionDTO.calle)) != null) {

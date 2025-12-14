@@ -1,13 +1,13 @@
 package com.isi.desa.Dto.Pago;
 
-import com.isi.desa.Dto.MetodoDePago.MetodoDePagoDTO;
+import com.isi.desa.Dto.Factura.FacturaDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class PagoDTO {
+    public String idPago;
     public BigDecimal valor;
     public LocalDateTime fecha;
-    public List<MetodoDePagoDTO> metodosDePago;
+    public FacturaDTO factura;
 }
