@@ -365,7 +365,7 @@ public class FacturacionService implements IFaucturacionService {
             return resultado;
         }
 
-        Boolean habitacionDisponible = habitacionValidator.validateExistById(idHabitacion);
+        Boolean habitacionDisponible = habitacionValidator.validateHabitacionDisponibleById(idHabitacion);
         if (habitacionDisponible) {
             resultado.id = 1;
             resultado.mensaje = "La habitacion no esta ocupada";

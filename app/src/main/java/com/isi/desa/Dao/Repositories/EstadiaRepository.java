@@ -10,15 +10,16 @@ import java.util.List;
 
 public interface EstadiaRepository extends JpaRepository<Estadia, String> {
     @Query("""
-        SELECT e
+    SELECT e
         FROM Estadia e
         JOIN e.habitaciones h
         WHERE h.idHabitacion = :idHabitacion
-          AND :moment >= e.checkIn
-          AND (e.checkOut IS NULL OR e.checkOut <= :moment)
+          AND e.checkIn <= :moment
+          AND (e.checkOut IS NULL OR e.checkOut > :moment)
     """)
     List<Estadia> findByHabitacionAndMoment(
             @Param("idHabitacion") String idHabitacion,
             @Param("moment") LocalDateTime moment
     );
+
 }

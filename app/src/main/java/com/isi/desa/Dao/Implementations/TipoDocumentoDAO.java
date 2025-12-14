@@ -15,12 +15,12 @@ public class TipoDocumentoDAO implements ITipoDocumentoDAO {
 
     @Override
     public List<TipoDocumento> obtenerTodos() {
-        return repo.findAll();
+        return this.repo.findAll();
     }
 
     @Override
     public TipoDocumento obtener(String id) {
-        return repo.findById(id)
+        return this.repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("No se encontro TipoDocumento con id: " + id));
     }
 }

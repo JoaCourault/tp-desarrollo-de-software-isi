@@ -3,7 +3,6 @@ package com.isi.desa.Model.Entities.Habitacion;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Reserva.Reserva;
 import com.isi.desa.Model.Enums.EstadoHabitacion;
-import com.isi.desa.Model.Enums.TipoHabitacion;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -11,6 +10,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_habitacion", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "Habitacion")
 public abstract class Habitacion {
     @Id
@@ -38,11 +39,6 @@ public abstract class Habitacion {
     @Column(name = "detalles")
     private String detalles;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_habitacion", nullable = false)
-    private TipoHabitacion tipoHabitacion;
-
-    // Campos específicos del DER para camas
     @Column(name = "qCamIndividual")
     private Integer cantidadCamasIndividual;
 
@@ -80,9 +76,6 @@ public abstract class Habitacion {
 
     public String getDetalles() { return detalles; }
     public void setDetalles(String detalles) { this.detalles = detalles; }
-
-    public TipoHabitacion getTipoHabitacion() { return tipoHabitacion; }
-    public void setTipoHabitacion(TipoHabitacion tipoHabitacion) { this.tipoHabitacion = tipoHabitacion; }
 
     public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
     public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }

@@ -1,35 +1,17 @@
 package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
-import com.isi.desa.Dao.Interfaces.IDireccionDAO;
-import com.isi.desa.Dao.Interfaces.IHuespedDAO;
-import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
-import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
-import com.isi.desa.Dao.Implementations.DireccionDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 
 public class HuespedMapper {
-
-    @Autowired
-    public static ITipoDocumentoDAO tipoDocumentoDAO;
-
-    @Autowired
-    public static IDireccionDAO direccionDAO;
-
-    @Autowired
-    public static IHuespedDAO huespedDAO;
-
     public static HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
-
         TipoDocumentoDTO tipoDocDto = null;
-        TipoDocumento tdEntity = tipoDocumentoDAO.obtener(h.getTipoDoc().getTipoDocumento());
+        TipoDocumento tdEntity = h.getTipoDoc();
         if (tdEntity != null) {
             String id = tdEntity.getTipoDocumento();
             tipoDocDto = new TipoDocumentoDTO();
@@ -57,6 +39,7 @@ public class HuespedMapper {
     }
 
     public static Huesped dtoToEntity(HuespedDTO dto) {
+        TipoDocumentoDAO tipoDocumentoDAO = new TipoDocumentoDAO();
         if (dto == null) return null;
 
         Huesped h = new Huesped();
@@ -81,5 +64,19 @@ public class HuespedMapper {
         h.setEliminado(dto.eliminado);
 
         return h;
+    }
+    public static java.util.List<Huesped> dtoListToEntitiesList(java.util.List<HuespedDTO> dtoList) {
+        java.util.List<Huesped> huespedes = new java.util.ArrayList<>();
+        for (HuespedDTO dto : dtoList) {
+            huespedes.add(dtoToEntity(dto));
+        }
+        return huespedes;
+    }
+    public static java.util.List<HuespedDTO> entityListToDtoList(java.util.List<Huesped> huespedes) {
+        java.util.List<HuespedDTO> dtoList = new java.util.ArrayList<>();
+        for (Huesped h : huespedes) {
+            dtoList.add(entityToDTO(h));
+        }
+        return dtoList;
     }
 }

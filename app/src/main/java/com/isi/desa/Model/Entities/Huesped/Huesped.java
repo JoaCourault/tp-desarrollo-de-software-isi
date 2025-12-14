@@ -43,7 +43,7 @@ public class Huesped {
     @Column(name = "eliminado")
     private boolean eliminado;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_direccion", referencedColumnName = "id_direccion")
     private Direccion direccion;
 

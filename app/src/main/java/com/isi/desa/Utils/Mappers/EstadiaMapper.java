@@ -14,6 +14,8 @@ public class EstadiaMapper {
         dto.checkIn = e.getCheckIn();
         dto.checkOut = e.getCheckOut();
         dto.cantNoches = e.getCantNoches();
+        dto.huespedesHospedados = HuespedMapper.entityListToDtoList(e.getHuespedesHospedados());
+        dto.habitaciones = HabitacionMapper.entityListToDtoList(e.getHabitaciones());
         return dto;
     }
     public static Estadia dtoToEntity(EstadiaDTO dto) {
@@ -23,6 +25,8 @@ public class EstadiaMapper {
         e.setCheckIn(dto.checkIn);
         e.setCheckOut(dto.checkOut);
         e.setCantNoches(dto.cantNoches);
+        e.setHuespedesHospedados(HuespedMapper.dtoListToEntitiesList(dto.huespedesHospedados));
+        e.setHabitaciones(HabitacionMapper.dtoLisToEntitiesList(dto.habitaciones));
         return e;
     }
     public static List<Estadia> dtoLisToEntitiesList(List<EstadiaDTO> dto) {

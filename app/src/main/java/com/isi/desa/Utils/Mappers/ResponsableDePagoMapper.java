@@ -6,17 +6,22 @@ import com.isi.desa.Model.Entities.ResponsableDePago.PersonaFisica;
 import com.isi.desa.Model.Entities.ResponsableDePago.PersonaJuridica;
 import com.isi.desa.Dto.ResponsableDePago.PersonaFisica.PersonaFisicaDTO;
 import com.isi.desa.Dto.ResponsableDePago.PersonaJuridica.PersonaJuridicaDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+
 public class ResponsableDePagoMapper {
+    @Autowired
+    private HuespedMapper HuespedMapper;
 
     public static ResponsableDePagoDTO entityToDto (ResponsableDePago responsableDePago) {
+
         if (responsableDePago == null) return null;
         ResponsableDePagoDTO dto;
         if (responsableDePago instanceof PersonaFisica pf) {
             PersonaFisicaDTO pfDto = new PersonaFisicaDTO();
-            pfDto.huesped = HuespedMapper.entityToDTO(pf.getHuesped());
+            pfDto.huesped = com.isi.desa.Utils.Mappers.HuespedMapper.entityToDTO(pf.getHuesped());
             pfDto.idResponsableDePago = pf.getIdResponsableDePago();
             dto = pfDto;
         } else if (responsableDePago instanceof PersonaJuridica pj) {
@@ -35,10 +40,11 @@ public class ResponsableDePagoMapper {
     }
 
     public static ResponsableDePago dtoToEntity (ResponsableDePagoDTO responsableDePagoDTO) {
+
         if (responsableDePagoDTO == null) return null;
         if (responsableDePagoDTO instanceof PersonaFisicaDTO pfDto) {
             PersonaFisica pf = new PersonaFisica();
-            pf.setHuesped(HuespedMapper.dtoToEntity(pfDto.huesped));
+            pf.setHuesped(com.isi.desa.Utils.Mappers.HuespedMapper.dtoToEntity(pfDto.huesped));
             pf.setIdResponsableDePago(pfDto.idResponsableDePago);
             return pf;
         } else if (responsableDePagoDTO instanceof PersonaJuridicaDTO pjDto) {
