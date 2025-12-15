@@ -18,9 +18,9 @@ public class Reserva {
     private LocalDateTime fechaIngreso;
     @Column(name = "fechaEgreso")
     private LocalDateTime fechaEgreso;
-    @Column(name = "nombre_huesped")
+    @Column(name = "nombre_huesped", columnDefinition = "VARCHAR(255)")
     private String nombreHuesped;
-    @Column(name = "apellido_huesped")
+    @Column(name = "apellido_huesped", columnDefinition = "VARCHAR(255)")
     private String apellidoHuesped;
     @Column(name = "telefono_huesped")
     private String telefonoHuesped;

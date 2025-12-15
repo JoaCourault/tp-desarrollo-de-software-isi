@@ -15,8 +15,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
     // Busca por apellido (obligatorio) y nombre (opcional).
     // LOWER para hacerla insensible a mayúsculas/minúsculas.
     @Query("SELECT r FROM Reserva r " +
-            "WHERE LOWER(r.apellidoHuesped) LIKE LOWER(CONCAT(:apellido, '%')) " +
-            "AND (:nombre IS NULL OR LOWER(r.nombreHuesped) LIKE LOWER(CONCAT(:nombre, '%')))")
+            "WHERE LOWER(r.apellidoHuesped) LIKE LOWER(:apellido) " +
+            "AND (:nombre IS NULL OR LOWER(r.nombreHuesped) LIKE LOWER(:nombre))")
     List<Reserva> buscarPorHuesped(@Param("apellido") String apellido,
                                    @Param("nombre") String nombre);
     // Consulta corregida para comparar fechas con horas

@@ -97,7 +97,7 @@ public class ReservaService implements IReservaService {
         // 1. Obtener habitaciones (Proyección)
         List<HabitacionResumen> habitacionesRaw = habitacionRepository.findAllResumen();
 
-        // 2. Obtener estadías
+        // 2. Obtener estadías y reservas en el rango
         List<Estadia> estadiasEnRango = estadiaRepository.findEstadiasEnRango(
                 desde.atStartOfDay(),
                 hasta.atTime(LocalTime.MAX)
@@ -108,19 +108,18 @@ public class ReservaService implements IReservaService {
                 hasta.atTime(LocalTime.MAX)
         );
 
-        LocalDate hoy = LocalDate.now(); // Guardamos la fecha de hoy para comparar
+        LocalDate hoy = LocalDate.now();
 
         for (HabitacionResumen h : habitacionesRaw) {
 
             HabitacionDisponibilidadDTO disponibilidadDTO = new HabitacionDisponibilidadDTO();
             HabitacionDTO habDTO = new HabitacionDTO();
 
+            // Mapeo básico de la habitación
             habDTO.setIdHabitacion(h.getIdHabitacion());
             habDTO.setNumero(h.getNumero());
             habDTO.setPrecio(h.getPrecio());
             habDTO.setCapacidad(h.getCapacidad());
-
-            // Manejo seguro del Enum TipoHabitacion
             try {
                 if (h.getDetalles() != null) {
                     habDTO.setTipoHabitacion(TipoHabitacion.valueOf(h.getDetalles().toUpperCase()));
@@ -130,41 +129,40 @@ public class ReservaService implements IReservaService {
             } catch (Exception e) {
                 habDTO.setTipoHabitacion(null);
             }
-
             disponibilidadDTO.setHabitacion(habDTO);
 
-            // Lógica de Disponibilidad día por día
+            // Lógica día por día
             List<DisponibilidadDiaDTO> dias = new ArrayList<>();
             LocalDate fechaActual = desde;
+
+            // Convertimos el ID de la habitación actual a String limpio para comparar fácil
+            String idHabitacionActual = String.valueOf(h.getIdHabitacion()).trim();
 
             while (!fechaActual.isAfter(hasta)) {
 
                 String estadoDia = "DISPONIBLE";
                 boolean ocupada = false;
 
-                // 1. PRIORIDAD MÁXIMA: Estado Físico (Mantenimiento o Check-in recién hecho)
-                // Si la habitación dice "OCUPADA" y estamos pintando el día de HOY, es OCUPADA sí o sí.
+                // 1. PRIORIDAD MÁXIMA: Estado Físico
                 if ("MANTENIMIENTO".equals(h.getEstado())) {
                     estadoDia = "MANTENIMIENTO";
                     ocupada = true;
                 }
                 else if (fechaActual.equals(hoy) && "OCUPADA".equals(h.getEstado())) {
-                    // Forzamos el rojo si hoy la habitación está ocupada físicamente
                     estadoDia = "OCUPADA";
                     ocupada = true;
                 }
                 else {
-                    // 2. Si no es físico, buscamos en las ESTADÍAS (Historial/Futuro)
+                    // 2. ESTADÍAS
                     for (Estadia e : estadiasEnRango) {
-                        // Verificamos si la estadía pertenece a esta habitación
                         boolean esDeEstaHabitacion = e.getHabitaciones().stream()
-                                .anyMatch(habEntidad -> String.valueOf(habEntidad.getIdHabitacion()).equals(String.valueOf(h.getIdHabitacion())));
+                                .anyMatch(hab -> String.valueOf(hab.getIdHabitacion()).trim().equalsIgnoreCase(idHabitacionActual));
 
                         if (esDeEstaHabitacion) {
                             LocalDate checkInDate = e.getCheckIn().toLocalDate();
                             LocalDate checkOutDate = e.getCheckOut().toLocalDate();
 
-                            // Lógica: Fecha actual está dentro del rango (inclusive in, exclusivo out)
+                            // Si fechaActual es igual o mayor al checkIn Y menor al checkOut
                             if (!fechaActual.isBefore(checkInDate) && fechaActual.isBefore(checkOutDate)) {
                                 estadoDia = "OCUPADA";
                                 ocupada = true;
@@ -173,16 +171,18 @@ public class ReservaService implements IReservaService {
                         }
                     }
 
-                    // 3. Chequeo de RESERVAS (Solo si no está ocupada ya)
+                    // 3. RESERVAS (Solo si no está ocupada ya)
                     if (!ocupada) {
                         for (Reserva r : reservasEnRango) {
-                            boolean esDeEstaHabitacion = String.valueOf(r.getHabitacion().getIdHabitacion())
-                                    .equals(String.valueOf(h.getIdHabitacion()));
+
+                            boolean esDeEstaHabitacion = String.valueOf(r.getHabitacion().getIdHabitacion()).trim()
+                                    .equalsIgnoreCase(idHabitacionActual);
 
                             if (esDeEstaHabitacion) {
                                 LocalDate rIngreso = r.getFechaIngreso().toLocalDate();
                                 LocalDate rEgreso = r.getFechaEgreso().toLocalDate();
 
+                                // Lógica: [Ingreso, Egreso) -> El día de ingreso está ocupado, el de egreso libre
                                 if (!fechaActual.isBefore(rIngreso) && fechaActual.isBefore(rEgreso)) {
                                     ocupada = true;
                                     estadoDia = "RESERVADA";
