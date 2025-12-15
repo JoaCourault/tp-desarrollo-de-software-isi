@@ -2,18 +2,18 @@ package com.isi.desa.Dto.Direccion;
 
 public class DireccionDTO {
     // 1. Campos PRIVADOS (Buena práctica de encapsulamiento)
-    private String id;
-    private String pais;
-    private String provincia;
-    private String localidad;
+    public String id;
+    public String pais;
+    public String provincia;
+    public String localidad;
 
     // El front envía "codigoPostal", este nombre debe coincidir EXACTO
-    private String codigoPostal;
+    public String codigoPostal;
 
-    private String calle;
-    private String numero;
-    private String departamento;
-    private String piso; // String es mejor para evitar errores de conversión
+    public String calle;
+    public String numero;
+    public String departamento;
+    public int piso; // String es mejor para evitar errores de conversión
 
     public DireccionDTO() {}
 
@@ -43,6 +43,6 @@ public class DireccionDTO {
     public String getDepartamento() { return departamento; }
     public void setDepartamento(String departamento) { this.departamento = departamento; }
 
-    public String getPiso() { return piso; }
-    public void setPiso(String piso) { this.piso = piso; }
+    public int getPiso() { return piso; }
+    public void setPiso(int piso) { this.piso = piso; }
 }
