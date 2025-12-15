@@ -20,11 +20,11 @@ public class DireccionDAO implements IDireccionDAO {
     @Override
     @Transactional
     public Direccion crear(DireccionDTO direccion) {
-        if (direccion.idDireccion == null || direccion.idDireccion.isBlank()) {
-            direccion.idDireccion = java.util.UUID.randomUUID().toString();
+        if (direccion.id == null || direccion.id.isBlank()) {
+            direccion.id = java.util.UUID.randomUUID().toString();
         }
-        if (repository.existsById(direccion.idDireccion)) {
-            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.idDireccion);
+        if (repository.existsById(direccion.id)) {
+            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.id);
         }
         Direccion nueva = DireccionMapper.dtoToEntity(direccion);
         return repository.save(nueva);
@@ -48,9 +48,6 @@ public class DireccionDAO implements IDireccionDAO {
         // 3. Convertir a Entidad
         Direccion entidad = DireccionMapper.dtoToEntity(direccion);
 
-        // 4. VINCULAR CON EL HUÉSPED (Clave Foránea)
-        entidad.setIdHuesped(nuevoIdHuesped);
-
         // 5. Guardar
         repository.save(entidad);
     }
@@ -58,8 +55,8 @@ public class DireccionDAO implements IDireccionDAO {
     @Override
     @Transactional
     public Direccion modificar(DireccionDTO direccion) {
-        if (!repository.existsById(direccion.idDireccion)) {
-            throw new RuntimeException("No se encontro la direccion con ID: " + direccion.idDireccion);
+        if (!repository.existsById(direccion.id)){
+            throw new RuntimeException("No se encontro la direccion con ID: " + direccion.id);
         }
         Direccion actualizada = DireccionMapper.dtoToEntity(direccion);
         return repository.save(actualizada);
@@ -68,8 +65,8 @@ public class DireccionDAO implements IDireccionDAO {
     @Override
     @Transactional
     public Direccion eliminar(DireccionDTO direccion) {
-        Direccion existente = repository.findById(direccion.idDireccion)
-                .orElseThrow(() -> new RuntimeException("No se encontro la direccion a eliminar: " + direccion.idDireccion));
+        Direccion existente = repository.findById(direccion.id)
+                .orElseThrow(() -> new RuntimeException("No se encontro la direccion a eliminar: " + direccion.id));
         repository.delete(existente);
         return existente;
     }
@@ -77,8 +74,8 @@ public class DireccionDAO implements IDireccionDAO {
     @Override
     @Transactional(readOnly = true)
     public Direccion obtener(DireccionDTO direccion) {
-        return repository.findById(direccion.idDireccion)
-                .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.idDireccion));
+        return repository.findById(direccion.id)
+                .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.id));
     }
 
     @Override

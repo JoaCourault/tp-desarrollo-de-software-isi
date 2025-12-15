@@ -23,7 +23,7 @@ public class HuespedMapper {
         HuespedMapper.tipoDocumentoDAO = dao;
     }
     @Autowired
-    private IDireccionDAO direccionDAO;
+    private static IDireccionDAO direccionDAO;
 
     @Autowired
     @Lazy
@@ -31,7 +31,7 @@ public class HuespedMapper {
 
 
 
-    public Huesped dtoToEntity(HuespedDTO dto) {
+    public static Huesped dtoToEntity(HuespedDTO dto) {
         if (dto == null) return null;
 
         // Tipo Documento
