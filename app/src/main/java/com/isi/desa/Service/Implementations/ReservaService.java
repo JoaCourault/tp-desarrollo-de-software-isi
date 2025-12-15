@@ -19,11 +19,12 @@ import com.isi.desa.Service.Interfaces.IReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.isi.desa.Dto.Reserva.ReservaListadoDTO;
+import com.isi.desa.Service.Interfaces.Validators.IReservaValidator;
+import java.time.LocalTime;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,52 +42,42 @@ public class ReservaService implements IReservaService {
     @Autowired
     private EstadiaRepository estadiaRepository;
 
+    @Autowired
+    private IReservaValidator reservaValidator; // Inyectar Validator
+
     @Override
     @Transactional
     public void realizarReserva(CrearReservaRequestDTO request) {
 
-        // Validaciones básicas de entrada
         if (request.getReservas() == null || request.getReservas().isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos una habitación.");
         }
 
-        // --- BUCLE (Coincide con 'loop para cada Habitacion' del diagrama) ---
         for (ReservaDetalleDTO item : request.getReservas()) {
-
-            // 1. Validaciones de Fechas (Refleja la validación de UI del diagrama pero en backend)
+            // A.1 Validar coherencia de fechas (Desde < Hasta)
             if (item.getFechaDesde().isAfter(item.getFechaHasta())) {
                 throw new IllegalArgumentException("Fecha ingreso mayor a egreso en habitación " + item.getIdHabitacion());
             }
+            // A.2 Validar FECHA PASADA
             if (item.getFechaDesde().isBefore(LocalDate.now())) {
                 throw new IllegalArgumentException("No se puede reservar en una fecha anterior al día de hoy.");
             }
-
-            // 2. Buscar Habitación (Paso previo necesario para setear la relación)
+            // B. Buscar habitación
             Habitacion habitacion = habitacionRepository.findById(item.getIdHabitacion())
-                    .orElseThrow(() -> new RuntimeException("Habitación no encontrada..."));
-
-            // 3. create Reserva (Según diagrama)
+                    .orElseThrow(() -> new RuntimeException("Habitación no encontrada: " + item.getIdHabitacion()));
+            // C. Crear Reserva
             Reserva nuevaReserva = new Reserva();
 
-            // 4. Setters (Según diagrama)
-            // IMPORTANTE: NO setear ID manualmente, dejar que @GeneratedValue actúe.
-
-            // Seteo de Fechas
-            nuevaReserva.setFechaIngreso(item.getFechaDesde().atStartOfDay());
-            nuevaReserva.setFechaEgreso(item.getFechaHasta().atStartOfDay());
-
-            // Seteo de Habitación
+            nuevaReserva.setFechaIngreso(item.getFechaDesde());
+            nuevaReserva.setFechaEgreso(item.getFechaHasta());
             nuevaReserva.setHabitacion(habitacion);
 
-            // Seteo de Datos del Huésped (Diagrama: Ingresar Apellido, Nombre, Telefono)
             nuevaReserva.setNombreHuesped(request.getNombreCliente());
             nuevaReserva.setApellidoHuesped(request.getApellidoCliente());
             nuevaReserva.setTelefonoHuesped(request.getTelefonoCliente());
-
-            // 5. Guardar (RDAO -> GR: confirmacion OK)
+            // D. Guardar
             reservaDAO.guardar(nuevaReserva);
         }
-        // Fin del loop. El controlador retornará el mensaje de éxito.
     }
 
     @Override
@@ -102,7 +93,7 @@ public class ReservaService implements IReservaService {
                 desde.atStartOfDay(),
                 hasta.atTime(LocalTime.MAX)
         );
-
+        List<Reserva> reservasEnRango = reservaRepository.findReservasEnRango(desde, hasta);
         for (HabitacionResumen h : habitacionesRaw) {
 
             HabitacionDisponibilidadDTO disponibilidadDTO = new HabitacionDisponibilidadDTO();
@@ -149,13 +140,21 @@ public class ReservaService implements IReservaService {
                             LocalDate checkOutDate = e.getCheckOut().toLocalDate();
 
                             if (!fechaActual.isBefore(checkInDate) && fechaActual.isBefore(checkOutDate)) {
+                                estadoDia = "OCUPADA";
                                 ocupada = true;
                                 break;
                             }
                         }
                     }
-                    if (ocupada) {
-                        estadoDia = "RESERVADO"; // O "OCUPADA" según tu DTO
+                    if (!ocupada) {
+                        for (Reserva r : reservasEnRango) {
+                            if (r.getHabitacion().getIdHabitacion().equals(h.getIdHabitacion())) {
+                                if (!fechaActual.isBefore(r.getFechaIngreso()) && fechaActual.isBefore(r.getFechaEgreso())) {
+                                    estadoDia = "RESERVADA";
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -171,5 +170,55 @@ public class ReservaService implements IReservaService {
         }
 
         return resultado;
+    }
+
+    @Override
+    public List<ReservaListadoDTO> buscarParaCancelar(String apellido, String nombre) {
+        // 1. Validación
+        RuntimeException error = reservaValidator.validateBuscar(apellido, nombre);
+        if (error != null) throw error;
+
+        // 2. Búsqueda
+        List<Reserva> reservas = reservaDAO.buscarPorHuesped(apellido, nombre);
+
+        // 3. Mapeo a DTO (Grid)
+        List<ReservaListadoDTO> dtos = new ArrayList<>();
+        for (Reserva r : reservas) {
+            ReservaListadoDTO dto = new ReservaListadoDTO();
+            dto.idReserva = r.getIdReserva();
+            dto.apellidoHuesped = r.getApellidoHuesped();
+            dto.nombreHuesped = r.getNombreHuesped();
+            dto.fechaIngreso = r.getFechaIngreso();
+            dto.fechaEgreso = r.getFechaEgreso();
+
+            // Accedemos a la habitación relacionada
+            if (r.getHabitacion() != null) {
+                dto.numeroHabitacion = r.getHabitacion().getNumero();
+                dto.tipoHabitacion = r.getHabitacion().getDetalles();
+            }
+            dtos.add(dto);
+        }
+
+        if (dtos.isEmpty()) {
+            // Opcional: lanzar error si el requerimiento dice "Mostrar error si no hay concordancia"
+            throw new RuntimeException("No existen reservas para los criterios de búsqueda");
+        }
+
+        return dtos;
+    }
+
+    @Override
+    @Transactional
+    public void cancelarReservas(List<String> idsReservas) {
+        if (idsReservas == null || idsReservas.isEmpty()) return;
+
+        for (String id : idsReservas) {
+            // Validar existencia
+            RuntimeException error = reservaValidator.validateEliminar(id);
+            if (error != null) throw error;
+
+            // Eliminar (Esto libera la habitación automáticamente para los algoritmos de disponibilidad)
+            reservaDAO.eliminar(id);
+        }
     }
 }

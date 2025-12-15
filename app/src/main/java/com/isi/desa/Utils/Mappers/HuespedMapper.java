@@ -1,31 +1,37 @@
 package com.isi.desa.Utils.Mappers;
 
+import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
 import com.isi.desa.Dao.Interfaces.IDireccionDAO;
+import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
+import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
+import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
-import com.isi.desa.Model.Entities.Direccion.Direccion;
+import com.isi.desa.Dao.Implementations.DireccionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HuespedMapper {
-
-    private static ITipoDocumentoDAO tipoDocumentoDAO;
-    private static IDireccionDAO direccionDAO;
-
     @Autowired
+    private static ITipoDocumentoDAO tipoDocumentoDAO;
+
     public void setTipoDocumentoDAO(ITipoDocumentoDAO dao) {
         HuespedMapper.tipoDocumentoDAO = dao;
     }
+    @Autowired
+    private IDireccionDAO direccionDAO;
 
     @Autowired
-    public void setDireccionDAO(IDireccionDAO dao) {
-        HuespedMapper.direccionDAO = dao;
-    }
+    @Lazy
+    private IHuespedDAO huespedDAO;
 
-    public static Huesped dtoToEntity(HuespedDTO dto) {
+
+
+    public Huesped dtoToEntity(HuespedDTO dto) {
         if (dto == null) return null;
 
         // Tipo Documento
@@ -38,13 +44,13 @@ public class HuespedMapper {
         Direccion direccion = null;
         if (dto.direccion != null) {
             // Si tiene ID, BUSCAMOS la entidad gestionada en la BD
-            if (dto.direccion.idDireccion != null && !dto.direccion.idDireccion.isEmpty()) {
-                direccion = direccionDAO.getById(dto.direccion.idDireccion);
+            if (dto.direccion.id != null && !dto.direccion.id.isEmpty()) {
+                direccion = direccionDAO.getById(dto.direccion.id);
 
                 // Si direccion es NULL aquí, significa que falló el guardado anterior.
                 // NO creamos una nueva con ese ID, porque Hibernate fallará.
                 if (direccion == null) {
-                    throw new RuntimeException("Error interno: La dirección con ID " + dto.direccion.idDireccion + " no se encontró en la BD.");
+                    throw new RuntimeException("Error interno: La dirección con ID " + dto.direccion.id + " no se encontró en la BD.");
                 }
             } else {
                 // Solo si NO tiene ID creamos una nueva (caso raro en update)
@@ -93,7 +99,7 @@ public class HuespedMapper {
         }
 
         if (entity.getDireccion() != null) {
-            // CORRECCIÓN: Llamamos al método con mayúsculas "DTO"
+
             dto.direccion = DireccionMapper.entityToDTO(entity.getDireccion());
         }
 

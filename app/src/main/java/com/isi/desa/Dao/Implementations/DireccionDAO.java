@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DireccionDAO implements IDireccionDAO {
-
     @Autowired
     private DireccionRepository repository;
 
@@ -28,6 +28,31 @@ public class DireccionDAO implements IDireccionDAO {
         }
         Direccion nueva = DireccionMapper.dtoToEntity(direccion);
         return repository.save(nueva);
+    }
+
+    // --- EL MÉTODO QUE TE FALTABA ---
+    @Transactional
+    public void crear(DireccionDTO direccion, String nuevoIdHuesped) {
+        if (direccion == null) return;
+
+        // 1. Generar ID si no viene
+        if (direccion.getId() == null || direccion.getId().isBlank()) {
+            direccion.setId("DIR-" + UUID.randomUUID().toString().substring(0, 8));
+        }
+
+        // 2. Validar duplicados si es necesario
+        if (repository.existsById(direccion.getId())) {
+            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.getId());
+        }
+
+        // 3. Convertir a Entidad
+        Direccion entidad = DireccionMapper.dtoToEntity(direccion);
+
+        // 4. VINCULAR CON EL HUÉSPED (Clave Foránea)
+        entidad.setIdHuesped(nuevoIdHuesped);
+
+        // 5. Guardar
+        repository.save(entidad);
     }
 
     @Override
@@ -56,8 +81,6 @@ public class DireccionDAO implements IDireccionDAO {
                 .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.idDireccion));
     }
 
-    // --- ESTE ES EL MÉTODO QUE TE FALTABA ---
-    // Usamos el mismo repository que en los otros métodos.
     @Override
     @Transactional(readOnly = true)
     public Direccion getById(String id) {

@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class HuespedService implements IHuespedService {
@@ -31,7 +33,6 @@ public class HuespedService implements IHuespedService {
     @Autowired
     private IHuespedDAO dao;
 
-    // INYECCIÓN CORRECTA DEL DAO DE DIRECCIÓN
     @Autowired
     private DireccionDAO direccionDAO;
 
@@ -42,7 +43,7 @@ public class HuespedService implements IHuespedService {
     }
 
     @Override
-    @Transactional // <--- ¡OBLIGATORIO PARA QUE FUNCIONE!
+    @Transactional
     public HuespedDTO crear(HuespedDTO huespedDTO, Boolean aceptarIgualmente) throws HuespedDuplicadoException {
         // 1. Validación
         CannotCreateHuespedException validation = this.validator.validateCreate(huespedDTO);
@@ -70,13 +71,13 @@ public class HuespedService implements IHuespedService {
 
         // 3. Persistencia de Dirección
         if (huespedDTO.direccion != null) {
-            // CORRECCIÓN: Quitamos el try-catch que ocultaba errores.
+
             // Si falla guardar la dirección, debe fallar todo.
             Direccion dirGuardada = direccionDAO.crear(huespedDTO.direccion);
 
             // Aseguramos que el DTO tenga el ID correcto para que el Mapper lo encuentre
             if (dirGuardada != null) {
-                huespedDTO.direccion.idDireccion = dirGuardada.getIdDireccion();
+                huespedDTO.direccion.id = dirGuardada.getIdDireccion();
             }
         }
 
@@ -86,8 +87,6 @@ public class HuespedService implements IHuespedService {
         return HuespedMapper.entityToDTO(creado);
     }
 
-    // ... (Mantén el resto de métodos: crear(sobrecarga), eliminar, buscar, modificar igual que antes) ...
-    // Solo estoy abreviando aquí para no llenar la pantalla, pero copia tus métodos anteriores debajo.
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
         return crear(huespedDTO, false);
@@ -118,11 +117,11 @@ public class HuespedService implements IHuespedService {
         return res;
     }
 
-
     @Override
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO req) {
         BuscarHuespedResultDTO res = new BuscarHuespedResultDTO();
         res.resultado = new Resultado();
+        // Inicializamos la lista para evitar NullPointer
         res.huespedesEncontrados = new ArrayList<>();
 
         // proteger contra req o filtro nulos
@@ -131,21 +130,21 @@ public class HuespedService implements IHuespedService {
 
         if (filtro == null) {
             // si no hay filtro, devolvemos todos
-            res.huespedesEncontrados = todos.stream().map(HuespedMapper::entityToDTO).toList();
+            res.huespedesEncontrados = todos;
             res.resultado.id = 0;
             res.resultado.mensaje = "OK";
             return res;
         }
 
-        // Validar si hay algún campo de búsqueda, protegiendo contra nulls
+        // Si el usuario no completa NADA → devolver todos
         boolean algunCampo =
                 (filtro.nombre != null && !filtro.nombre.isEmpty()) ||
                         (filtro.apellido != null && !filtro.apellido.isEmpty()) ||
-                        (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null) || // CORRECCIÓN AQUÍ
+                        (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null) ||
                         (filtro.numDoc != null && !filtro.numDoc.isEmpty());
 
         if (!algunCampo) {
-            res.huespedesEncontrados = todos.stream().map(HuespedMapper::entityToDTO).toList();
+            res.huespedesEncontrados = todos;
             res.resultado.id = 0;
             res.resultado.mensaje = "OK";
             return res;
@@ -166,7 +165,7 @@ public class HuespedService implements IHuespedService {
                 else { coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase()); }
             }
 
-            // CORRECCIÓN AQUÍ: Verificar filtro.tipoDoc != null antes de acceder a sus propiedades
+            // Verificar filtro.tipoDoc != null antes de acceder a sus propiedades
             if (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null) {
                 coincide &= (
                         h.getTipoDoc() != null &&
@@ -179,7 +178,7 @@ public class HuespedService implements IHuespedService {
                 else { coincide &= h.getNumDoc().equalsIgnoreCase(filtro.numDoc); }
             }
 
-            if (coincide) res.huespedesEncontrados.add(HuespedMapper.entityToDTO(h));
+            if (coincide) res.huespedesEncontrados.add(h);
         }
 
         res.resultado.id = 0;
@@ -217,7 +216,7 @@ public class HuespedService implements IHuespedService {
                             h.getIdHuesped() != null &&
                                     !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) &&
                                     h.getTipoDoc() != null &&
-                                    dto.tipoDoc != null && // CORRECCIÓN: Seguridad extra
+                                    dto.tipoDoc != null &&
                                     dto.tipoDoc.tipoDocumento != null &&
                                     h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(dto.tipoDoc.tipoDocumento) &&
                                     h.getNumDoc().equals(dto.numDoc)
@@ -251,5 +250,10 @@ public class HuespedService implements IHuespedService {
             res.resultado.mensaje = "Error interno al modificar huesped: " + e.getMessage();
             return res;
         }
+    }
+
+    @Override
+    public Huesped getById(String id) {
+        return dao.getById(id);
     }
 }

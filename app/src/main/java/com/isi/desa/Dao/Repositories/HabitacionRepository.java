@@ -4,7 +4,9 @@ import com.isi.desa.Model.Entities.Habitacion.Habitacion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface HabitacionRepository extends JpaRepository<Habitacion, String> {
 
     @Query(value = "SELECT h.id_habitacion as idHabitacion, h.numero, h.precio, " +

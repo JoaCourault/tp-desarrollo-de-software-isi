@@ -16,7 +16,7 @@ public class HabitacionDTO {
     public Integer capacidad;
     public String detalles;
     public TipoHabitacion tipoHabitacion;
-
+    private Integer cantidadCamasIndividual;
     public Integer cantidadCamasDobles;
     public Integer cantidadCamasKingSize;
 
@@ -44,38 +44,6 @@ public class HabitacionDTO {
         this.numero = numero;
     }
 
-    public Integer getPiso() {
-        return piso;
-    }
-
-    public void setPiso(Integer piso) {
-        this.piso = piso;
-    }
-
-    public EstadoHabitacion getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoHabitacion estado) {
-        this.estado = estado;
-    }
-
-    public Integer getCapacidad() {
-        return capacidad;
-    }
-
-    public void setCapacidad(Integer capacidad) {
-        this.capacidad = capacidad;
-    }
-
-    public String getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(String detalles) {
-        this.detalles = detalles;
-    }
-
     public TipoHabitacion getTipoHabitacion() {
         return tipoHabitacion;
     }
@@ -84,19 +52,24 @@ public class HabitacionDTO {
         this.tipoHabitacion = tipoHabitacion;
     }
 
-    public Integer getCantidadCamasDobles() {
-        return cantidadCamasDobles;
-    }
+    public Integer getPiso() { return piso; }
+    public void setPiso(Integer piso) { this.piso = piso; }
 
-    public void setCantidadCamasDobles(Integer cantidadCamasDobles) {
-        this.cantidadCamasDobles = cantidadCamasDobles;
-    }
+    public EstadoHabitacion getEstado() { return estado; }
+    public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
 
-    public Integer getCantidadCamasKingSize() {
-        return cantidadCamasKingSize;
-    }
+    public Integer getCapacidad() { return capacidad; }
+    public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
 
-    public void setCantidadCamasKingSize(Integer cantidadCamasKingSize) {
-        this.cantidadCamasKingSize = cantidadCamasKingSize;
-    }
+    public String getDetalles() { return detalles; }
+    public void setDetalles(String detalles) { this.detalles = detalles; }
+
+    public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
+    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
+
+    public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
+    public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
+
+    public Integer getCantidadCamasKingSize() { return cantidadCamasKingSize; }
+    public void setCantidadCamasKingSize(Integer cantidadCamasKingSize) { this.cantidadCamasKingSize = cantidadCamasKingSize; }
 }

@@ -1,7 +1,6 @@
 package com.isi.desa.Model.Entities.Direccion;
 
-import com.isi.desa.Model.Entities.Huesped.Huesped;
-import com.isi.desa.Model.Entities.ResponsableDePago.PersonaJuridica;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -13,20 +12,28 @@ public class Direccion {
     @GenericGenerator(name = "id_direccion", strategy = "uuid2")
     @Column(name = "id_direccion", updatable = false, nullable = false)
     private String idDireccion;
+
     @Column(name = "calle")
     private String calle;
+
     @Column(name = "numero")
     private String numero;
+
     @Column(name = "depto")
     private String departamento;
+
     @Column(name = "piso")
     private Integer piso;
+
     @Column(name = "cp")
     private String cp;
+
     @Column(name = "localidad")
     private String localidad;
+
     @Column(name = "provincia")
     private String provincia;
+
     @Column(name = "pais")
     private String pais;
 
@@ -71,6 +78,7 @@ public class Direccion {
     public String getIdDireccion() {
         return idDireccion;
     }
+
     public void setIdDireccion(String idDireccion) {
         this.idDireccion = idDireccion;
     }
