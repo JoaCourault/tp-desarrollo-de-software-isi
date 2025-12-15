@@ -15,9 +15,9 @@ import java.util.Optional;
 
 @Service
 public class EstadiaDAO implements IEstadiaDAO {
+
     @Autowired
     private EstadiaRepository estadiaRepository;
-
 
     @Override
     @Transactional
@@ -45,6 +45,6 @@ public class EstadiaDAO implements IEstadiaDAO {
 
     @Override
     public List<Estadia> findByIdHabitacionAndMoment(String idHabitacion, LocalDateTime moment) {
-        return List.of();
+        return estadiaRepository.findByHabitacionAndMoment(idHabitacion, moment);
     }
 }

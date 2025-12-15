@@ -43,7 +43,7 @@ public class Huesped {
     @Column(name = "eliminado")
     private boolean eliminado;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_direccion", referencedColumnName = "id_direccion")
     private Direccion direccion;
 

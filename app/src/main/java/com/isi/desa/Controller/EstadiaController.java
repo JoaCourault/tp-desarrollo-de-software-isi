@@ -28,7 +28,10 @@ public class EstadiaController {
             return ResponseEntity.badRequest().body(error);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error interno al realizar Check-In");
+            Resultado error = new Resultado();
+            error.id = 500;
+            error.mensaje = "Error interno: " + e.getMessage();
+            return ResponseEntity.internalServerError().body(error);
         }
     }
 }

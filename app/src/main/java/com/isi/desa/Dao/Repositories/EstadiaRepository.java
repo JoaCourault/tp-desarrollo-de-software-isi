@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EstadiaRepository extends JpaRepository<Estadia, String> {
@@ -25,4 +26,6 @@ public interface EstadiaRepository extends JpaRepository<Estadia, String> {
     @Query("SELECT e FROM Estadia e WHERE e.checkIn <= :hasta AND e.checkOut >= :desde")
     List<Estadia> findEstadiasEnRango(@Param("desde") LocalDateTime desde,
                                       @Param("hasta") LocalDateTime hasta);
+
+    Optional<Estadia> findTopByOrderByIdEstadiaDesc();
 }
