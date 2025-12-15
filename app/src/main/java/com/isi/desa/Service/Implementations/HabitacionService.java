@@ -71,12 +71,12 @@ public class HabitacionService implements IHabitacionService {
         // Usamos un Map para asegurar que cada ID aparezca una sola vez.
         Map<String, HabitacionDTO> mapaUnico = todas.stream()
                 .collect(Collectors.toMap(
-                        h -> h.idHabitacion,  // Clave: ID de habitación
-                        h -> h,               // Valor: El DTO
+                        h -> h.idHabitacion,  //ID de habitación
+                        h -> h,               // El DTO
                         (existente, nuevo) -> existente // Si se repite, nos quedamos con el primero
                 ));
 
-        // Convertimos de nuevo a lista y ordenamos por número (opcional, para prolijidad)
+        // Convertimos de nuevo a lista y ordenamos por número
         List<HabitacionDTO> habitacionesUnicas = new ArrayList<>(mapaUnico.values());
         habitacionesUnicas.sort((h1, h2) -> {
             if (h1.numero != null && h2.numero != null) return h1.numero.compareTo(h2.numero);

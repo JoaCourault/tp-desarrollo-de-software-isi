@@ -37,22 +37,25 @@ public class ReservaDAO implements IReservaDAO {
     @Override
     @Transactional
     public Reserva crear(ReservaDTO dto) {
+        System.out.println(">>> INICIANDO CREACION DE RESERVA"); // DEBUG
 
         Reserva reserva = ReservaMapper.dtoToEntity(dto);
 
-        // generar ID si no vino
         if (reserva.getIdReserva() == null || reserva.getIdReserva().isBlank()) {
             long count = reservaRepo.count();
             reserva.setIdReserva(String.format("RES-%03d", count + 1));
         }
 
-        // relacion habitacion
         HabitacionEntity hab = habitacionRepo.findById(dto.idHabitacion)
                 .orElseThrow(() -> new RuntimeException("Habitación no encontrada: " + dto.idHabitacion));
 
         reserva.setHabitacion(hab);
 
-        return reservaRepo.save(reserva);
+        System.out.println(">>> INTENTANDO GUARDAR EN REPO..."); // DEBUG
+        Reserva saved = reservaRepo.save(reserva);
+        System.out.println(">>> GUARDADO EXITOSO."); // DEBUG
+
+        return saved;
     }
 
     // ===============================================================

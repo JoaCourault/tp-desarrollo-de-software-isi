@@ -1,13 +1,10 @@
 package com.isi.desa.Service.Implementations;
 
-// Asegúrate de importar la Interfaz o la Clase de DireccionDAO según corresponda
-import com.isi.desa.Dao.Implementations.DireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.*;
 import com.isi.desa.Dto.Resultado;
 import com.isi.desa.Exceptions.Huesped.CannotCreateHuespedException;
 import com.isi.desa.Exceptions.Huesped.CannotModifyHuespedEsception;
-import com.isi.desa.Exceptions.Huesped.HuespedDuplicadoException;
 import com.isi.desa.Exceptions.Huesped.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Service.Interfaces.IHuespedService;
@@ -27,60 +24,76 @@ public class HuespedService implements IHuespedService {
     private IHuespedValidator validator;
 
     @Autowired
-    @Qualifier("huespedDAO") // CORRECCIÓN: Resuelve la ambigüedad del Bean
+    @Qualifier("huespedDAO")
     private IHuespedDAO dao;
 
-    @Autowired // CORRECCIÓN: Inyección de dependencia en lugar de 'new'
-    private DireccionDAO direccionDAO;
-
-    // CORRECCIÓN: Se eliminó el patrón Singleton manual (getInstance) porque Spring ya es Singleton.
-
     @Override
-    public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
+    public AltaHuespedResultDTO crear(AltaHuespedRequestDTO request) {
+        AltaHuespedResultDTO response = new AltaHuespedResultDTO();
+        response.resultado = new Resultado();
 
-        // Validación básica
-        CannotCreateHuespedException validation = this.validator.validateCreate(huespedDTO);
-        if (validation != null) {
-            throw validation;
-        }
-
-        // Validación de duplicados (Optimización: Se podría mover a una Query en el Repo)
-        boolean duplicado = dao.leerHuespedes().stream()
-                .filter(h -> h != null && !h.isEliminado())
-                .anyMatch(h ->
-                        h.getTipoDocumento() != null &&
-                                huespedDTO.tipoDocumento != null &&
-                                huespedDTO.tipoDocumento.tipoDocumento != null &&
-                                h.getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
-                                h.getNumDoc() != null &&
-                                h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
-                );
-
-        if (duplicado) {
-            throw new HuespedDuplicadoException(
-                    "Ya existe un huésped con ese tipo y número de documento."
-            );
-        }
-
-        // Persistencia de Dirección (Usando el Bean inyectado)
         try {
-            direccionDAO.obtener(huespedDTO.direccion);
+            // 1. Validar request
+            if (request == null || request.huesped == null) {
+                response.resultado.id = 2;
+                response.resultado.mensaje = "Datos de huésped no proporcionados.";
+                return response;
+            }
+
+            HuespedDTO huespedDTO = request.huesped;
+
+            // 2. Validaciones de negocio (Campos obligatorios)
+            CannotCreateHuespedException validationError = this.validator.validateCreate(huespedDTO);
+            if (validationError != null) {
+                response.resultado.id = 2;
+                response.resultado.mensaje = validationError.getMessage();
+                return response;
+            }
+
+            // 3. Chequeo de DUPLICADOS
+            boolean duplicado = dao.leerHuespedes().stream()
+                    .filter(h -> h != null && !h.isEliminado())
+                    .anyMatch(h ->
+                            h.getTipoDocumento() != null &&
+                                    huespedDTO.tipoDocumento != null &&
+                                    huespedDTO.tipoDocumento.tipoDocumento != null &&
+                                    h.getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDocumento.tipoDocumento) &&
+                                    h.getNumDoc() != null &&
+                                    h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
+                    );
+
+            // --- LÓGICA DE ADVERTENCIA ---
+            if (duplicado) {
+                // Si es duplicado Y NO confirmaron la acción -> Devolvemos ADVERTENCIA (id=3)
+                if (request.aceptarIgualmente == null || !request.aceptarIgualmente) {
+                    response.resultado.id = 3; // 3 = Warning
+                    response.resultado.mensaje = "Ya existe un huésped con ese tipo y número de documento. ¿Desea crearlo de todos modos?";
+                    return response;
+                }
+                // Si request.aceptarIgualmente es TRUE, el código sigue y crea el registro.
+            }
+
+            // 4. Persistencia
+            // El DAO maneja la creación (y la dirección por Cascade)
+            Huesped creado = dao.crear(huespedDTO);
+
+            // 5. Respuesta Éxito
+            response.huesped = HuespedMapper.entityToDTO(creado);
+            response.resultado.id = 0; // 0 = Éxito
+            response.resultado.mensaje = "Huésped creado exitosamente.";
+
         } catch (Exception e) {
-            direccionDAO.crear(huespedDTO.direccion);
+            response.resultado.id = 1; // Error interno
+            response.resultado.mensaje = "Error interno al crear huésped: " + e.getMessage();
         }
 
-        // Persistencia del huésped
-        Huesped creado = dao.crear(huespedDTO);
-
-        return HuespedMapper.entityToDTO(creado);
+        return response;
     }
-
 
     @Override
     public BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO requestDTO) {
         BajaHuespedResultDTO res = new BajaHuespedResultDTO();
         res.resultado = new Resultado();
-
         res.resultado.id = 0;
         res.resultado.mensaje = "Huesped eliminado exitosamente.";
 
@@ -94,14 +107,13 @@ public class HuespedService implements IHuespedService {
         Huesped eliminado = dao.eliminar(requestDTO.idHuesped);
         if (eliminado == null) {
             res.resultado.id = 1;
-            res.resultado.mensaje = "No se pudo eliminar el huesped.";
+            res.resultado.mensaje = "No se pudo eliminar el huesped (puede que no exista).";
             return res;
         }
 
         res.huesped = HuespedMapper.entityToDTO(eliminado);
         return res;
     }
-
 
     @Override
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO req) {
@@ -165,7 +177,6 @@ public class HuespedService implements IHuespedService {
         return res;
     }
 
-
     @Override
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
         ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
@@ -193,7 +204,7 @@ public class HuespedService implements IHuespedService {
                     .filter(h -> h != null && !h.isEliminado())
                     .anyMatch(h ->
                             h.getIdHuesped() != null &&
-                                    !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) &&
+                                    !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) && // No soy yo mismo
                                     h.getTipoDocumento() != null &&
                                     dto.tipoDocumento != null &&
                                     h.getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
@@ -229,4 +240,6 @@ public class HuespedService implements IHuespedService {
             return res;
         }
     }
+
+    
 }

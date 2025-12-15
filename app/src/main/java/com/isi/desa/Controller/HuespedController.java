@@ -46,36 +46,28 @@ public class HuespedController {
     }
 
     @PostMapping("/Alta")
-    public AltaHuespedResultDTO altaHuesped(@RequestBody AltaHuesperRequestDTO requestDTO) {
-        AltaHuespedResultDTO res = new AltaHuespedResultDTO();
-
+    public AltaHuespedResultDTO altaHuesped(@RequestBody AltaHuespedRequestDTO requestDTO) {
         try {
-            // alta del huesped
-            HuespedDTO creado = this.service.crear(requestDTO.huesped);
 
-            res.resultado.id = 0;
-            res.resultado.mensaje = "Huesped dado de alta exitosamente.";
-            res.huesped = creado;
+            return this.service.crear(requestDTO);
 
         } catch (CannotCreateHuespedException e) {
-            // errores de validación normales
+            AltaHuespedResultDTO res = new AltaHuespedResultDTO();
+            res.resultado = new Resultado();
             res.resultado.id = 2;
             res.resultado.mensaje = e.getMessage();
-
-        } catch (HuespedDuplicadoException e) {
-            // esto es cuando ya existe un tipoDoc + numDoc igual
-            res.resultado.id = 2;
-            res.resultado.mensaje = e.getMessage();
+            return res;
 
         } catch (Exception e) {
-            // error inesperado
             this.logger.error("Error en altaHuesped: " + e.getMessage(), e);
+            AltaHuespedResultDTO res = new AltaHuespedResultDTO();
+            res.resultado = new Resultado();
             res.resultado.id = 1;
-            res.resultado.mensaje = "Ocurrio un error interno al realizar el alta del huesped.";
+            res.resultado.mensaje = "Ocurrió un error interno al realizar el alta del huésped.";
+            return res;
         }
-
-        return res;
     }
+
 
     public ModificarHuespedResultDTO modificarHuesped(ModificarHuespedRequestDTO requestDTO) {
         try {

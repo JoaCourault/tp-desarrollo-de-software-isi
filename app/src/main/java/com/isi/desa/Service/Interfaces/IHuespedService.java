@@ -4,7 +4,7 @@ import com.isi.desa.Dto.Huesped.*;
 import com.isi.desa.Exceptions.Huesped.HuespedDuplicadoException;
 
 public interface IHuespedService{
-    HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException;
+    AltaHuespedResultDTO crear(AltaHuespedRequestDTO huespedDTO);
     BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO huespedDTO);
     BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO requestDTO);
     ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO requestDTO);

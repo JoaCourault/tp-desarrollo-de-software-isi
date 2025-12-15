@@ -11,7 +11,7 @@ import java.util.List;
 @Table(name = "habitacion")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Todos los hijos en la misma tabla
 @DiscriminatorColumn(name = "tipo_habitacion", discriminatorType = DiscriminatorType.STRING) // Columna que decide la clase
-public abstract class HabitacionEntity { // <--- CLASE ABSTRACTA
+public abstract class HabitacionEntity {
 
     @Id
     @Column(name = "id_habitacion")

@@ -2,105 +2,40 @@ package com.isi.desa.Service.Implementations.Validators;
 
 import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
-import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Service
+@Component
 public class DireccionValidator implements IDireccionValidator {
 
-    public DireccionValidator() {
-        // Constructor público vacío para Spring
-    }
-
-    public static DireccionValidator getInstance() {
-        return new DireccionValidator();
-    }
-
     @Override
-    public Direccion create(DireccionDTO direccionDTO) {
-        InvalidDirectionException validationError = validate(direccionDTO);
-        if (validationError != null) throw validationError;
-
-        return new Direccion(
-                direccionDTO.id,
-                direccionDTO.calle,
-                direccionDTO.numero,
-                direccionDTO.departamento,
-                direccionDTO.piso,
-                direccionDTO.codigoPostal,
-                direccionDTO.pais,
-                direccionDTO.provincia,
-                direccionDTO.localidad
-        );
-    }
-
-    @Override
-    public InvalidDirectionException validate(DireccionDTO direccionDTO) {
-
-        if (direccionDTO == null) {
-            return new InvalidDirectionException("La direccion no puede ser nula");
+    public RuntimeException validate(DireccionDTO dto) {
+        if (dto == null) {
+            return new InvalidDirectionException("La dirección no puede ser nula.");
         }
 
-        List<RuntimeException> errores = new ArrayList<>();
-        String error;
+        List<String> errores = new ArrayList<>();
 
-        if ((error = validatePais(direccionDTO.pais)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateProvincia(direccionDTO.provincia)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateLocalidad(direccionDTO.localidad)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateCodigoPostal(direccionDTO.codigoPostal)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateCalle(direccionDTO.calle)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateNumero(direccionDTO.numero)) != null) {
-            errores.add(new InvalidDirectionException(error));
+        if (isNullOrEmpty(dto.calle)) errores.add("La calle es obligatoria.");
+        if (isNullOrEmpty(dto.numero)) errores.add("El número es obligatorio.");
+        if (isNullOrEmpty(dto.codigoPostal)) errores.add("El código postal es obligatorio.");
+        if (isNullOrEmpty(dto.localidad)) errores.add("La localidad es obligatoria.");
+        if (isNullOrEmpty(dto.provincia)) errores.add("La provincia es obligatoria.");
+        if (isNullOrEmpty(dto.pais)) errores.add("El país es obligatorio.");
+
+        if (!errores.isEmpty()) {
+            String mensaje = errores.stream().collect(Collectors.joining(", "));
+            return new InvalidDirectionException(mensaje);
         }
 
-        if (!errores.isEmpty()) return new InvalidDirectionException(
-                errores.stream()
-                        .map(RuntimeException::getMessage)
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse("")
-        );
-
-        return null;
+        return null; // Todo OK
     }
 
-    private String validatePais(String pais) {
-        return (pais == null || pais.trim().isEmpty()) ? "El pais es obligatorio" : null;
-    }
-
-    private String validateProvincia(String provincia) {
-        return (provincia == null || provincia.trim().isEmpty()) ? "La provincia es obligatoria" : null;
-    }
-
-    private String validateLocalidad(String localidad) {
-        return (localidad == null || localidad.trim().isEmpty()) ? "La localidad es obligatoria" : null;
-    }
-
-    private String validateCodigoPostal(String codigoPostal) {
-        // CORREGIDO: Antes tenías !codigoPostal.isEmpty() (Si NO está vacío = error).
-        // AHORA: Si es null O está vacío = error.
-        return (codigoPostal == null || codigoPostal.trim().isEmpty()) ? "El codigo postal es obligatorio y debe ser positivo" : null;
-    }
-
-    private String validateCalle(String calle) {
-        return (calle == null || calle.trim().isEmpty()) ? "La calle es obligatoria" : null;
-    }
-
-    private String validateNumero(String numero) {
-        // CORREGIDO: Igual que el CP, eliminamos el '!' y agregamos trim().
-        return (numero == null || numero.trim().isEmpty()) ? "El numero es obligatorio y debe ser positivo" : null;
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
     }
 }

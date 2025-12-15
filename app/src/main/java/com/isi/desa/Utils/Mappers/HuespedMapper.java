@@ -1,6 +1,5 @@
 package com.isi.desa.Utils.Mappers;
 
-import com.isi.desa.Dao.Interfaces.IDireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
@@ -18,51 +17,26 @@ import java.util.Collections;
 @Component
 public class HuespedMapper {
 
-    // Variables estáticas para uso interno en métodos estáticos
     private static ITipoDocumentoDAO staticTipoDocumentoDAO;
-    private static IDireccionDAO staticDireccionDAO;
     private static IHuespedDAO staticHuespedDAO;
 
+    @Autowired private ITipoDocumentoDAO tipoDocumentoDAO;
+    @Autowired @Lazy private IHuespedDAO huespedDAO;
 
-    @Autowired
-    private ITipoDocumentoDAO tipoDocumentoDAO;
-
-    @Autowired
-    private IDireccionDAO direccionDAO;
-
-    @Autowired
-    @Lazy // Usamos Lazy para evitar referencia circular (HuespedDAO -> Mapper -> HuespedDAO)
-    private IHuespedDAO huespedDAO;
-
-    // 3. Este método se ejecuta al iniciar Spring y copia los beans a las variables estáticas
     @PostConstruct
     public void init() {
         staticTipoDocumentoDAO = this.tipoDocumentoDAO;
-        staticDireccionDAO = this.direccionDAO;
         staticHuespedDAO = this.huespedDAO;
     }
 
-    //  MÉTODOS ESTÁTICOS
-
     public static HuespedDTO entityToDTO(Huesped h) {
         if (h == null) return null;
-
-        TipoDocumentoDTO tipoDocDto = null;
-        // Usamos la variable estática ya inicializada
-        if (h.getTipoDocumento() != null) {
-            TipoDocumento tdEntity = staticTipoDocumentoDAO.obtener(h.getTipoDocumento());
-            if (tdEntity != null) {
-                tipoDocDto = new TipoDocumentoDTO();
-                tipoDocDto.tipoDocumento = tdEntity.getTipoDocumento();
-            }
-        }
 
         HuespedDTO dto = new HuespedDTO();
         dto.idHuesped = h.getIdHuesped();
         dto.nombre = h.getNombre();
         dto.apellido = h.getApellido();
         dto.numDoc = h.getNumDoc();
-        dto.tipoDocumento = tipoDocDto;
         dto.cuit = h.getCuit();
         dto.posicionIva = h.getPosicionIva();
         dto.fechaNacimiento = h.getFechaNac();
@@ -72,19 +46,18 @@ public class HuespedMapper {
         dto.nacionalidad = h.getNacionalidad();
         dto.eliminado = h.isEliminado();
 
-        // Direccion
-        try {
-            Direccion dEntity = staticDireccionDAO.obtenerDireccionDeHuespedPorId(h.getIdHuesped());
-            if (dEntity != null) {
-                dto.direccion = DireccionMapper.entityToDto(dEntity);
-            } else {
-                dto.direccion = null;
+        if (h.getTipoDocumento() != null) {
+            TipoDocumento tdEntity = staticTipoDocumentoDAO.obtener(h.getTipoDocumento());
+            if (tdEntity != null) {
+                dto.tipoDocumento = new TipoDocumentoDTO();
+                dto.tipoDocumento.tipoDocumento = tdEntity.getTipoDocumento();
             }
-        } catch (Exception e) {
-            dto.direccion = null;
         }
 
-        // Estadias
+        if (h.getDireccion() != null) {
+            dto.direccion = DireccionMapper.entityToDto(h.getDireccion());
+        }
+
         try {
             dto.estadias = EstadiaMapper.entityListToDtoList(staticHuespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
         } catch (Exception e) {
@@ -98,7 +71,7 @@ public class HuespedMapper {
         if (dto == null) return null;
 
         Huesped h = new Huesped();
-        h.setIdHuesped(dto.idHuesped);
+        h.setIdHuesped(dto.idHuesped); // El ID se setea en el DAO si es null
         h.setNombre(dto.nombre);
         h.setApellido(dto.apellido);
         h.setNumDoc(dto.numDoc);
@@ -111,16 +84,13 @@ public class HuespedMapper {
         h.setNacionalidad(dto.nacionalidad);
         h.setEliminado(dto.eliminado);
 
-        // TipoDocumento
         if (dto.tipoDocumento != null && dto.tipoDocumento.tipoDocumento != null) {
-            String tipoDocId = dto.tipoDocumento.tipoDocumento;
-            // Validamos que exista antes de asignarlo, o asignamos el ID directo
-            TipoDocumento td = staticTipoDocumentoDAO.obtener(tipoDocId);
-            if (td != null) {
-                h.setTipoDocumento(td.getTipoDocumento());
-            } else {
-                h.setTipoDocumento(tipoDocId);
-            }
+            h.setTipoDocumento(dto.tipoDocumento.tipoDocumento);
+        }
+
+        if (dto.direccion != null) {
+            Direccion dirEntity = DireccionMapper.dtoToEntity(dto.direccion);
+            h.setDireccion(dirEntity);
         }
 
         return h;

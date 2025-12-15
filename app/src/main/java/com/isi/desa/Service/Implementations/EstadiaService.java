@@ -52,9 +52,8 @@ public class EstadiaService implements IEstadiaService {
         }
 
         // Acumuladores
-        Float valorTotalAcumulado = 0.0f;
+        Float valorTotalAcumulado = 0f;
         List<String> habitacionesIdsParaEstadia = new ArrayList<>();
-
         // Usamos un Set para evitar duplicados si la misma persona está en varias habitaciones (raro, pero posible)
         Set<String> todosLosOcupantesIds = new HashSet<>();
 
@@ -83,7 +82,7 @@ public class EstadiaService implements IEstadiaService {
                 }
             }
 
-            // B. Buscar Reserva (Lógica existente)
+            // B. Buscar Reserva
             if (idReservaEncontrada == null) {
                 List<Reserva> reservas = reservaRepository.findReservasEnRango(
                         habDTO.idHabitacion,
