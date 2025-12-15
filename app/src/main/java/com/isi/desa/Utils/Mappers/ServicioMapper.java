@@ -5,10 +5,18 @@ import com.isi.desa.Model.Entities.Servicio.Bar;
 import com.isi.desa.Model.Entities.Servicio.LavadoYPlanchado;
 import com.isi.desa.Model.Entities.Servicio.Sauna;
 import com.isi.desa.Model.Entities.Servicio.Servicio;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
 public class ServicioMapper {
-    public static ServicioDTO entityToDto(Servicio entity) {
+
+    public ServicioDTO entityToDto(Servicio entity) {
         if (entity == null) return null;
+
         if (entity instanceof Bar bar) {
             ServicioDTO.BarDTO dto = new ServicioDTO.BarDTO();
             dto.id = bar.getId();
@@ -34,8 +42,9 @@ public class ServicioMapper {
         return null;
     }
 
-    public static Servicio dtoToEntity(ServicioDTO dto) {
+    public Servicio dtoToEntity(ServicioDTO dto) {
         if (dto == null) return null;
+
         if (dto instanceof ServicioDTO.BarDTO barDto) {
             Bar entity = new Bar();
             entity.setId(barDto.id);
@@ -61,20 +70,13 @@ public class ServicioMapper {
         return null;
     }
 
-    public static java.util.List<ServicioDTO> listaEntityToDto(java.util.List<Servicio> entities) {
-        if (entities == null) return null;
-        java.util.List<ServicioDTO> dtos = new java.util.ArrayList<>();
-        for (Servicio entity : entities) {
-            dtos.add(entityToDto(entity));
-        }
-        return dtos;
+    public List<ServicioDTO> listaEntityToDto(List<Servicio> entities) {
+        if (entities == null) return new ArrayList<>();
+        return entities.stream().map(this::entityToDto).collect(Collectors.toList());
     }
-    public static java.util.List<Servicio> listaDtoToEntity(java.util.List<ServicioDTO> dtos) {
-        if (dtos == null) return null;
-        java.util.List<Servicio> entities = new java.util.ArrayList<>();
-        for (ServicioDTO dto : dtos) {
-            entities.add(dtoToEntity(dto));
-        }
-        return entities;
+
+    public List<Servicio> listaDtoToEntity(List<ServicioDTO> dtos) {
+        if (dtos == null) return new ArrayList<>();
+        return dtos.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
 }

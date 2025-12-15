@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class BuscarHuespedResultDTO {
     public Resultado resultado;
-    public List<Huesped> huespedesEncontrados;
+    public List<HuespedDTO> huespedesEncontrados;
 
     public BuscarHuespedResultDTO() {
         this.resultado = new Resultado();

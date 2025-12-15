@@ -2,10 +2,12 @@ package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dto.Pago.PagoDTO;
 import com.isi.desa.Model.Entities.Pago.Pago;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class PagoMapper {
-    public static PagoDTO entityToDto (Pago pago) {
+
+    public PagoDTO entityToDto (Pago pago) {
         if (pago == null) return null;
         PagoDTO dto = new PagoDTO();
         dto.idPago = pago.getIdPago();
@@ -15,9 +17,11 @@ public class PagoMapper {
         return dto;
     }
 
-    public static Pago dtoToEntity (PagoDTO pagoDTO) {
+    public Pago dtoToEntity (PagoDTO pagoDTO) {
         if (pagoDTO == null) return null;
         Pago pago = new Pago();
+        // Generalmente el ID no se setea al crear la entidad (es autogenerado),
+        // así que tu lógica de solo setear valor y fecha está bien.
         pago.setValor(pagoDTO.valor);
         pago.setFecha(pagoDTO.fecha);
 

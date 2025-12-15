@@ -1,43 +1,67 @@
 package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dto.Factura.FacturaDTO;
-import com.isi.desa.Dto.NotaDeCredito.NotaDeCreditoDTO;
 import com.isi.desa.Model.Entities.Factura.Factura;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FacturacionMapper {
-    public static FacturaDTO factura_entityToDto (Factura factura) {
+
+    // 2. Inyección de dependencias
+    @Autowired
+    private ResponsableDePagoMapper responsableDePagoMapper;
+
+    @Autowired
+    private PagoMapper pagoMapper;
+
+    @Autowired
+    private NotaDeCreditoMapper notaDeCreditoMapper;
+
+    @Autowired
+    private ServicioMapper servicioMapper;
+
+    @Autowired
+    private EstadiaMapper estadiaMapper;
+
+
+    public FacturaDTO factura_entityToDto(Factura factura) {
+        if (factura == null) return null;
+
         FacturaDTO facturaDTO = new FacturaDTO();
 
         facturaDTO.idFactura = factura.getIdFactura();
         facturaDTO.detalle = factura.getDetalle();
         facturaDTO.total = factura.getTotal();
         facturaDTO.nombre = factura.getNombre();
-        facturaDTO.responsableDePago = ResponsableDePagoMapper.entityToDto(
-                factura.getResponsableDePago()
-        );
-        facturaDTO.pago = PagoMapper.entityToDto(factura.getPago());
-        facturaDTO.notaDeCredito = NotaDeCreditoMapper.entityToDto(factura.getNotaDeCredito());
-        facturaDTO.servicios = ServicioMapper.listaEntityToDto(factura.getServicios());
-        facturaDTO.estadias = EstadiaMapper.entityListToDtoList(factura.getEstadias());
+
+        // Uso de las instancias inyectadas
+        facturaDTO.responsableDePago = responsableDePagoMapper.entityToDto(factura.getResponsableDePago());
+        facturaDTO.pago = pagoMapper.entityToDto(factura.getPago());
+        facturaDTO.notaDeCredito = notaDeCreditoMapper.entityToDto(factura.getNotaDeCredito());
+        facturaDTO.servicios = servicioMapper.listaEntityToDto(factura.getServicios());
+        facturaDTO.estadias = estadiaMapper.entityListToDtoList(factura.getEstadias());
+
         return facturaDTO;
     }
 
-    public static Factura factura_dtoToEntity (FacturaDTO facturaDto) {
+    public Factura factura_dtoToEntity(FacturaDTO facturaDto) {
+        if (facturaDto == null) return null;
+
         Factura factura = new Factura();
 
         factura.setIdFactura(facturaDto.idFactura);
         factura.setDetalle(facturaDto.detalle);
         factura.setTotal(facturaDto.total);
         factura.setNombre(facturaDto.nombre);
-        factura.setResponsableDePago(
-                ResponsableDePagoMapper.dtoToEntity(facturaDto.responsableDePago)
-        );
-        factura.setPago(PagoMapper.dtoToEntity(facturaDto.pago));
-        factura.setNotaDeCredito(
-                NotaDeCreditoMapper.dtoToEntity(facturaDto.notaDeCredito)
-        );
-        factura.setServicios(ServicioMapper.listaDtoToEntity(facturaDto.servicios));
-        factura.setEstadias(EstadiaMapper.dtoLisToEntitiesList(facturaDto.estadias));
+
+        // Uso de las instancias inyectadas
+        factura.setResponsableDePago(responsableDePagoMapper.dtoToEntity(facturaDto.responsableDePago));
+        factura.setPago(pagoMapper.dtoToEntity(facturaDto.pago));
+        factura.setNotaDeCredito(notaDeCreditoMapper.dtoToEntity(facturaDto.notaDeCredito));
+        factura.setServicios(servicioMapper.listaDtoToEntity(facturaDto.servicios));
+        factura.setEstadias(estadiaMapper.dtoLisToEntitiesList(facturaDto.estadias));
+
         return factura;
     }
 }

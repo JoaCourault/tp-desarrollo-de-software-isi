@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class HuespedService implements IHuespedService {
@@ -36,11 +34,9 @@ public class HuespedService implements IHuespedService {
     @Autowired
     private DireccionDAO direccionDAO;
 
-    private static final HuespedService INSTANCE = new HuespedService();
-
-    public static HuespedService getInstance() {
-        return INSTANCE;
-    }
+    // 1. INYECCIÓN DEL MAPPER
+    @Autowired
+    private HuespedMapper huespedMapper;
 
     @Override
     @Transactional
@@ -71,11 +67,7 @@ public class HuespedService implements IHuespedService {
 
         // 3. Persistencia de Dirección
         if (huespedDTO.direccion != null) {
-
-            // Si falla guardar la dirección, debe fallar todo.
             Direccion dirGuardada = direccionDAO.crear(huespedDTO.direccion);
-
-            // Aseguramos que el DTO tenga el ID correcto para que el Mapper lo encuentre
             if (dirGuardada != null) {
                 huespedDTO.direccion.id = dirGuardada.getIdDireccion();
             }
@@ -84,14 +76,14 @@ public class HuespedService implements IHuespedService {
         // 4. Persistencia del huésped
         Huesped creado = dao.crear(huespedDTO);
 
-        return HuespedMapper.entityToDTO(creado);
+        // 2. USO DE INSTANCIA INYECTADA (this.huespedMapper)
+        return this.huespedMapper.entityToDTO(creado);
     }
 
     @Override
     public HuespedDTO crear(HuespedDTO huespedDTO) throws HuespedDuplicadoException {
         return crear(huespedDTO, false);
     }
-
 
     @Override
     public BajaHuespedResultDTO eliminar(BajaHuespedRequestDTO requestDTO) {
@@ -113,7 +105,9 @@ public class HuespedService implements IHuespedService {
             res.resultado.mensaje = "No se pudo eliminar el huesped.";
             return res;
         }
-        res.huesped = HuespedMapper.entityToDTO(eliminado);
+
+        // 2. USO DE INSTANCIA INYECTADA
+        res.huesped = this.huespedMapper.entityToDTO(eliminado);
         return res;
     }
 
@@ -121,22 +115,19 @@ public class HuespedService implements IHuespedService {
     public BuscarHuespedResultDTO buscarHuesped(BuscarHuespedRequestDTO req) {
         BuscarHuespedResultDTO res = new BuscarHuespedResultDTO();
         res.resultado = new Resultado();
-        // Inicializamos la lista para evitar NullPointer
         res.huespedesEncontrados = new ArrayList<>();
 
-        // proteger contra req o filtro nulos
         HuespedDTO filtro = (req == null) ? null : req.huesped;
         List<Huesped> todos = this.dao.leerHuespedes();
 
         if (filtro == null) {
-            // si no hay filtro, devolvemos todos
-            res.huespedesEncontrados = todos;
+            // Convertimos la lista completa a DTOs
+            res.huespedesEncontrados = convertirLista(todos);
             res.resultado.id = 0;
             res.resultado.mensaje = "OK";
             return res;
         }
 
-        // Si el usuario no completa NADA → devolver todos
         boolean algunCampo =
                 (filtro.nombre != null && !filtro.nombre.isEmpty()) ||
                         (filtro.apellido != null && !filtro.apellido.isEmpty()) ||
@@ -144,7 +135,7 @@ public class HuespedService implements IHuespedService {
                         (filtro.numDoc != null && !filtro.numDoc.isEmpty());
 
         if (!algunCampo) {
-            res.huespedesEncontrados = todos;
+            res.huespedesEncontrados = convertirLista(todos);
             res.resultado.id = 0;
             res.resultado.mensaje = "OK";
             return res;
@@ -152,7 +143,6 @@ public class HuespedService implements IHuespedService {
 
         // Filtrado
         for (Huesped h : todos) {
-
             boolean coincide = true;
 
             if (filtro.nombre != null && !filtro.nombre.isEmpty()) {
@@ -165,8 +155,7 @@ public class HuespedService implements IHuespedService {
                 else { coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase()); }
             }
 
-            // Verificar filtro.tipoDoc != null antes de acceder a sus propiedades
-            if (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null) {
+            if (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null && !filtro.tipoDoc.tipoDocumento.isEmpty()) {
                 coincide &= (
                         h.getTipoDoc() != null &&
                                 h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(filtro.tipoDoc.tipoDocumento)
@@ -178,7 +167,10 @@ public class HuespedService implements IHuespedService {
                 else { coincide &= h.getNumDoc().equalsIgnoreCase(filtro.numDoc); }
             }
 
-            if (coincide) res.huespedesEncontrados.add(h);
+            if (coincide) {
+                // 3. CONVERSIÓN: Entidad -> DTO antes de agregar a la lista de respuesta
+                res.huespedesEncontrados.add(this.huespedMapper.entityToDTO(h));
+            }
         }
 
         res.resultado.id = 0;
@@ -186,6 +178,16 @@ public class HuespedService implements IHuespedService {
         return res;
     }
 
+    // Método auxiliar para convertir listas masivas
+    private List<HuespedDTO> convertirLista(List<Huesped> entidades) {
+        List<HuespedDTO> dtos = new ArrayList<>();
+        if (entidades != null) {
+            for (Huesped h : entidades) {
+                dtos.add(this.huespedMapper.entityToDTO(h));
+            }
+        }
+        return dtos;
+    }
 
     @Override
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
@@ -209,7 +211,7 @@ public class HuespedService implements IHuespedService {
                 return res;
             }
 
-            // Validación duplicado en UPDATE
+            // Validación duplicado
             boolean duplicado = dao.leerHuespedes().stream()
                     .filter(h -> h != null && !h.isEliminado())
                     .anyMatch(h ->
@@ -246,6 +248,7 @@ public class HuespedService implements IHuespedService {
             return res;
 
         } catch (Exception e) {
+            e.printStackTrace(); // Agregado para ver error en consola si pasa algo raro
             res.resultado.id = 1;
             res.resultado.mensaje = "Error interno al modificar huesped: " + e.getMessage();
             return res;

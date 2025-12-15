@@ -19,10 +19,15 @@ public class EstadiaDAO implements IEstadiaDAO {
     @Autowired
     private EstadiaRepository estadiaRepository;
 
+    // 1. INYECTAMOS EL MAPPER
+    @Autowired
+    private EstadiaMapper estadiaMapper;
+
     @Override
     @Transactional
     public EstadiaDTO save(Estadia estadia) {
-        return EstadiaMapper.entityToDto(estadiaRepository.save(estadia));
+
+        return estadiaMapper.entityToDto(estadiaRepository.save(estadia));
     }
 
     @Override

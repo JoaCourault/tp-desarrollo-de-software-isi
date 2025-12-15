@@ -13,7 +13,7 @@ public class DireccionDTO {
     public String calle;
     public String numero;
     public String departamento;
-    public int piso; // String es mejor para evitar errores de conversión
+    public String piso; // String es mejor para evitar errores de conversión
 
     public DireccionDTO() {}
 
@@ -43,6 +43,6 @@ public class DireccionDTO {
     public String getDepartamento() { return departamento; }
     public void setDepartamento(String departamento) { this.departamento = departamento; }
 
-    public int getPiso() { return piso; }
-    public void setPiso(int piso) { this.piso = piso; }
+    public String getPiso() { return piso; }
+    public void setPiso(String piso) { this.piso = piso; }
 }
