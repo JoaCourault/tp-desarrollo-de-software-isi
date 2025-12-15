@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +21,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
                                    @Param("nombre") String nombre);
     // Consulta corregida para comparar fechas con horas
     @Query("SELECT r FROM Reserva r WHERE r.fechaIngreso < :hasta AND r.fechaEgreso > :desde")
-    List<Reserva> findReservasEnRango(@Param("desde") LocalDate desde,
-                                      @Param("hasta") LocalDate hasta);
+    List<Reserva> findReservasEnRango(@Param("desde") LocalDateTime desde,
+                                      @Param("hasta") LocalDateTime hasta);
 
     @Query("SELECT r FROM Reserva r WHERE r.habitacion.idHabitacion = :idHabitacion " +
             "AND :fecha >= r.fechaIngreso AND :fecha < r.fechaEgreso")

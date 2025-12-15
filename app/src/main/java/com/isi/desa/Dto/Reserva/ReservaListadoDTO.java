@@ -9,8 +9,8 @@ public class ReservaListadoDTO {
     public String nombreHuesped;
     public Integer numeroHabitacion;
     public String tipoHabitacion; // "Detalles" en tu entidad Habitacion
-    public LocalDate fechaIngreso;
-    public LocalDate fechaEgreso;
+    public LocalDateTime fechaIngreso;
+    public LocalDateTime fechaEgreso;
 
     // Constructor vacío
     public ReservaListadoDTO() {}
@@ -18,7 +18,7 @@ public class ReservaListadoDTO {
     // Constructor con campos para facilitar el mapeo
     public ReservaListadoDTO(String idReserva, String apellidoHuesped, String nombreHuesped,
                              Integer numeroHabitacion, String tipoHabitacion,
-                             LocalDate fechaIngreso, LocalDate fechaEgreso) {
+                             LocalDateTime fechaIngreso, LocalDateTime fechaEgreso) {
         this.idReserva = idReserva;
         this.apellidoHuesped = apellidoHuesped;
         this.nombreHuesped = nombreHuesped;

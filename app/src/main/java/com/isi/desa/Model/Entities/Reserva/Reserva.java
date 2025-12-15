@@ -4,6 +4,7 @@ import com.isi.desa.Model.Entities.Habitacion.Habitacion;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Reserva")
@@ -14,9 +15,9 @@ public class Reserva {
     @Column(name = "id_reserva", nullable = false, updatable = false)
     private String idReserva;
     @Column(name = "fechaIngreso")
-    private LocalDate fechaIngreso;
+    private LocalDateTime fechaIngreso;
     @Column(name = "fechaEgreso")
-    private LocalDate fechaEgreso;
+    private LocalDateTime fechaEgreso;
     @Column(name = "nombre_huesped")
     private String nombreHuesped;
     @Column(name = "apellido_huesped")
@@ -29,15 +30,15 @@ public class Reserva {
 
     public Reserva() {}
 
-    public Reserva(LocalDate fechaIngreso, LocalDate fechaEgreso) {
+    public Reserva(LocalDateTime fechaIngreso, LocalDateTime fechaEgreso) {
         this.fechaIngreso = fechaIngreso;
         this.fechaEgreso = fechaEgreso;
     }
 
-    public LocalDate getFechaIngreso() { return fechaIngreso; }
-    public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
-    public LocalDate getFechaEgreso() { return fechaEgreso; }
-    public void setFechaEgreso(LocalDate fechaEgreso) { this.fechaEgreso = fechaEgreso; }
+    public LocalDateTime getFechaIngreso() { return fechaIngreso; }
+    public void setFechaIngreso(LocalDateTime fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+    public LocalDateTime getFechaEgreso() { return fechaEgreso; }
+    public void setFechaEgreso(LocalDateTime fechaEgreso) { this.fechaEgreso = fechaEgreso; }
     public String getNombreHuesped() { return nombreHuesped; }
     public void setNombreHuesped(String nombreHuesped) { this.nombreHuesped = nombreHuesped; }
     public String getApellidoHuesped() { return apellidoHuesped; }
