@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,6 +53,11 @@ public class EstadiaService implements IEstadiaService {
             throw new RuntimeException("Huésped titular no encontrado con ID: " + request.idHuespedTitular);
         }
 
+        int edad = Period.between(titular.getFechaNac(), LocalDate.now()).getYears();
+
+        if (edad < 18) {
+            throw new RuntimeException("El titular debe ser mayor de 18 años. Edad actual: " + edad);
+        }
         // Acumuladores
         Float valorTotalAcumulado = 0f;
         List<String> habitacionesIdsParaEstadia = new ArrayList<>();

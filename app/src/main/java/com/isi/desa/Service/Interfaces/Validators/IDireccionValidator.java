@@ -5,4 +5,5 @@ import com.isi.desa.Dto.Direccion.DireccionDTO;
 public interface IDireccionValidator {
 
     RuntimeException validate(DireccionDTO direccionDTO);
+    RuntimeException validateUpdate(DireccionDTO dto);
 }

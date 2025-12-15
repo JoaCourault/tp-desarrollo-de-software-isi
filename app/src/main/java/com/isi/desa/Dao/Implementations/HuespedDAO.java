@@ -77,8 +77,13 @@ public class HuespedDAO implements IHuespedDAO {
     }
 
     // --- Métodos de lectura ---
+    @Override
+    @Transactional(readOnly = true)
+    public List<Huesped> leerHuespedes() {
+        // Usamos el método que filtra por eliminado=false
+        return repository.findByEliminadoFalse();
+    }
     @Override @Transactional(readOnly = true) public Huesped obtenerHuesped(String DNI) { return null; }
-    @Override @Transactional(readOnly = true) public List<Huesped> leerHuespedes() { return repository.findAll(); }
     @Override @Transactional(readOnly = true) public Huesped getById(String id) { return repository.findById(id).orElse(null); }
 
     @Override

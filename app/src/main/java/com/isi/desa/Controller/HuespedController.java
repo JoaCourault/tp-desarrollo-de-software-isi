@@ -69,7 +69,9 @@ public class HuespedController {
     }
 
 
-    public ModificarHuespedResultDTO modificarHuesped(ModificarHuespedRequestDTO requestDTO) {
+    // --- CORRECCIÓN AQUÍ: AGREGAR @PostMapping y @RequestBody ---
+    @PostMapping("/Modificar")
+    public ModificarHuespedResultDTO modificarHuesped(@RequestBody ModificarHuespedRequestDTO requestDTO) {
         try {
             return this.service.modificar(requestDTO);
         } catch (Exception e) {
@@ -82,12 +84,18 @@ public class HuespedController {
         }
     }
 
-    public BajaHuespedResultDTO bajaHuesped(BajaHuespedRequestDTO requestDTO) {
+    // --- ASEGÚRATE QUE EL DE BAJA ESTÉ ASÍ TAMBIÉN ---
+    @PostMapping("/Baja")
+    public BajaHuespedResultDTO bajaHuesped(@RequestBody BajaHuespedRequestDTO requestDTO) {
         try {
             return this.service.eliminar(requestDTO);
         } catch (Exception e){
             this.logger.error("Error en HuespedController - bajaHuesped: " + e.getMessage(), e);
-            return null;
+            BajaHuespedResultDTO res = new BajaHuespedResultDTO();
+            res.resultado = new Resultado();
+            res.resultado.id = 1;
+            res.resultado.mensaje = "Error de conexión";
+            return res;
         }
     }
 }

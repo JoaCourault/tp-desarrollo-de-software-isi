@@ -1,5 +1,6 @@
 package com.isi.desa.Service.Implementations;
 
+import com.isi.desa.Dao.Interfaces.IDireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dto.Huesped.*;
 import com.isi.desa.Dto.Resultado;
@@ -8,8 +9,10 @@ import com.isi.desa.Exceptions.Huesped.CannotModifyHuespedEsception;
 import com.isi.desa.Exceptions.Huesped.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Service.Interfaces.IHuespedService;
+import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
 import com.isi.desa.Service.Interfaces.Validators.IHuespedValidator;
 import com.isi.desa.Utils.Mappers.HuespedMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,10 @@ public class HuespedService implements IHuespedService {
     @Autowired
     @Qualifier("huespedDAO")
     private IHuespedDAO dao;
+    @Autowired
+    private IDireccionDAO direccionDAO; // <--- Inyectamos el DAO de dirección
+    @Autowired
+    private IDireccionValidator direccionValidator;
 
     @Override
     public AltaHuespedResultDTO crear(AltaHuespedRequestDTO request) {
@@ -177,26 +184,53 @@ public class HuespedService implements IHuespedService {
         return res;
     }
 
+
     @Override
+    @Transactional
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
         ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
         res.resultado = new Resultado();
-        res.resultado.id = 1;
 
         try {
             if (request == null || request.huesped == null) {
                 res.resultado.id = 2;
-                res.resultado.mensaje = "Solicitud invalida: no se enviaron datos de huesped.";
+                res.resultado.mensaje = "Datos no proporcionados.";
                 return res;
             }
 
             HuespedDTO dto = request.huesped;
 
-            CannotModifyHuespedEsception errorValidacion = this.validator.validateUpdate(dto);
-            if (errorValidacion != null) {
+            // 1. Validar Huesped (Datos básicos)
+            CannotModifyHuespedEsception errorHuesped = this.validator.validateUpdate(dto);
+            if (errorHuesped != null) {
                 res.resultado.id = 2;
-                res.resultado.mensaje = errorValidacion.getMessage();
+                res.resultado.mensaje = errorHuesped.getMessage();
                 return res;
+            }
+
+            // 2. LOGICA DE DIRECCIÓN (Corrección del ID)
+            if (dto.direccion != null) {
+
+                // --- TRUCO: Si el DTO no trae ID de dirección, lo buscamos en la BD ---
+                if (dto.direccion.id == null || dto.direccion.id.isBlank()) {
+                    Huesped huespedActual = dao.getById(dto.idHuesped);
+                    if (huespedActual != null && huespedActual.getDireccion() != null) {
+                        // Rescatamos el ID existente para que el validador no falle
+                        dto.direccion.id = huespedActual.getDireccion().getIdDireccion();
+                    }
+                }
+                // ---------------------------------------------------------------------
+
+                // A. Ahora sí validamos (ya debería tener ID)
+                RuntimeException errorDir = this.direccionValidator.validateUpdate(dto.direccion);
+                if (errorDir != null) {
+                    res.resultado.id = 2;
+                    res.resultado.mensaje = "Error en Dirección: " + errorDir.getMessage();
+                    return res;
+                }
+
+                // B. Actualizar Dirección independientemente
+                this.direccionDAO.modificar(dto.direccion);
             }
 
             // Validación duplicado en UPDATE
@@ -209,34 +243,27 @@ public class HuespedService implements IHuespedService {
                                     dto.tipoDocumento != null &&
                                     h.getTipoDocumento().equalsIgnoreCase(dto.tipoDocumento.tipoDocumento) &&
                                     h.getNumDoc().equals(dto.numDoc)
+
                     );
+
 
             if (duplicado && (request.aceptarIgualmente == null || !request.aceptarIgualmente)) {
                 res.resultado.id = 3;
                 res.resultado.mensaje = "¡CUIDADO! El tipo y numero de documento ya existen en el sistema";
                 return res;
+
             }
 
+            // 4. Modificar Huesped
             Huesped modificado = dao.modificar(dto);
-
-            if (modificado == null) {
-                res.resultado.id = 1;
-                res.resultado.mensaje = "Error interno al modificar huesped.";
-                return res;
-            }
 
             res.resultado.id = 0;
             res.resultado.mensaje = "La operacion ha culminado con exito";
             return res;
 
-        } catch (HuespedNotFoundException nf) {
-            res.resultado.id = 2;
-            res.resultado.mensaje = nf.getMessage();
-            return res;
-
         } catch (Exception e) {
             res.resultado.id = 1;
-            res.resultado.mensaje = "Error interno al modificar huesped: " + e.getMessage();
+            res.resultado.mensaje = "Error interno: " + e.getMessage();
             return res;
         }
     }

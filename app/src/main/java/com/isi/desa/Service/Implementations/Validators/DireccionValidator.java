@@ -38,4 +38,17 @@ public class DireccionValidator implements IDireccionValidator {
     private boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
+    @Override
+    public RuntimeException validateUpdate(DireccionDTO dto) {
+        // 1. Validaciones básicas (campos vacíos)
+        RuntimeException errorBasico = this.validate(dto);
+        if (errorBasico != null) return errorBasico;
+
+        // 2. Validación específica de Update: Debe tener ID
+        if (dto.id == null || dto.id.trim().isEmpty()) {
+            return new InvalidDirectionException("Para modificar la dirección, el ID es obligatorio.");
+        }
+
+        return null;
+    }
 }
