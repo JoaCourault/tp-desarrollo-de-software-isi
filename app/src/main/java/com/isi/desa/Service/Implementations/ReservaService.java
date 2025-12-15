@@ -13,21 +13,16 @@ import com.isi.desa.Dto.Reserva.ReservaDetalleDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Habitacion.Habitacion;
 import com.isi.desa.Model.Entities.Reserva.Reserva;
-import com.isi.desa.Model.Enums.EstadoHabitacion;
 import com.isi.desa.Model.Enums.TipoHabitacion;
 import com.isi.desa.Service.Interfaces.IReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class ReservaService implements IReservaService {
@@ -45,15 +40,12 @@ public class ReservaService implements IReservaService {
     @Transactional
     public void realizarReserva(CrearReservaRequestDTO request) {
 
-        // Validaciones básicas de entrada
         if (request.getReservas() == null || request.getReservas().isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos una habitación.");
         }
 
-        // --- BUCLE (Coincide con 'loop para cada Habitacion' del diagrama) ---
         for (ReservaDetalleDTO item : request.getReservas()) {
 
-            // 1. Validaciones de Fechas (Refleja la validación de UI del diagrama pero en backend)
             if (item.getFechaDesde().isAfter(item.getFechaHasta())) {
                 throw new IllegalArgumentException("Fecha ingreso mayor a egreso en habitación " + item.getIdHabitacion());
             }
@@ -61,86 +53,93 @@ public class ReservaService implements IReservaService {
                 throw new IllegalArgumentException("No se puede reservar en una fecha anterior al día de hoy.");
             }
 
-            // 2. Buscar Habitación (Paso previo necesario para setear la relación)
-            Habitacion habitacion = habitacionRepository.findById(item.getIdHabitacion())
-                    .orElseThrow(() -> new RuntimeException("Habitación no encontrada..."));
+            Habitacion habitacion = habitacionRepository.findById(String.valueOf((item.getIdHabitacion())))
+                    .orElseThrow(() -> new RuntimeException("Habitación no encontrada: " + item.getIdHabitacion()));
 
-            // 3. create Reserva (Según diagrama)
             Reserva nuevaReserva = new Reserva();
 
-            // 4. Setters (Según diagrama)
-            // IMPORTANTE: NO setear ID manualmente, dejar que @GeneratedValue actúe.
+            // --- CORRECCIÓN AQUÍ ---
+            // Usamos getFechaDesde() para el ingreso
+            // Configuramos Check-in a las 14:00 (estándar) o la hora que prefieras
+            nuevaReserva.setFechaIngreso(item.getFechaDesde().atTime(14, 0));
 
-            // Seteo de Fechas
-            nuevaReserva.setFechaIngreso(item.getFechaDesde().atStartOfDay());
-            nuevaReserva.setFechaEgreso(item.getFechaHasta().atStartOfDay());
+            // Usamos getFechaHasta() para el egreso (Check-out 10:00 AM)
+            nuevaReserva.setFechaEgreso(item.getFechaHasta().atTime(10, 0));
 
-            // Seteo de Habitación
             nuevaReserva.setHabitacion(habitacion);
-
-            // Seteo de Datos del Huésped (Diagrama: Ingresar Apellido, Nombre, Telefono)
             nuevaReserva.setNombreHuesped(request.getNombreCliente());
             nuevaReserva.setApellidoHuesped(request.getApellidoCliente());
             nuevaReserva.setTelefonoHuesped(request.getTelefonoCliente());
 
-            // 5. Guardar (RDAO -> GR: confirmacion OK)
             reservaDAO.guardar(nuevaReserva);
         }
-        // Fin del loop. El controlador retornará el mensaje de éxito.
     }
 
     @Override
     public List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDate desde, LocalDate hasta) {
 
         List<HabitacionDisponibilidadDTO> resultado = new ArrayList<>();
-
-        // 1. Obtener habitaciones (Proyección)
         List<HabitacionResumen> habitacionesRaw = habitacionRepository.findAllResumen();
 
-        // 2. Obtener estadías
+        // Traemos todo lo que ocurra en el rango
         List<Estadia> estadiasEnRango = estadiaRepository.findEstadiasEnRango(
                 desde.atStartOfDay(),
                 hasta.atTime(LocalTime.MAX)
         );
+
+        List<Reserva> reservasEnRango = reservaRepository.findReservasEnRango(
+                desde.atStartOfDay(),
+                hasta.atTime(LocalTime.MAX)
+        );
+
+        LocalDate hoy = LocalDate.now(); // Guardamos la fecha de hoy para comparar
 
         for (HabitacionResumen h : habitacionesRaw) {
 
             HabitacionDisponibilidadDTO disponibilidadDTO = new HabitacionDisponibilidadDTO();
             HabitacionDTO habDTO = new HabitacionDTO();
 
-            // --- CORRECCIÓN 1: Convertir Long a String ---
             habDTO.setIdHabitacion(h.getIdHabitacion());
             habDTO.setNumero(h.getNumero());
             habDTO.setPrecio(h.getPrecio());
             habDTO.setCapacidad(h.getCapacidad());
 
-            // --- CORRECCIÓN 2: Manejo del Enum sin forzar un valor por defecto ---
+            // Manejo seguro del Enum TipoHabitacion
             try {
-                // Intenta convertir el texto de la BD al Enum
-                habDTO.setTipoHabitacion(TipoHabitacion.valueOf(h.getDetalles().toUpperCase()));
+                if (h.getDetalles() != null) {
+                    habDTO.setTipoHabitacion(TipoHabitacion.valueOf(h.getDetalles().toUpperCase()));
+                } else {
+                    habDTO.setTipoHabitacion(null);
+                }
             } catch (Exception e) {
-                // Si el texto en la BD no coincide con ningún Enum, lo dejamos nulo o lo logueamos
-                // Esto evita el error de compilación si 'INDIVIDUAL' no existe en tu Enum
                 habDTO.setTipoHabitacion(null);
-                System.out.println("Error mapeando tipo de habitación: " + h.getDetalles());
             }
 
             disponibilidadDTO.setHabitacion(habDTO);
 
-            // Lógica de Disponibilidad día por día
             List<DisponibilidadDiaDTO> dias = new ArrayList<>();
             LocalDate fechaActual = desde;
 
             while (!fechaActual.isAfter(hasta)) {
 
                 String estadoDia = "DISPONIBLE";
+                boolean ocupada = false;
 
+                // 1. PRIORIDAD MÁXIMA: Estado Físico (Mantenimiento o Check-in recién hecho)
+                // Si la habitación dice "OCUPADA" y estamos pintando el día de HOY, es OCUPADA sí o sí.
                 if ("MANTENIMIENTO".equals(h.getEstado())) {
                     estadoDia = "MANTENIMIENTO";
-                } else {
-                    boolean ocupada = false;
+                    ocupada = true;
+                }
+                else if (fechaActual.equals(hoy) && "OCUPADA".equals(h.getEstado())) {
+                    // ESTO ES NUEVO: Forzamos el rojo si hoy la habitación está ocupada físicamente
+                    estadoDia = "OCUPADA";
+                    ocupada = true;
+                }
+                else {
+                    // 2. Si no es físico, buscamos en las ESTADÍAS (Historial/Futuro)
                     for (Estadia e : estadiasEnRango) {
-                        // Validamos que sea la misma habitación (Comparando Strings ahora)
+                        // Verificamos si la estadía pertenece a esta habitación
                         boolean esDeEstaHabitacion = e.getHabitaciones().stream()
                                 .anyMatch(habEntidad -> String.valueOf(habEntidad.getIdHabitacion()).equals(String.valueOf(h.getIdHabitacion())));
 
@@ -148,21 +147,36 @@ public class ReservaService implements IReservaService {
                             LocalDate checkInDate = e.getCheckIn().toLocalDate();
                             LocalDate checkOutDate = e.getCheckOut().toLocalDate();
 
+                            // Lógica: Fecha actual está dentro del rango (inclusive in, exclusivo out)
                             if (!fechaActual.isBefore(checkInDate) && fechaActual.isBefore(checkOutDate)) {
                                 ocupada = true;
+                                estadoDia = "OCUPADA"; // CORRECCIÓN: "OCUPADA" (antes decía OCUPADO)
                                 break;
                             }
                         }
                     }
-                    if (ocupada) {
-                        estadoDia = "RESERVADO"; // O "OCUPADA" según tu DTO
+
+                    // 3. Chequeo de RESERVAS (Solo si no está ocupada ya)
+                    if (!ocupada) {
+                        for (Reserva r : reservasEnRango) {
+                            boolean esDeEstaHabitacion = String.valueOf(r.getHabitacion().getIdHabitacion())
+                                    .equals(String.valueOf(h.getIdHabitacion()));
+
+                            if (esDeEstaHabitacion) {
+                                LocalDate rIngreso = r.getFechaIngreso().toLocalDate();
+                                LocalDate rEgreso = r.getFechaEgreso().toLocalDate();
+
+                                if (!fechaActual.isBefore(rIngreso) && fechaActual.isBefore(rEgreso)) {
+                                    ocupada = true;
+                                    estadoDia = "RESERVADA";
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
 
-                // --- CORRECCIÓN 3: Usar el constructor con parámetros ---
-                // Como no tienes constructor vacío, pasamos los datos al crear el objeto
                 dias.add(new DisponibilidadDiaDTO(fechaActual, estadoDia));
-
                 fechaActual = fechaActual.plusDays(1);
             }
 

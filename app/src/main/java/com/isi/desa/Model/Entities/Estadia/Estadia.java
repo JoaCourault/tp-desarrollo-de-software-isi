@@ -87,4 +87,16 @@ public class Estadia {
     public void setHabitaciones(List<Habitacion> habitaciones) {
         this.habitaciones = habitaciones;
     }
+
+    public Reserva getReserva() {
+        return reserva;
+    }
+
+    public void setReserva(Reserva reserva) {
+        this.reserva = reserva;
+    }
+
+    public void setHuespedes(List<Huesped> huespedes) {
+
+    }
 }
