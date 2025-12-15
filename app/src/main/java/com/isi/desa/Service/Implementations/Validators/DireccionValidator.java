@@ -2,78 +2,41 @@ package com.isi.desa.Service.Implementations.Validators;
 
 import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Exceptions.Direccion.InvalidDirectionException;
-import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Service.Interfaces.Validators.IDireccionValidator;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service; // Cambiado a Service o Component
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class DireccionValidator implements IDireccionValidator {
-    // Instancia unica (eager singleton)
-    private static final DireccionValidator INSTANCE = new DireccionValidator();
 
-    // Constructor privado
-    private DireccionValidator() {}
+    // -------------------------------------------------------------
+    // ELIMINADO: Singleton Manual (Spring ya lo hace por ti)
+    // ELIMINADO: Método create (Un validador no debe crear objetos)
+    // -------------------------------------------------------------
 
-    // Metodo publico para obtener la instancia
-    public static DireccionValidator getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public Direccion create(DireccionDTO direccionDTO) {
-        InvalidDirectionException validationError = validate(direccionDTO);
-        if (validationError != null) throw validationError;
-
-        return new Direccion(
-                direccionDTO.idDireccion,
-                direccionDTO.calle,
-                direccionDTO.numero,
-                direccionDTO.departamento,
-                direccionDTO.piso,
-                direccionDTO.cp,
-                direccionDTO.pais,
-                direccionDTO.provincia,
-                direccionDTO.localidad
-        );
-    }
-    
     @Override
     public InvalidDirectionException validate(DireccionDTO direccionDTO) {
         if (direccionDTO == null) {
-
             return new InvalidDirectionException("La direccion no puede ser nula");
         }
 
-        List<RuntimeException> errores = new ArrayList<>();
+        List<String> errores = new ArrayList<>(); // Lista de Strings es más fácil
         String error;
-        if ((error = validatePais(direccionDTO.pais)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateProvincia(direccionDTO.provincia)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateLocalidad(direccionDTO.localidad)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateCodigoPostal(direccionDTO.cp)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateCalle(direccionDTO.calle)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
-        if ((error = validateNumero(direccionDTO.numero)) != null) {
-            errores.add(new InvalidDirectionException(error));
-        }
 
-        if (!errores.isEmpty()) return new InvalidDirectionException(
-                errores.stream()
-                        .map(RuntimeException::getMessage)
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse("")
-        );
+        if ((error = validatePais(direccionDTO.pais)) != null) errores.add(error);
+        if ((error = validateProvincia(direccionDTO.provincia)) != null) errores.add(error);
+        if ((error = validateLocalidad(direccionDTO.localidad)) != null) errores.add(error);
+        if ((error = validateCodigoPostal(direccionDTO.cp)) != null) errores.add(error);
+        if ((error = validateCalle(direccionDTO.calle)) != null) errores.add(error);
+        if ((error = validateNumero(direccionDTO.numero)) != null) errores.add(error);
+
+        if (!errores.isEmpty()) {
+            // Unimos los errores en un solo mensaje
+            String mensajeFinal = String.join(", ", errores);
+            return new InvalidDirectionException(mensajeFinal);
+        }
 
         return null;
     }
@@ -90,15 +53,33 @@ public class DireccionValidator implements IDireccionValidator {
         return (localidad == null || localidad.trim().isEmpty()) ? "La localidad es obligatoria" : null;
     }
 
-    private String validateCodigoPostal(String codigoPostal) {
-        return (codigoPostal == null || !codigoPostal.isEmpty()) ? "El codigo postal es obligatorio y debe ser positivo" : null;
-    }
-
     private String validateCalle(String calle) {
         return (calle == null || calle.trim().isEmpty()) ? "La calle es obligatoria" : null;
     }
 
+    // --- AQUÍ ESTABA EL ERROR GRAVE ---
+    private String validateCodigoPostal(String codigoPostal) {
+        // CORREGIDO: "Si es nulo O si al quitar espacios queda vacio..."
+        if (codigoPostal == null || codigoPostal.trim().isEmpty()) {
+            return "El codigo postal es obligatorio";
+        }
+        // Validación extra: Verificar que sea numérico y positivo (Regex)
+        if (!codigoPostal.matches("\\d+")) {
+            return "El codigo postal debe contener solo números positivos";
+        }
+        return null;
+    }
+
+    // --- AQUÍ TAMBIÉN ESTABA EL ERROR ---
     private String validateNumero(String numero) {
-        return (numero == null || !numero.isEmpty()) ? "El numero es obligatorio y debe ser positivo" : null;
+        // CORREGIDO: Quitamos el "!" y usamos trim()
+        if (numero == null || numero.trim().isEmpty()) {
+            return "El numero es obligatorio";
+        }
+        // Validación extra: Verificar que sea numérico
+        if (!numero.matches("\\d+")) {
+            return "El numero de calle debe ser positivo";
+        }
+        return null;
     }
 }

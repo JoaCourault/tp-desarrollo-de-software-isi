@@ -21,4 +21,7 @@ public interface EstadiaRepository extends JpaRepository<Estadia, String> {
             @Param("idHabitacion") String idHabitacion,
             @Param("moment") LocalDateTime moment
     );
+    @Query("SELECT e FROM Estadia e WHERE e.checkIn <= :hasta AND e.checkOut >= :desde")
+    List<Estadia> findEstadiasEnRango(@Param("desde") LocalDateTime desde,
+                                      @Param("hasta") LocalDateTime hasta);
 }

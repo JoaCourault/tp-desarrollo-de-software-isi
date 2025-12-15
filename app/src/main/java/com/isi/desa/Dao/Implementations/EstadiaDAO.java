@@ -44,11 +44,7 @@ public class EstadiaDAO implements IEstadiaDAO {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Estadia> findByIdHabitacionAndMoment(
-            String idHabitacion,
-            LocalDateTime moment
-    ) {
-        return estadiaRepository.findByHabitacionAndMoment(idHabitacion, moment);
+    public List<Estadia> findByIdHabitacionAndMoment(String idHabitacion, LocalDateTime moment) {
+        return List.of();
     }
 }

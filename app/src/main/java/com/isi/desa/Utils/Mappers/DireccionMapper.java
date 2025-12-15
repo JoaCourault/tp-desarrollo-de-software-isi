@@ -4,7 +4,10 @@ import com.isi.desa.Dto.Direccion.DireccionDTO;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 
 public class DireccionMapper {
-    public static DireccionDTO entityToDto(Direccion d) {
+
+    // --- NOMBRE CORREGIDO: DTO en mayúsculas ---
+    public static DireccionDTO entityToDTO(Direccion d) {
+        if (d == null) return null;
         DireccionDTO dto = new DireccionDTO();
         dto.idDireccion= d.getIdDireccion();
         dto.pais = d.getPais();
@@ -17,7 +20,9 @@ public class DireccionMapper {
         dto.piso = d.getPiso();
         return dto;
     }
+
     public static Direccion dtoToEntity(DireccionDTO dto) {
+        if (dto == null) return null;
         Direccion d = new Direccion();
         d.setIdDireccion(dto.idDireccion);
         d.setPais(dto.pais);

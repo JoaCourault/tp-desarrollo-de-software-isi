@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Service
 public class DireccionDAO implements IDireccionDAO {
+
     @Autowired
     private DireccionRepository repository;
 
@@ -53,5 +54,15 @@ public class DireccionDAO implements IDireccionDAO {
     public Direccion obtener(DireccionDTO direccion) {
         return repository.findById(direccion.idDireccion)
                 .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.idDireccion));
+    }
+
+    // --- ESTE ES EL MÉTODO QUE TE FALTABA ---
+    // Usamos el mismo repository que en los otros métodos.
+    @Override
+    @Transactional(readOnly = true)
+    public Direccion getById(String id) {
+        if (id == null) return null;
+        // Retorna la dirección si existe, o null si no existe (sin lanzar error para que el mapper lo controle)
+        return repository.findById(id).orElse(null);
     }
 }

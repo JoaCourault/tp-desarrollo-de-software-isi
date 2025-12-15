@@ -1,85 +1,102 @@
 package com.isi.desa.Utils.Mappers;
 
-import com.isi.desa.Dao.Implementations.TipoDocumentoDAO;
 import com.isi.desa.Dao.Interfaces.IDireccionDAO;
-import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dao.Interfaces.ITipoDocumentoDAO;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
-import com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO;
-import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
-import com.isi.desa.Dao.Implementations.DireccionDAO;
+import com.isi.desa.Model.Entities.Direccion.Direccion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-
+@Component
 public class HuespedMapper {
 
-    @Autowired
-    public static ITipoDocumentoDAO tipoDocumentoDAO;
+    private static ITipoDocumentoDAO tipoDocumentoDAO;
+    private static IDireccionDAO direccionDAO;
 
     @Autowired
-    public static IDireccionDAO direccionDAO;
+    public void setTipoDocumentoDAO(ITipoDocumentoDAO dao) {
+        HuespedMapper.tipoDocumentoDAO = dao;
+    }
 
     @Autowired
-    public static IHuespedDAO huespedDAO;
-
-    public static HuespedDTO entityToDTO(Huesped h) {
-        if (h == null) return null;
-
-        TipoDocumentoDTO tipoDocDto = null;
-        TipoDocumento tdEntity = tipoDocumentoDAO.obtener(h.getTipoDoc().getTipoDocumento());
-        if (tdEntity != null) {
-            String id = tdEntity.getTipoDocumento();
-            tipoDocDto = new TipoDocumentoDTO();
-            tipoDocDto.tipoDocumento = id;
-        }
-
-        HuespedDTO dto = new HuespedDTO();
-        dto.idHuesped = h.getIdHuesped();
-        dto.nombre = h.getNombre();
-        dto.apellido = h.getApellido();
-        dto.numDoc = h.getNumDoc();
-        dto.tipoDoc = tipoDocDto;
-        dto.cuit = h.getCuit();
-        dto.posicionIva = h.getPosicionIva();
-        dto.fechaNac = h.getFechaNac();
-        dto.telefono = h.getTelefono();
-        dto.email = h.getEmail();
-        dto.ocupacion = h.getOcupacion();
-        dto.nacionalidad = h.getNacionalidad();
-        dto.direccion = DireccionMapper.entityToDto(h.getDireccion());
-
-        dto.eliminado = h.isEliminado();
-
-        return dto;
+    public void setDireccionDAO(IDireccionDAO dao) {
+        HuespedMapper.direccionDAO = dao;
     }
 
     public static Huesped dtoToEntity(HuespedDTO dto) {
         if (dto == null) return null;
 
-        Huesped h = new Huesped();
-        h.setIdHuesped(dto.idHuesped);
-        h.setNombre(dto.nombre);
-        h.setApellido(dto.apellido);
-        h.setNumDoc(dto.numDoc);
-        h.setPosicionIva(dto.posicionIva);
-        h.setCuit(dto.cuit);
-        h.setFechaNac(dto.fechaNac);
-        h.setTelefono(dto.telefono);
-        h.setEmail(dto.email);
-        h.setOcupacion(dto.ocupacion);
-        h.setNacionalidad(dto.nacionalidad);
-
-        // TipoDocumento
-        if (dto.tipoDoc != null) {
-            String tipoDocId = dto.tipoDoc.tipoDocumento;
-            h.setTipoDoc(tipoDocumentoDAO.obtener(tipoDocId));
+        // Tipo Documento
+        TipoDocumento tipoDoc = tipoDocumentoDAO.obtener(dto.tipoDoc.tipoDocumento);
+        if (tipoDoc == null) {
+            throw new RuntimeException("El tipo de documento no existe");
         }
 
-        h.setEliminado(dto.eliminado);
+        // Dirección
+        Direccion direccion = null;
+        if (dto.direccion != null) {
+            // Si tiene ID, BUSCAMOS la entidad gestionada en la BD
+            if (dto.direccion.idDireccion != null && !dto.direccion.idDireccion.isEmpty()) {
+                direccion = direccionDAO.getById(dto.direccion.idDireccion);
 
-        return h;
+                // Si direccion es NULL aquí, significa que falló el guardado anterior.
+                // NO creamos una nueva con ese ID, porque Hibernate fallará.
+                if (direccion == null) {
+                    throw new RuntimeException("Error interno: La dirección con ID " + dto.direccion.idDireccion + " no se encontró en la BD.");
+                }
+            } else {
+                // Solo si NO tiene ID creamos una nueva (caso raro en update)
+                direccion = DireccionMapper.dtoToEntity(dto.direccion);
+            }
+        }
+
+        return new Huesped(
+                dto.nombre,
+                dto.apellido,
+                tipoDoc,
+                dto.numDoc,
+                dto.posicionIva,
+                dto.cuit,
+                dto.fechaNac,
+                dto.telefono,
+                dto.email,
+                dto.ocupacion,
+                dto.nacionalidad,
+                direccion,
+                dto.idHuesped
+        );
+    }
+
+    public static HuespedDTO entityToDTO(Huesped entity) {
+        if (entity == null) return null;
+
+        HuespedDTO dto = new HuespedDTO();
+        dto.idHuesped = entity.getIdHuesped();
+        dto.nombre = entity.getNombre();
+        dto.apellido = entity.getApellido();
+        dto.numDoc = entity.getNumDoc();
+        dto.posicionIva = entity.getPosicionIva();
+        dto.cuit = entity.getCuit();
+        dto.fechaNac = entity.getFechaNac();
+        dto.telefono = entity.getTelefono();
+        dto.email = entity.getEmail();
+        dto.ocupacion = entity.getOcupacion();
+        dto.nacionalidad = entity.getNacionalidad();
+        dto.eliminado = entity.isEliminado();
+
+        if (entity.getTipoDoc() != null) {
+            com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO tdDto = new com.isi.desa.Dto.TipoDocumento.TipoDocumentoDTO();
+            tdDto.tipoDocumento = entity.getTipoDoc().getTipoDocumento();
+            dto.tipoDoc = tdDto;
+        }
+
+        if (entity.getDireccion() != null) {
+            // CORRECCIÓN: Llamamos al método con mayúsculas "DTO"
+            dto.direccion = DireccionMapper.entityToDTO(entity.getDireccion());
+        }
+
+        return dto;
     }
 }

@@ -42,7 +42,7 @@ public class Estadia {
 
     @ManyToMany
     @JoinTable(
-            name = "Ocupacion_de_Habitacion",
+            name = "habitacion_estadia",
             joinColumns = @JoinColumn(name = "id_estadia"),
             inverseJoinColumns = @JoinColumn(name = "id_habitacion")
     )
@@ -50,7 +50,7 @@ public class Estadia {
 
     @ManyToMany
     @JoinTable(
-            name = "Huespedes_Hospedados_por_Estadia",
+            name = "huesped_estadia",
             joinColumns = @JoinColumn(name = "id_estadia"),
             inverseJoinColumns = @JoinColumn(name = "id_huesped")
     )
@@ -79,4 +79,12 @@ public class Estadia {
 
     public List<Factura> getFacturas() { return facturas; }
     public void setFacturas(List<Factura> facturas) { this.facturas = facturas; }
+
+    public List<Habitacion> getHabitaciones() {
+        return habitaciones;
+    }
+
+    public void setHabitaciones(List<Habitacion> habitaciones) {
+        this.habitaciones = habitaciones;
+    }
 }

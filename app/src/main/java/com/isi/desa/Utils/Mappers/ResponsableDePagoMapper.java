@@ -23,7 +23,7 @@ public class ResponsableDePagoMapper {
             PersonaJuridicaDTO pjDto = new PersonaJuridicaDTO();
             pjDto.razonSocial = pj.getRazonSocial();
             pjDto.telefono = pj.getTelefono();
-            pjDto.direccion = DireccionMapper.entityToDto(pj.getDireccion());
+            pjDto.direccion = DireccionMapper.entityToDTO(pj.getDireccion());
             pjDto.cuit = pj.getCuit();
             pjDto.idResponsableDePago = pj.getIdResponsableDePago();
             dto = pjDto;

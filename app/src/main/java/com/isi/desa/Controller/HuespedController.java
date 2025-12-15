@@ -5,41 +5,31 @@ import com.isi.desa.Dto.Resultado;
 import com.isi.desa.Exceptions.Huesped.CannotCreateHuespedException;
 import com.isi.desa.Exceptions.Huesped.HuespedDuplicadoException;
 import com.isi.desa.Service.Implementations.HuespedService;
-import com.isi.desa.Service.Implementations.Logger;
-import com.isi.desa.Service.Interfaces.IHuespedService;
 import com.isi.desa.Service.Interfaces.ILogger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
 @RestController
 @RequestMapping("/Huesped")
+// ¡SIN @CrossOrigin AQUI! (Ya está en CorsConfig)
 public class HuespedController {
 
     @Autowired
-    private IHuespedService service;
+    private HuespedService service;
 
     @Autowired
     private ILogger logger;
-
-    // instancia única SINGLETON
-    private static final HuespedController INSTANCE = new HuespedController();
-
-    public static HuespedController getInstance() {
-        return INSTANCE;
-    }
 
     @PostMapping("/Buscar")
     public BuscarHuespedResultDTO buscar(@RequestBody BuscarHuespedRequestDTO requestDTO) {
         try {
             return this.service.buscarHuesped(requestDTO);
         } catch (Exception e) {
-            this.logger.error("Error en buscarHuesped: " + e.getMessage(), e);
+            this.logger.error("Error buscar: " + e.getMessage(), e);
             BuscarHuespedResultDTO res = new BuscarHuespedResultDTO();
             res.resultado = new Resultado();
             res.resultado.id = 1;
-            res.resultado.mensaje = "Error interno al buscar huéspedes.";
+            res.resultado.mensaje = "Error interno.";
             return res;
         }
     }
@@ -47,40 +37,47 @@ public class HuespedController {
     @PostMapping("/Alta")
     public AltaHuespedResultDTO altaHuesped(@RequestBody AltaHuesperRequestDTO requestDTO) {
         AltaHuespedResultDTO res = new AltaHuespedResultDTO();
+        res.resultado = new Resultado();
+
+        System.out.println("Llegó request: " + requestDTO);
+        if (requestDTO.huesped != null) {
+            System.out.println("Nombre: " + requestDTO.huesped.nombre);
+            System.out.println("TipoDoc: " + requestDTO.huesped.tipoDoc);
+        } else {
+            System.out.println("EL OBJETO HUESPED ES NULL (Error de estructura JSON)");
+        }
 
         try {
-            // alta del huesped
-            HuespedDTO creado = this.service.crear(requestDTO.huesped);
-
+            HuespedDTO creado = this.service.crear(requestDTO.huesped, requestDTO.aceptarIgualmente);
             res.resultado.id = 0;
             res.resultado.mensaje = "Huesped dado de alta exitosamente.";
             res.huesped = creado;
 
         } catch (CannotCreateHuespedException e) {
-            // errores de validación normales
+            // ERROR DE VALIDACIÓN (Falta campo, mal formato, etc.)
             res.resultado.id = 2;
             res.resultado.mensaje = e.getMessage();
 
         } catch (HuespedDuplicadoException e) {
-            // esto es cuando ya existe un tipoDoc + numDoc igual
-            res.resultado.id = 2;
+            // 🔥 CAMBIO CLAVE: Usamos ID 3 para duplicados
+            res.resultado.id = 3;
             res.resultado.mensaje = e.getMessage();
 
         } catch (Exception e) {
-            // error inesperado
             this.logger.error("Error en altaHuesped: " + e.getMessage(), e);
             res.resultado.id = 1;
-            res.resultado.mensaje = "Ocurrio un error interno al realizar el alta del huesped.";
+            res.resultado.mensaje = "Ocurrio un error interno: " + e.getMessage();
         }
 
         return res;
     }
 
-    public ModificarHuespedResultDTO modificarHuesped(ModificarHuespedRequestDTO requestDTO) {
+    @PostMapping("/Modificar")
+    public ModificarHuespedResultDTO modificarHuesped(@RequestBody ModificarHuespedRequestDTO requestDTO) {
         try {
             return this.service.modificar(requestDTO);
         } catch (Exception e) {
-            this.logger.error("Error en HuespedController - modificarHuesped: " + e.getMessage(), e);
+            this.logger.error("Error modificar: " + e.getMessage(), e);
             ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
             res.resultado = new Resultado();
             res.resultado.id = 1;
@@ -89,12 +86,17 @@ public class HuespedController {
         }
     }
 
-    public BajaHuespedResultDTO bajaHuesped(BajaHuespedRequestDTO requestDTO) {
+    @PostMapping("/Baja")
+    public BajaHuespedResultDTO bajaHuesped(@RequestBody BajaHuespedRequestDTO requestDTO) {
         try {
             return this.service.eliminar(requestDTO);
         } catch (Exception e){
-            this.logger.error("Error en HuespedController - bajaHuesped: " + e.getMessage(), e);
-            return null;
+            this.logger.error("Error baja: " + e.getMessage(), e);
+            BajaHuespedResultDTO res = new BajaHuespedResultDTO();
+            res.resultado = new Resultado();
+            res.resultado.id = 1;
+            res.resultado.mensaje = "Error interno";
+            return res;
         }
     }
 }

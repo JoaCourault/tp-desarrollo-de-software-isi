@@ -7,6 +7,5 @@ import com.isi.desa.Model.Entities.Direccion.Direccion;
 import java.util.List;
 
 public interface IDireccionValidator {
-    Direccion create(DireccionDTO direccionDTO);
     InvalidDirectionException validate(DireccionDTO direccionDTO);
 }
