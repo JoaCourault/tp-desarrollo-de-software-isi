@@ -153,20 +153,28 @@ public class HuespedService implements IHuespedService {
     }
 
     @Override
+    @Transactional
     public ModificarHuespedResultDTO modificar(ModificarHuespedRequestDTO request) {
         ModificarHuespedResultDTO res = new ModificarHuespedResultDTO();
         res.resultado = new Resultado();
-        res.resultado.id = 1;
 
         try {
+            // 1. Validaciones Básicas (Null checks)
             if (request == null || request.huesped == null) {
                 res.resultado.id = 2;
-                res.resultado.mensaje = "Solicitud invalida: no se enviaron datos de huesped.";
+                res.resultado.mensaje = "Datos vacíos.";
                 return res;
             }
 
             HuespedDTO dto = request.huesped;
 
+            if (dto.idHuesped == null || dto.idHuesped.isBlank()) {
+                res.resultado.id = 2;
+                res.resultado.mensaje = "El ID del huésped es obligatorio para modificar.";
+                return res;
+            }
+
+            // Validaciones de Regex y Negocio
             CannotModifyHuespedEsception errorValidacion = this.validator.validateUpdate(dto);
             if (errorValidacion != null) {
                 res.resultado.id = 2;
@@ -174,46 +182,58 @@ public class HuespedService implements IHuespedService {
                 return res;
             }
 
-            // Validación duplicado
-            boolean duplicado = dao.leerHuespedes().stream()
-                    .filter(h -> h != null && !h.isEliminado())
-                    .anyMatch(h ->
-                            h.getIdHuesped() != null &&
-                                    !h.getIdHuesped().equalsIgnoreCase(dto.idHuesped) &&
-                                    h.getTipoDoc() != null &&
-                                    dto.tipoDoc != null &&
-                                    dto.tipoDoc.tipoDocumento != null &&
-                                    h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(dto.tipoDoc.tipoDocumento) &&
-                                    h.getNumDoc().equals(dto.numDoc)
-                    );
+            // 2. Validación de Duplicados
+            if (request.aceptarIgualmente == null || !request.aceptarIgualmente) {
+                boolean existeOtro = repository.existsByNumDocAndTipoDoc_TipoDocumentoAndIdHuespedNot(
+                        dto.numDoc,
+                        dto.tipoDoc.tipoDocumento,
+                        dto.idHuesped
+                );
 
-            if (duplicado && (request.aceptarIgualmente == null || !request.aceptarIgualmente)) {
-                res.resultado.id = 3;
-                res.resultado.mensaje = "¡CUIDADO! El tipo y numero de documento ya existen en el sistema";
+                if (existeOtro) {
+                    res.resultado.id = 3; // Activa modal "Aceptar Igualmente"
+                    res.resultado.mensaje = "El documento ya existe en otro huésped.";
+                    return res;
+                }
+            }
+
+            // 3. Actualización de Dirección (ESTRICTA)
+            if (dto.direccion == null || dto.direccion.id == null || dto.direccion.id.isBlank()) {
+                res.resultado.id = 2;
+                res.resultado.mensaje = "Error de integridad: El huésped no tiene una dirección válida para modificar.";
                 return res;
             }
 
+            // Llamamos al DAO. Si el ID no existe en BD, el DAO lanzará RuntimeException
+            // y caeremos en el catch de abajo.
+            direccionDAO.modificar(dto.direccion);
+
+
+            // 4. Actualización del Huésped
             Huesped modificado = dao.modificar(dto);
 
             if (modificado == null) {
                 res.resultado.id = 1;
-                res.resultado.mensaje = "Error interno al modificar huesped.";
+                res.resultado.mensaje = "No se encontró el huésped a modificar.";
                 return res;
             }
 
+            // Éxito
             res.resultado.id = 0;
-            res.resultado.mensaje = "La operacion ha culminado con exito";
+            res.resultado.mensaje = "Huésped modificado exitosamente.";
             return res;
 
-        } catch (HuespedNotFoundException nf) {
-            res.resultado.id = 2;
-            res.resultado.mensaje = nf.getMessage();
+        } catch (RuntimeException re) {
+            // Capturamos la excepción específica del DAO de Dirección
+            re.printStackTrace();
+            res.resultado.id = 2; // Error de validación/lógica
+            res.resultado.mensaje = re.getMessage(); // "No se encontró la dirección con ID..."
             return res;
 
         } catch (Exception e) {
-            e.printStackTrace(); // Agregado para ver error en consola si pasa algo raro
-            res.resultado.id = 1;
-            res.resultado.mensaje = "Error interno al modificar huesped: " + e.getMessage();
+            e.printStackTrace();
+            res.resultado.id = 1; // Error interno
+            res.resultado.mensaje = "Error interno: " + e.getMessage();
             return res;
         }
     }

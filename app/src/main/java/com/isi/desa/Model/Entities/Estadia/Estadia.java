@@ -34,8 +34,12 @@ public class Estadia {
     private Integer cantNoches;
 
     @OneToOne
-    @JoinColumn(name = "id_reserva", referencedColumnName = "id_reserva", nullable = false)
+    @JoinColumn(name = "id_reserva", referencedColumnName = "id_reserva", nullable = true)
     private Reserva reserva;
+
+    @ManyToOne
+    @JoinColumn(name = "id_huesped_titular", referencedColumnName = "id_huesped")
+    private Huesped huesped_titular;
 
     @ManyToMany(mappedBy = "estadias")
     private List<Factura> facturas;
@@ -98,5 +102,12 @@ public class Estadia {
 
     public void setHuespedes(List<Huesped> huespedes) {
 
+    }
+    public Huesped getHuesped() {
+        return huesped_titular;
+    }
+
+    public void setHuesped(Huesped huesped) {
+        this.huesped_titular = huesped;
     }
 }

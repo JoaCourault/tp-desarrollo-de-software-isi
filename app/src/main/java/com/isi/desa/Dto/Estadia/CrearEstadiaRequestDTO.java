@@ -11,6 +11,7 @@ public class CrearEstadiaRequestDTO {
     private Integer cantNoches;
     private String idReserva;
 
+    private String idHuespedTitular;
     private List<String> idsHabitaciones;
     private List<String> idsHuespedes;
 
@@ -31,4 +32,6 @@ public class CrearEstadiaRequestDTO {
     public void setIdsHabitaciones(List<String> idsHabitaciones) { this.idsHabitaciones = idsHabitaciones; }
     public List<String> getIdsHuespedes() { return idsHuespedes; }
     public void setIdsHuespedes(List<String> idsHuespedes) { this.idsHuespedes = idsHuespedes; }
+    public String getIdHuespedTitular() { return idHuespedTitular; }
+    public void setIdHuespedTitular(String idHuespedTitular) { this.idHuespedTitular = idHuespedTitular; }
 }

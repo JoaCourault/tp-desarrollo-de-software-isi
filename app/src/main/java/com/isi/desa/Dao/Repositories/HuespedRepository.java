@@ -23,6 +23,9 @@ public interface HuespedRepository extends JpaRepository<Huesped, String> {
             @Param("numDoc") String numDoc,
             @Param("tipoDoc") String tipoDoc
     );
-    // Spring Data genera el SQL: SELECT count(*) > 0 FROM Huesped WHERE num_doc = ? AND tipo_doc = ?
+
     boolean existsByNumDocAndTipoDoc_TipoDocumento(String numDoc, String tipoDocumento);
+
+    boolean existsByNumDocAndTipoDoc_TipoDocumentoAndIdHuespedNot(String numDoc, String tipoDocumento, String idHuesped);
+
 }

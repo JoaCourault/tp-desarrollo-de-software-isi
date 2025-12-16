@@ -24,6 +24,8 @@ public class Reserva {
     private String apellidoHuesped;
     @Column(name = "telefono_huesped")
     private String telefonoHuesped;
+    @Column(name = "estado", length = 50)
+    private String estado;
     @ManyToOne
     @JoinColumn(name = "id_habitacion", referencedColumnName = "id_habitacion", nullable = false)
     private Habitacion habitacion;

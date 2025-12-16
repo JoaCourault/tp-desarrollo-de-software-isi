@@ -67,7 +67,6 @@ public abstract class Habitacion {
     public abstract void mostrarEstadoHabitaciones(); // Si es abstracta, fueras la implementación
 
     // Getters y Setters...
-    // (Incluye el resto de tu código de getters y setters aquí)
 
     public TipoHabitacion getTipoHabitacion() { return tipoHabitacion; }
 

@@ -1,7 +1,6 @@
 package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Implementations.EstadiaDAO;
-import com.isi.desa.Dao.Implementations.ReservaDAO;
 import com.isi.desa.Dao.Repositories.HabitacionRepository;
 import com.isi.desa.Dao.Repositories.HuespedRepository;
 import com.isi.desa.Dao.Repositories.ReservaRepository;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class EstadiaService implements IEstadiaService {
@@ -36,90 +34,63 @@ public class EstadiaService implements IEstadiaService {
     @Autowired
     private ReservaRepository reservaRepository;
 
-    @Autowired
-    private ReservaDAO reservaDAO;
-
+    @Override
     @Transactional
     public EstadiaDTO ocuparHabitacion(CrearEstadiaRequestDTO request) {
-        // 1. Validaciones básicas
+        // 1. VALIDACIONES
         if (request.getIdsHabitaciones() == null || request.getIdsHabitaciones().isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos una habitación.");
         }
-        if (request.getIdsHuespedes() == null || request.getIdsHuespedes().isEmpty()) {
-            throw new IllegalArgumentException("Debe seleccionar al menos un huésped.");
+        if (request.getIdHuespedTitular() == null || request.getIdHuespedTitular().isBlank()) {
+            throw new IllegalArgumentException("Es obligatorio designar un Titular para la estadía.");
         }
 
-        // 2. Buscar Entidades (Habitaciones y Huéspedes)
+        // 2. RECUPERAR ENTIDADES
         List<Habitacion> habitaciones = habitacionRepository.findAllById(request.getIdsHabitaciones());
-        List<Huesped> huespedes = huespedRepository.findAllById(request.getIdsHuespedes());
+        List<Huesped> todosLosHuespedes = huespedRepository.findAllById(request.getIdsHuespedes());
+
+        // Buscamos Titular existente
+        Huesped titularEntity = huespedRepository.findById(request.getIdHuespedTitular())
+                .orElseThrow(() -> new IllegalArgumentException("El titular seleccionado no existe en la base de datos."));
 
         if (habitaciones.size() != request.getIdsHabitaciones().size()) {
-            throw new IllegalArgumentException("Alguna de las habitaciones no existe.");
+            throw new IllegalArgumentException("Alguna de las habitaciones solicitadas no existe.");
         }
 
-        // 3. Validar Disponibilidad y Actualizar Estado
+        // 3. CAMBIAR ESTADO HABITACIONES
         for (Habitacion hab : habitaciones) {
-            // Verifica que no esté ocupada ni fuera de servicio
             if (hab.getEstado() == EstadoHabitacion.OCUPADA || hab.getEstado() == EstadoHabitacion.FUERA_DE_SERVICIO) {
                 throw new IllegalArgumentException("La habitación " + hab.getNumero() + " no está disponible.");
             }
-            // Actualizamos estado a OCUPADA (Check-In efectivo)
             hab.setEstado(EstadoHabitacion.OCUPADA);
             habitacionRepository.save(hab);
         }
 
-        // 4. Instanciar Estadía
+        // 4. CREAR ESTADÍA
         Estadia estadia = new Estadia();
 
-        // --- SETEAR ID MANUALMENTE ---
-        // Generamos un ID de máximo 20 caracteres para evitar el error de base de datos.
-        // Al setearlo aquí (no null), Hibernate debería respetar este valor y no usar el generator uuid2.
-        String uuidRaw = UUID.randomUUID().toString().replace("-", "");
-        String idCorto = "ES_" + uuidRaw.substring(0, 15); // Total 18 caracteres (seguro < 20)
-        estadia.setIdEstadia(idCorto);
-        // -----------------------------------------------
+        // (ID generado automáticamente por JPA)
 
-        // Seteo de fechas
         estadia.setCheckIn(request.getCheckIn().atTime(14, 0));
         estadia.setCheckOut(request.getCheckOut().atTime(10, 0));
         estadia.setCantNoches(request.getCantNoches());
 
-        // 5. LÓGICA DE RESERVA
-        Reserva reservaVinculada;
+        // Vinculamos Titular (columna id_huesped_titular)
+        estadia.setHuesped(titularEntity);
 
+        // 5. GESTIÓN DE RESERVA
         if (request.getIdReserva() != null && !request.getIdReserva().isEmpty()) {
-            // CASO A: Viene con reserva previa
-            reservaVinculada = reservaRepository.findById(request.getIdReserva())
-                    .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + request.getIdReserva()));
+            // CASO A: Viene de una Reserva Existente -> La vinculamos
+            Reserva reservaVinculada = reservaRepository.findById(request.getIdReserva())
+                    .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + request.getIdReserva()));
+
+            estadia.setReserva(reservaVinculada);
         } else {
-            // CASO B: WALK-IN (Sin reserva)
-            System.out.println(">>> Generando Reserva Automática (Walk-In)...");
-
-            reservaVinculada = new Reserva();
-
-            // También generamos ID corto para la reserva por si acaso
-            String uuidRes = UUID.randomUUID().toString().replace("-", "");
-            reservaVinculada.setIdReserva("RE_" + uuidRes.substring(0, 15));
-
-            reservaVinculada.setFechaIngreso(estadia.getCheckIn());
-            reservaVinculada.setFechaEgreso(estadia.getCheckOut());
-            reservaVinculada.setHabitacion(habitaciones.get(0));
-
-            if (!huespedes.isEmpty()) {
-                Huesped titular = huespedes.get(0);
-                reservaVinculada.setNombreHuesped(titular.getNombre());
-                reservaVinculada.setApellidoHuesped(titular.getApellido());
-                reservaVinculada.setTelefonoHuesped(titular.getTelefono());
-            } else {
-                reservaVinculada.setApellidoHuesped("WALK-IN ANÓNIMO");
-            }
-
-            reservaVinculada = reservaDAO.guardar(reservaVinculada);
+            // CASO B: Walk-In -> No hay reserva asociada
+            estadia.setReserva(null);
         }
 
-        estadia.setReserva(reservaVinculada);
-
-        // 6. Calcular Valor Total
+        // 6. VALOR TOTAL
         BigDecimal total = BigDecimal.ZERO;
         for (Habitacion h : habitaciones) {
             if (h.getPrecio() != null) {
@@ -129,12 +100,10 @@ public class EstadiaService implements IEstadiaService {
         total = total.multiply(new BigDecimal(request.getCantNoches()));
         estadia.setValorTotalEstadia(total);
 
-        // 7. Setear Relaciones
+        // 7. RELACIONES
         estadia.setHabitaciones(habitaciones);
-        estadia.setHuespedesHospedados(huespedes);
+        estadia.setHuespedesHospedados(todosLosHuespedes);
 
-        // 8. Guardar Estadía
-        // Al tener el ID ya seteado, el DAO insertará el string corto que generamos arriba.
         return estadiaDAO.save(estadia);
     }
 }
