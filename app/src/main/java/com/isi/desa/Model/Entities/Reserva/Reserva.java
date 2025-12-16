@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.isi.desa.Model.Enums.EstadoReserva;
 
 @Entity
 @Table(name = "Reserva")
@@ -24,8 +25,9 @@ public class Reserva {
     private String apellidoHuesped;
     @Column(name = "telefono_huesped")
     private String telefonoHuesped;
-    @Column(name = "estado", length = 50)
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = true)
+    private EstadoReserva estado;
     @ManyToOne
     @JoinColumn(name = "id_habitacion", referencedColumnName = "id_habitacion", nullable = false)
     private Habitacion habitacion;
@@ -57,4 +59,8 @@ public class Reserva {
     public void setIdReserva(String idReserva) {
         this.idReserva = idReserva;
     }
+
+    public EstadoReserva getEstado() {return estado;  }
+
+    public void setEstado(EstadoReserva estado) {this.estado = estado;   }
 }

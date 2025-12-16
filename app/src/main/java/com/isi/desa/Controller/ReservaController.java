@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.isi.desa.Dto.Reserva.ReservaListadoDTO;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -47,11 +48,21 @@ public class ReservaController {
             @RequestParam(value = "tipo", required = false) String tipo){
 
         try {
-            LocalDate desde = LocalDate.parse(desdeStr);
-            LocalDate hasta = LocalDate.parse(hastaStr);
+            LocalDate fechaDesde = LocalDate.parse(desdeStr);
+            LocalDate fechaHasta = LocalDate.parse(hastaStr);
+            // 2. Convertir a LocalDateTime, agregando la hora de referencia para el Service.
+            // Check-in se asume a las 14:00 (o 00:00 para rango de búsqueda)
+            // Usaremos atStartOfDay() para tomar el inicio del día:
+            LocalDateTime desde = fechaDesde.atStartOfDay();
+            LocalDateTime hasta = fechaHasta.atStartOfDay();
 
             List<HabitacionDisponibilidadDTO> disponibilidad = reservaService.consultarDisponibilidad(desde, hasta, tipo);
             return ResponseEntity.ok(disponibilidad);
+
+        } catch (java.time.format.DateTimeParseException dtpe) {
+            // Manejo específico del error de formato
+            dtpe.printStackTrace();
+            return ResponseEntity.badRequest().build();
 
         } catch (Exception e) {
             e.printStackTrace(); // Ver error en consola

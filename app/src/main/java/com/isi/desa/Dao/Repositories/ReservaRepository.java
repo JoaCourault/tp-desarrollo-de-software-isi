@@ -20,7 +20,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
     List<Reserva> buscarPorHuesped(@Param("apellido") String apellido,
                                    @Param("nombre") String nombre);
     // Consulta corregida para comparar fechas con horas
-    @Query("SELECT r FROM Reserva r WHERE r.fechaIngreso < :hasta AND r.fechaEgreso > :desde")
+    @Query("SELECT r FROM Reserva r WHERE " +
+            "(r.fechaIngreso < :hasta AND r.fechaEgreso > :desde) AND " +
+            "(r.estado IS NULL OR r.estado != com.isi.desa.Model.Enums.EstadoReserva.CANCELADA OR r.estado != com.isi.desa.Model.Enums.EstadoReserva.FINALIZADA)")
     List<Reserva> findReservasEnRango(@Param("desde") LocalDateTime desde,
                                       @Param("hasta") LocalDateTime hasta);
 

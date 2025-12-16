@@ -1,6 +1,7 @@
 package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Implementations.EstadiaDAO;
+import com.isi.desa.Dao.Implementations.ReservaDAO;
 import com.isi.desa.Dao.Repositories.HabitacionRepository;
 import com.isi.desa.Dao.Repositories.HuespedRepository;
 import com.isi.desa.Dao.Repositories.ReservaRepository;
@@ -15,7 +16,7 @@ import com.isi.desa.Service.Interfaces.IEstadiaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.isi.desa.Model.Enums.EstadoReserva;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class EstadiaService implements IEstadiaService {
 
     @Autowired
     private ReservaRepository reservaRepository;
+
+    @Autowired
+    private ReservaDAO reservaDAO;
 
     @Override
     @Transactional
@@ -59,13 +63,11 @@ public class EstadiaService implements IEstadiaService {
 
         // 3. CAMBIAR ESTADO HABITACIONES
         for (Habitacion hab : habitaciones) {
-            if (hab.getEstado() == EstadoHabitacion.OCUPADA || hab.getEstado() == EstadoHabitacion.FUERA_DE_SERVICIO) {
-                throw new IllegalArgumentException("La habitación " + hab.getNumero() + " no está disponible.");
+            // VALIDACIÓN: Solo verificamos que no esté rota.
+            if (hab.getEstado() == EstadoHabitacion.FUERA_DE_SERVICIO) {
+                throw new IllegalArgumentException("La habitación " + hab.getNumero() + " está fuera de servicio.");
             }
-            hab.setEstado(EstadoHabitacion.OCUPADA);
-            habitacionRepository.save(hab);
         }
-
         // 4. CREAR ESTADÍA
         Estadia estadia = new Estadia();
 
@@ -84,6 +86,9 @@ public class EstadiaService implements IEstadiaService {
             Reserva reservaVinculada = reservaRepository.findById(request.getIdReserva())
                     .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + request.getIdReserva()));
 
+            // ACTUALIZAMOS EL ESTADO: De REALIZADA a COMPLETADA
+            reservaVinculada.setEstado(EstadoReserva.COMPLETADA);
+            reservaDAO.guardar(reservaVinculada); // Guardamos el cambio de estado
             estadia.setReserva(reservaVinculada);
         } else {
             // CASO B: Walk-In -> No hay reserva asociada
