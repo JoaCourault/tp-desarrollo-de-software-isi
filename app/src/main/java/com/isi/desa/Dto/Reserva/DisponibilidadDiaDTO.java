@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public class DisponibilidadDiaDTO {
     public LocalDate fecha;
     public String estado; // "DISPONIBLE", "OCUPADA", "RESERVADA", "MANTENIMIENTO"
+    private String idReserva;
 
     public DisponibilidadDiaDTO(LocalDate fecha, String estado) {
         this.fecha = fecha;
@@ -28,4 +29,6 @@ public class DisponibilidadDiaDTO {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+    public String getIdReserva() { return idReserva; }
+    public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
 }

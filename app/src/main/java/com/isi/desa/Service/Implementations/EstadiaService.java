@@ -87,7 +87,7 @@ public class EstadiaService implements IEstadiaService {
                     .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + request.getIdReserva()));
 
             // ACTUALIZAMOS EL ESTADO: De REALIZADA a COMPLETADA
-            reservaVinculada.setEstado(EstadoReserva.COMPLETADA);
+            reservaVinculada.setEstado(EstadoReserva.EFECTIVIZADA);
             reservaDAO.guardar(reservaVinculada); // Guardamos el cambio de estado
             estadia.setReserva(reservaVinculada);
         } else {

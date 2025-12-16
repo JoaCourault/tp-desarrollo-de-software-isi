@@ -13,6 +13,4 @@ public class SuiteDoble extends Habitacion {
         this.setTipoHabitacion(TipoHabitacion.SUITE_DOBLE);
     }
 
-    @Override
-    public void mostrarEstadoHabitaciones() {}
 }

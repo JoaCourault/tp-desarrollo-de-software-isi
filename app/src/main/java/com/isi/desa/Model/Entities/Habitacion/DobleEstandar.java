@@ -14,8 +14,4 @@ public class DobleEstandar extends Habitacion {
         this.setTipoHabitacion(TipoHabitacion.DOBLE_ESTANDAR);
     }
 
-    @Override
-    public void mostrarEstadoHabitaciones() {
-
-    }
 }

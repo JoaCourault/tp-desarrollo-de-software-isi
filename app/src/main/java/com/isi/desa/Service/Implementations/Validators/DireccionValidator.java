@@ -87,8 +87,8 @@ public class DireccionValidator implements IDireccionValidator {
         if (codigoPostal == null || codigoPostal.trim().isEmpty()) {
             return "El codigo postal es obligatorio";
         }
-        if (!codigoPostal.matches("\\d+")) {
-            return "El codigo postal debe contener solo números positivos";
+        if (!codigoPostal.matches("^[a-zA-Z0-9]+$")) {
+            return "El codigo postal contiene caracteres inválidos (solo se permiten letras y números sin espacios)";
         }
         return null;
     }

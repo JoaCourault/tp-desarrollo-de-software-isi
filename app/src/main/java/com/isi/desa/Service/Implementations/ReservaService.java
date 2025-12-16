@@ -76,7 +76,7 @@ public class ReservaService implements IReservaService {
 
             Reserva nuevaReserva = new Reserva();
 
-            nuevaReserva.setEstado(EstadoReserva.REALIZADA);
+            nuevaReserva.setEstado(EstadoReserva.RESERVADA);
             // Usamos getFechaDesde() para el ingreso
             // Configuramos Check-in a las 14:00
             nuevaReserva.setFechaIngreso(item.getFechaDesde().atTime(14, 0));
@@ -100,18 +100,15 @@ public class ReservaService implements IReservaService {
     public List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDateTime desde, LocalDateTime hasta, String tipoHabitacion) {
         List<HabitacionDisponibilidadDTO> resultado = new ArrayList<>();
 
-        // 1. Obtener Habitaciones (filtrando por tipo si corresponde)
+        // 1. Obtener Habitaciones
         List<Habitacion> habitaciones;
         if (tipoHabitacion != null && !tipoHabitacion.isEmpty()) {
             habitaciones = habitacionRepository.findAll().stream()
-                    .filter(h -> h.getTipoHabitacion().toString().equals(tipoHabitacion))
+                    .filter(h -> h.getTipoHabitacion() != null && h.getTipoHabitacion().toString().equals(tipoHabitacion))
                     .collect(Collectors.toList());
         } else {
             habitaciones = habitacionRepository.findAll();
         }
-
-        // 2. Obtener Reservas y Estadías "crudas" para el rango (Optimización: traer todo y filtrar en memoria o iterar)
-        // Para simplificar y asegurar consistencia, iteraremos por habitación:
 
         for (Habitacion hab : habitaciones) {
             HabitacionDisponibilidadDTO dto = new HabitacionDisponibilidadDTO();
@@ -120,29 +117,27 @@ public class ReservaService implements IReservaService {
 
             // --- ESCENARIO 1: HABITACIÓN ROTA ---
             if (hab.getEstado() == EstadoHabitacion.FUERA_DE_SERVICIO) {
-                // Llenamos todos los días del rango como "MANTENIMIENTO"
                 LocalDateTime current = desde;
-                while (!current.isAfter(hasta.minusDays(1))) { // iterar dia a dia
+                while (!current.isAfter(hasta.minusDays(1))) {
                     DisponibilidadDiaDTO diaDTO = new DisponibilidadDiaDTO();
                     diaDTO.setFecha(current.toLocalDate());
-                    diaDTO.setEstado("MANTENIMIENTO"); // El front lo pintará gris
+                    diaDTO.setEstado("MANTENIMIENTO");
                     dias.add(diaDTO);
                     current = current.plusDays(1);
                 }
                 dto.setDisponibilidad(dias);
                 resultado.add(dto);
-                continue; // Pasamos a la siguiente habitación
+                continue;
             }
 
-            // --- ESCENARIO 2: HABITACIÓN FUNCIONAL (DISPONIBLE) ---
-            // Buscamos si hay ocupación real (Estadía) o futura (Reserva)
+            // --- ESCENARIO 2: HABITACIÓN FUNCIONAL ---
 
-            // a. Buscar Reservas activas (excluye canceladas gracias al cambio anterior en Repo)
+            // a. Traer Reservas (Solo validas)
             List<Reserva> reservasHab = reservaRepository.findReservasEnRango(desde, hasta).stream()
                     .filter(r -> r.getHabitacion().getIdHabitacion().equals(hab.getIdHabitacion()))
                     .collect(Collectors.toList());
 
-            // b. Buscar Estadías activas (Gente durmiendo AHORA)
+            // b. Traer Estadías
             List<Estadia> estadiasHab = estadiaRepository.findEstadiasPorHabitacionYFecha(hab.getIdHabitacion(), desde, hasta);
 
             LocalDateTime current = desde;
@@ -151,24 +146,34 @@ public class ReservaService implements IReservaService {
                 diaDTO.setFecha(current.toLocalDate());
 
                 final LocalDateTime fechaAnalizada = current;
+                LocalDate diaAnalizadoDate = fechaAnalizada.toLocalDate();
 
-                // 1. Prioridad ALTA: ¿Hay alguien durmiendo? -> OCUPADA (Rojo)
-                boolean hayEstadia = estadiasHab.stream().anyMatch(e ->
-                        (e.getCheckIn().isBefore(fechaAnalizada.plusDays(1)) && e.getCheckOut().isAfter(fechaAnalizada))
-                );
+                // 1. PRIORIDAD ALTA: ESTADÍA (OCUPADA - ROJO)
+                // Lógica: Si hoy duermen aquí. (CheckIn <= Hoy < CheckOut)
+                // IMPORTANTE: Si el checkout es HOY, hoy ya no cuenta como ocupado (se van a las 10am)
+                java.util.Optional<Estadia> estadiaMatch = estadiasHab.stream().filter(e ->
+                        !e.getCheckIn().toLocalDate().isAfter(diaAnalizadoDate) && // CheckIn fue hoy o antes
+                                e.getCheckOut().toLocalDate().isAfter(diaAnalizadoDate)    // CheckOut es MAÑANA o después
+                ).findFirst();
 
-                if (hayEstadia) {
+                if (estadiaMatch.isPresent()) {
                     diaDTO.setEstado("OCUPADA");
+                    // Opcional: Si quisieras vincular estadía, podrías agregar idEstadia al DTO
                 } else {
-                    // 2. Prioridad MEDIA: ¿Hay reserva? -> RESERVADA (Amarillo)
-                    boolean hayReserva = reservasHab.stream().anyMatch(r ->
-                            (r.getFechaIngreso().isBefore(fechaAnalizada.plusDays(1)) && r.getFechaEgreso().isAfter(fechaAnalizada))
-                    );
+                    // 2. PRIORIDAD MEDIA: RESERVA (RESERVADA - AMARILLO)
+                    // Si el checkout es HOY, hoy queda libre para nueva reserva.
+                    java.util.Optional<Reserva> reservaMatch = reservasHab.stream().filter(r ->
+                            (r.getEstado() == null || r.getEstado() == EstadoReserva.RESERVADA) &&
+                                    !r.getFechaIngreso().toLocalDate().isAfter(diaAnalizadoDate) && // Ingreso <= Hoy
+                                    r.getFechaEgreso().toLocalDate().isAfter(diaAnalizadoDate)      // Egreso > Hoy (O sea, duermen esta noche)
+                    ).findFirst();
 
-                    if (hayReserva) {
+                    if (reservaMatch.isPresent()) {
                         diaDTO.setEstado("RESERVADA");
+                        // Guardamos el ID para el Check-In
+                        diaDTO.setIdReserva(reservaMatch.get().getIdReserva());
                     } else {
-                        // 3. Libre -> DISPONIBLE (Verde)
+                        // 3. PRIORIDAD BAJA: LIBRE (DISPONIBLE - VERDE)
                         diaDTO.setEstado("DISPONIBLE");
                     }
                 }
@@ -230,7 +235,7 @@ public class ReservaService implements IReservaService {
                     .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + id));
 
             // Validamos que no esté efectuada/finalizada
-            if (reserva.getEstado() == EstadoReserva.COMPLETADA || reserva.getEstado() == EstadoReserva.FINALIZADA) {
+            if (reserva.getEstado() == EstadoReserva.EFECTIVIZADA || reserva.getEstado() == EstadoReserva.FINALIZADA) {
                 throw new RuntimeException("No se puede cancelar una reserva que ya fue efectuada o finalizada.");
             }
 

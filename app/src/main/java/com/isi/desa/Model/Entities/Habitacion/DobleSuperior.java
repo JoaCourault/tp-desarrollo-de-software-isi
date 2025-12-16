@@ -13,6 +13,4 @@ public class DobleSuperior extends Habitacion {
         this.setTipoHabitacion(TipoHabitacion.DOBLE_SUPERIOR);
     }
 
-    @Override
-    public void mostrarEstadoHabitaciones() {}
 }

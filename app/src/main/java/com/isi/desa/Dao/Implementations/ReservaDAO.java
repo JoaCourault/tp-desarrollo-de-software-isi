@@ -28,15 +28,7 @@ public class ReservaDAO implements IReservaDAO {
     // Implementaciones para borrar reservas
     @Override
     public List<Reserva> buscarPorHuesped(String apellido, String nombre) {
-        // 1. Preparamos el Apellido
-        String apellidoQuery = apellido + "%";
-        // 2. Preparamos el Nombre
-        String nombreQuery = null;
-        if (nombre != null && !nombre.trim().isEmpty()) {
-            nombreQuery = nombre + "%";
-        }
-        // 3. Llamamos al Repo con los strings ya preparados
-        return repository.buscarPorHuesped(apellidoQuery, nombreQuery);
+        return repository.buscarParaCancelar(apellido, nombre);
     }
 
     @Override

@@ -13,6 +13,4 @@ public class SuperiorFamilyPlan extends Habitacion {
         this.setTipoHabitacion(TipoHabitacion.SUPERIOR_FAMILY_PLAN);
     }
 
-    @Override
-    public void mostrarEstadoHabitaciones() {}
 }

@@ -6,14 +6,13 @@ import com.isi.desa.Model.Enums.EstadoHabitacion;
 import com.isi.desa.Model.Enums.TipoHabitacion;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
-
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
 @Table(name = "habitacion")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Estrategia de tabla única
-@DiscriminatorColumn(name = "tipo_habitacion", discriminatorType = DiscriminatorType.STRING) // La columna que decide la clase
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_habitacion", discriminatorType = DiscriminatorType.STRING)
 public abstract class Habitacion {
 
     @Id
@@ -41,15 +40,11 @@ public abstract class Habitacion {
     @Column(name = "detalles")
     private String detalles;
 
-    // Como esta columna  es usada por el @DiscriminatorColumn de arriba,
-    // marcamos como insertable=false y updatable=false para que no choquen.
-    // Hibernate llenará esto automáticamente según la subclase.
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_habitacion", nullable = false, insertable = false, updatable = false)
+    @Column(name = "tipo_habitacion", insertable = false, updatable = false)
     private TipoHabitacion tipoHabitacion;
 
-    // Campos específicos para camas
-    @Column(name = "q_cam_individual") // Sugerencia: usar snake_case en BD
+    @Column(name = "q_cam_individual")
     private Integer cantidadCamasIndividual;
 
     @Column(name = "q_cam_dobles")
@@ -64,17 +59,16 @@ public abstract class Habitacion {
     @ManyToMany(mappedBy = "habitaciones")
     private List<Estadia> estadias;
 
-    public abstract void mostrarEstadoHabitaciones(); // Si es abstracta, fueras la implementación
+    public Habitacion() {
+    }
 
-    // Getters y Setters...
+    // --- GETTERS Y SETTERS ---
 
     public TipoHabitacion getTipoHabitacion() { return tipoHabitacion; }
 
-    // Este setter actualizará el objeto Java, pero NO la base de datos (porque es read-only).
-    // La BD se actualiza sola al guardar la instancia de la subclase correcta.
+    // Este setter sirve para mantener coherencia en Java, pero NO escribe en BD directamente.
     public void setTipoHabitacion(TipoHabitacion tipoHabitacion) { this.tipoHabitacion = tipoHabitacion; }
 
-    // ... resto de getters y setters
     public String getIdHabitacion() { return idHabitacion; }
     public void setIdHabitacion(String idHabitacion) { this.idHabitacion = idHabitacion; }
     public BigDecimal getPrecio() { return precio; }

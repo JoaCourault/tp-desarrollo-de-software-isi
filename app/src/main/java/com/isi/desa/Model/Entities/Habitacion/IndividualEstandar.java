@@ -13,6 +13,4 @@ public class IndividualEstandar extends Habitacion {
         this.setTipoHabitacion(TipoHabitacion.INDIVIDUAL_ESTANDAR);
     }
 
-    @Override
-    public void mostrarEstadoHabitaciones() {}
 }
