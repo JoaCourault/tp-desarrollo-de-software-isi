@@ -1,26 +1,26 @@
 package com.isi.desa.Model.Entities.Usuario;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "Usuario")
 public class Usuario {
 
     @Id
-    @Column(name = "idusuario", nullable = false, length = 255)
+    @GeneratedValue(generator = "id_usuario")
+    @GenericGenerator(name = "id_usuario", strategy = "uuid2")
+    @Column(name = "id_usuario", nullable = false, updatable = false)
     private String idUsuario;
 
-    @Column(name = "contrasenia", nullable = false, length = 255)
+    @Column(name = "contrasenia", nullable = false)
     private String contrasenia;
 
-    @Column(name = "nombre", nullable = false, length = 255)
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Column(name = "apellido", nullable = false, length = 255)
+    @Column(name = "apellido", nullable = false)
     private String apellido;
 
     public Usuario() {}

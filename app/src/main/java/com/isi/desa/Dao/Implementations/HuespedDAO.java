@@ -2,7 +2,6 @@ package com.isi.desa.Dao.Implementations;
 
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
 import com.isi.desa.Dao.Repositories.HuespedRepository;
-import com.isi.desa.Dao.Repositories.DireccionRepository;
 import com.isi.desa.Dto.Huesped.HuespedDTO;
 import com.isi.desa.Exceptions.Huesped.HuespedNotFoundException;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
@@ -26,22 +25,32 @@ public class HuespedDAO implements IHuespedDAO {
     @Autowired
     private HuespedRepository repository;
 
-    @Autowired
-    private DireccionRepository direccionRepository;
-
     @Override
     @Transactional
     public Huesped save(Huesped huesped) {
         return repository.save(huesped);
     }
+
     @Override
     @Transactional
     public Huesped modificar(HuespedDTO dto) {
         Huesped existente = repository.findById(dto.idHuesped)
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
 
+        // Convertimos el DTO a Entidad.
+        // IMPORTANTE: El Mapper buscará el TipoDocumento en BBDD via DAO estático.
         Huesped actualizado = HuespedMapper.dtoToEntity(dto);
+
+        // Aseguramos que no se pierda el estado de eliminado original ni el ID
+        actualizado.setIdHuesped(existente.getIdHuesped());
         actualizado.setEliminado(existente.isEliminado());
+
+        // Si la dirección venía en el DTO, el mapper la creó.
+        // Si no venía, mantenemos la anterior (opcional, depende de tu lógica de negocio).
+        if(actualizado.getDireccion() == null && existente.getDireccion() != null){
+            actualizado.setDireccion(existente.getDireccion());
+        }
+
         return repository.save(actualizado);
     }
 
@@ -49,31 +58,27 @@ public class HuespedDAO implements IHuespedDAO {
     @Transactional
     public Huesped eliminar(String idHuesped) {
         Huesped existente = repository.findById(idHuesped)
-                .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped));
-
-        // Lógica de validación de estadias (si es necesario)...
+                .orElseThrow(() -> new HuespedNotFoundException("No se encontró huesped con ID: " + idHuesped));
 
         existente.setEliminado(true);
         return repository.save(existente);
     }
 
-    // --- Métodos de lectura ---
     @Override
     @Transactional(readOnly = true)
     public List<Huesped> leerHuespedes() {
         return repository.findByEliminadoFalse();
     }
-    @Override @Transactional(readOnly = true) public Huesped obtenerHuesped(String DNI) { return null; }
-    @Override @Transactional(readOnly = true) public Huesped getById(String id) { return repository.findById(id).orElse(null); }
 
-    @Override
-    @Transactional
-    public void agregarEstadiaAHuesped(String idHuesped, String idEstadia) {
-        String sql = "INSERT INTO huesped_estadia (id_huesped, id_estadia) VALUES (:idHuesped, :idEstadia)";
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("idHuesped", idHuesped);
-        query.setParameter("idEstadia", idEstadia);
-        query.executeUpdate();
+    @Override @Transactional(readOnly = true)
+    public Huesped obtenerHuesped(String DNI) {
+        // Implementar si tienes un método findByNumDoc en el repo
+        return null;
+    }
+
+    @Override @Transactional(readOnly = true)
+    public Huesped getById(String id) {
+        return repository.findById(id).orElse(null);
     }
 
     @Override
@@ -85,5 +90,15 @@ public class HuespedDAO implements IHuespedDAO {
         Query query = entityManager.createNativeQuery(sql, Estadia.class);
         query.setParameter("idHuesped", idHuesped);
         return query.getResultList();
+    }
+
+    @Override
+    @Transactional
+    public void agregarEstadiaAHuesped(String idHuesped, String idEstadia) {
+        String sql = "INSERT INTO huesped_estadia (id_huesped, id_estadia) VALUES (:idHuesped, :idEstadia)";
+        Query query = entityManager.createNativeQuery(sql);
+        query.setParameter("idHuesped", idHuesped);
+        query.setParameter("idEstadia", idEstadia);
+        query.executeUpdate();
     }
 }

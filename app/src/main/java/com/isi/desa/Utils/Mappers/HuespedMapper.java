@@ -21,6 +21,7 @@ public class HuespedMapper {
     private static IHuespedDAO staticHuespedDAO;
 
     @Autowired private ITipoDocumentoDAO tipoDocumentoDAO;
+    // Usamos Lazy para evitar referencias circulares si el DAO usa el Mapper
     @Autowired @Lazy private IHuespedDAO huespedDAO;
 
     @PostConstruct
@@ -39,6 +40,7 @@ public class HuespedMapper {
         dto.numDoc = h.getNumDoc();
         dto.cuit = h.getCuit();
         dto.posicionIva = h.getPosicionIva();
+        // CORRECCIÓN: Entidad (fechaNac) -> DTO (fechaNacimiento)
         dto.fechaNacimiento = h.getFechaNac();
         dto.telefono = h.getTelefono();
         dto.email = h.getEmail();
@@ -49,7 +51,6 @@ public class HuespedMapper {
         // CORRECCIÓN: Extraemos el String del objeto TipoDocumento
         if (h.getTipoDocumento() != null) {
             dto.tipoDocumento = new TipoDocumentoDTO();
-            // Asumimos que la entidad TipoDocumento tiene un método getTipoDocumento() que devuelve el String (ej: "DNI")
             dto.tipoDocumento.tipoDocumento = h.getTipoDocumento().getTipoDocumento();
         }
 
@@ -58,6 +59,7 @@ public class HuespedMapper {
         }
 
         try {
+            // Nota: Esto asume que obtenerEstadiasDeHuesped funciona bien
             dto.estadias = EstadiaMapper.entityListToDtoList(staticHuespedDAO.obtenerEstadiasDeHuesped(h.getIdHuesped()));
         } catch (Exception e) {
             dto.estadias = Collections.emptyList();
@@ -76,6 +78,7 @@ public class HuespedMapper {
         h.setNumDoc(dto.numDoc);
         h.setPosicionIva(dto.posicionIva);
         h.setCuit(dto.cuit);
+        // CORRECCIÓN: DTO (fechaNacimiento) -> Entidad (fechaNac)
         h.setFechaNac(dto.fechaNacimiento);
         h.setTelefono(dto.telefono);
         h.setEmail(dto.email);
@@ -83,14 +86,16 @@ public class HuespedMapper {
         h.setNacionalidad(dto.nacionalidad);
         h.setEliminado(dto.eliminado);
 
-        // CORRECCIÓN: Buscamos la entidad TipoDocumento usando el DAO
+        // CORRECCIÓN IMPORTANTE: Buscamos la entidad real en la BBDD
         if (dto.tipoDocumento != null && dto.tipoDocumento.tipoDocumento != null) {
+            // Usamos el DAO estático para recuperar el objeto gestionado
             TipoDocumento td = staticTipoDocumentoDAO.obtener(dto.tipoDocumento.tipoDocumento);
             h.setTipoDocumento(td);
         }
 
         if (dto.direccion != null) {
             Direccion dirEntity = DireccionMapper.dtoToEntity(dto.direccion);
+            // El setter del helper en Huesped vincula la relación bidireccional
             h.setDireccion(dirEntity);
         }
 

@@ -1,103 +1,55 @@
 package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dto.Habitacion.HabitacionDTO;
-import com.isi.desa.Model.Entities.Habitacion.*; // Importamos todas las hijas
-import java.util.ArrayList;
-import java.util.List;
+import com.isi.desa.Model.Entities.Habitacion.*; // Importar todas las hijas
 
 public class HabitacionMapper {
 
-    public static HabitacionDTO entityToDTO(HabitacionEntity e) {
-        if (e == null) return null;
+    public static HabitacionDTO entityToDTO(Habitacion entity) {
+        if (entity == null) return null;
         HabitacionDTO dto = new HabitacionDTO();
+        dto.idHabitacion = entity.getIdHabitacion();
+        dto.precio = entity.getPrecio();
+        dto.numero = entity.getNumero();
+        dto.piso = entity.getPiso();
+        dto.capacidad = entity.getCapacidad();
+        dto.detalles = entity.getDetalles();
+        dto.estado = entity.getEstado();
+        dto.qCamDobles = entity.getqCamDobles();
+        dto.qCamIndividual = entity.getqCamIndividual();
+        dto.qCamKingSize = entity.getqCamKingSize();
 
-        // 1. Campos Comunes
-        dto.idHabitacion = e.getIdHabitacion();
-        dto.precio = e.getPrecio();
-        dto.numero = e.getNumero();
-        dto.piso = e.getPiso();
-        dto.capacidad = e.getCapacidad();
-        dto.detalles = e.getDetalles();
-        dto.estado = e.getEstado();
-
-        // 2. Determinar Tipo y Campos Específicos (Polimorfismo inverso)
-        // Usamos instanceof para saber qué tipo de objeto recuperó Hibernate
-        if (e instanceof IndividualEstandar) {
-            dto.tipoHabitacion = "Individual Estandar";
-            dto.cantidadCamasIndividual = ((IndividualEstandar) e).getCantidadCamasIndividual();
-        }
-        else if (e instanceof SuiteDoble) {
-            dto.tipoHabitacion = "Suite Doble";
-            dto.cantidadCamasDobles = ((SuiteDoble) e).getCantidadCamasDobles();
-        }
-        else if (e instanceof DobleSuperior) {
-            dto.tipoHabitacion = "Doble Superior";
-            DobleSuperior ds = (DobleSuperior) e;
-            dto.cantidadCamasIndividual = ds.getCantidadCamasIndividual();
-            dto.cantidadCamasDobles = ds.getCantidadCamasDobles();
-            dto.cantidadCamasKingSize = ds.getCantidadCamasKingSize();
-        }
-        else if (e instanceof SuperiorFamilyPlan) {
-            dto.tipoHabitacion = "Superior Family Plan";
-            SuperiorFamilyPlan sfp = (SuperiorFamilyPlan) e;
-            dto.cantidadCamasIndividual = sfp.getCantidadCamasIndividual();
-            dto.cantidadCamasDobles = sfp.getCantidadCamasDobles();
-        }
-        else if (e instanceof DobleEstandar) {
-            dto.tipoHabitacion = "Doble Estandar";
-            DobleEstandar de = (DobleEstandar) e;
-            dto.cantidadCamasIndividual = de.getCantidadCamasIndividual();
-            dto.cantidadCamasDobles = de.getCantidadCamasDobles();
-        }
+        // Recuperamos el DiscriminatorValue implícitamente si queremos,
+        // o lo inferimos de la clase:
+        if (entity instanceof DobleEstandar) dto.tipoHabitacion = "DOBLE_ESTANDAR";
+        else if (entity instanceof DobleSuperior) dto.tipoHabitacion = "DOBLE_SUPERIOR";
+        else if (entity instanceof IndividualEstandar) dto.tipoHabitacion = "INDIVIDUAL_ESTANDAR";
+        else if (entity instanceof SuiteDoble) dto.tipoHabitacion = "SUITE_DOBLE";
+        else if (entity instanceof SuperiorFamilyPlan) dto.tipoHabitacion = "SUPERIOR_FAMILY_PLAN";
 
         return dto;
     }
 
-    public static HabitacionEntity dtoToEntity(HabitacionDTO dto) {
+    public static Habitacion dtoToEntity(HabitacionDTO dto) {
         if (dto == null) return null;
 
-        HabitacionEntity entity;
+        Habitacion entity;
 
-        // 1. Instanciar la clase hija correcta según el String
+        // FÁBRICA DE INSTANCIAS: Dependiendo del String, creamos el HIJO concreto
         if (dto.tipoHabitacion == null) {
-            throw new RuntimeException("El tipo de habitación es obligatorio");
+            throw new RuntimeException("El tipo de habitación es obligatorio para crear la entidad.");
         }
 
-        switch (dto.tipoHabitacion) {
-            case "Individual Estandar":
-                IndividualEstandar ind = new IndividualEstandar();
-                ind.setCantidadCamasIndividual(dto.cantidadCamasIndividual);
-                entity = ind;
-                break;
-            case "Suite Doble":
-                SuiteDoble sd = new SuiteDoble();
-                sd.setCantidadCamasDobles(dto.cantidadCamasDobles);
-                entity = sd;
-                break;
-            case "Doble Superior":
-                DobleSuperior ds = new DobleSuperior();
-                ds.setCantidadCamasIndividual(dto.cantidadCamasIndividual);
-                ds.setCantidadCamasDobles(dto.cantidadCamasDobles);
-                ds.setCantidadCamasKingSize(dto.cantidadCamasKingSize);
-                entity = ds;
-                break;
-            case "Superior Family Plan":
-                SuperiorFamilyPlan sfp = new SuperiorFamilyPlan();
-                sfp.setCantidadCamasIndividual(dto.cantidadCamasIndividual);
-                sfp.setCantidadCamasDobles(dto.cantidadCamasDobles);
-                entity = sfp;
-                break;
-            case "Doble Estandar":
-                DobleEstandar de = new DobleEstandar();
-                de.setCantidadCamasIndividual(dto.cantidadCamasIndividual);
-                de.setCantidadCamasDobles(dto.cantidadCamasDobles);
-                entity = de;
-                break;
-            default:
-                throw new RuntimeException("Tipo de habitación desconocido: " + dto.tipoHabitacion);
+        switch (dto.tipoHabitacion.toUpperCase()) {
+            case "DOBLE_ESTANDAR": entity = new DobleEstandar(); break;
+            case "DOBLE_SUPERIOR": entity = new DobleSuperior(); break;
+            case "INDIVIDUAL_ESTANDAR": entity = new IndividualEstandar(); break;
+            case "SUITE_DOBLE": entity = new SuiteDoble(); break;
+            case "SUPERIOR_FAMILY_PLAN": entity = new SuperiorFamilyPlan(); break;
+            default: throw new RuntimeException("Tipo de habitación desconocido: " + dto.tipoHabitacion);
         }
 
-        // 2. Llenar Campos Comunes (La entidad ya fue instanciada arriba)
+        // Asignamos propiedades comunes (definidas en la clase abstracta)
         entity.setIdHabitacion(dto.idHabitacion);
         entity.setPrecio(dto.precio);
         entity.setNumero(dto.numero);
@@ -105,16 +57,10 @@ public class HabitacionMapper {
         entity.setCapacidad(dto.capacidad);
         entity.setDetalles(dto.detalles);
         entity.setEstado(dto.estado);
+        entity.setqCamDobles(dto.qCamDobles);
+        entity.setqCamIndividual(dto.qCamIndividual);
+        entity.setqCamKingSize(dto.qCamKingSize);
 
         return entity;
-    }
-
-    public static List<HabitacionDTO> entityListToDtoList(List<HabitacionEntity> entities) {
-        if (entities == null) return new ArrayList<>();
-        List<HabitacionDTO> dtos = new ArrayList<>();
-        for (HabitacionEntity h : entities) {
-            dtos.add(entityToDTO(h));
-        }
-        return dtos;
     }
 }

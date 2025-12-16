@@ -3,7 +3,7 @@ package com.isi.desa.Dao.Implementations;
 import com.isi.desa.Dao.Interfaces.IHabitacionDAO;
 import com.isi.desa.Dao.Repositories.HabitacionRepository;
 import com.isi.desa.Dto.Habitacion.HabitacionDTO; // <--- IMPORTANTE
-import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
+import com.isi.desa.Model.Entities.Habitacion.Habitacion;
 import com.isi.desa.Utils.Mappers.HabitacionMapper; // <--- IMPORTANTE
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,21 +19,21 @@ public class HabitacionDAO implements IHabitacionDAO {
 
     @Override
     @Transactional
-    public HabitacionEntity save(HabitacionEntity entity) {
+    public Habitacion save(Habitacion entity) {
         return repo.save(entity);
     }
 
 
     @Override
     @Transactional
-    public HabitacionEntity modificar(HabitacionDTO dto) {
+    public Habitacion modificar(HabitacionDTO dto) {
         // Verificamos que exista antes de intentar modificar
         if (dto.idHabitacion == null || !repo.existsById(dto.idHabitacion)) {
             throw new RuntimeException("No se puede modificar. No se encontró habitación con ID: " + dto.idHabitacion);
         }
 
         // Convertimos el DTO a Entidad para que JPA lo guarde
-        HabitacionEntity entity = HabitacionMapper.dtoToEntity(dto);
+        Habitacion entity = HabitacionMapper.dtoToEntity(dto);
 
         // Al tener ID existente, .save() funciona como Update
         return repo.save(entity);
@@ -42,14 +42,14 @@ public class HabitacionDAO implements IHabitacionDAO {
 
     @Override
     @Transactional(readOnly = true)
-    public HabitacionEntity obtener(String id) {
+    public Habitacion obtener(String id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("No se encontró habitación con ID: " + id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<HabitacionEntity> listar() {
+    public List<Habitacion> listar() {
         return repo.findAll();
     }
 

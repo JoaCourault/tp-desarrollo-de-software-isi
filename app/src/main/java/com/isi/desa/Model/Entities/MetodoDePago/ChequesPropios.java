@@ -1,13 +1,24 @@
 package com.isi.desa.Model.Entities.MetodoDePago;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "ChequesPropios")
 public class ChequesPropios extends MetodoDePago {
+    @Column(name = "num_cheque")
     private Integer numCheque;
+    @Column(name = "nombre_huesped")
     private String nombreHuesped;
+    @Column(name = "banco")
     private String banco;
+    @Column(name = "monto")
     private BigDecimal monto;
+    @Column(name = "fecha")
     private LocalDate fecha;
 
     public ChequesPropios() {}
@@ -34,4 +45,7 @@ public class ChequesPropios extends MetodoDePago {
 
     public LocalDate getFecha() { return fecha; }
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+
+    public String getIdMetodoDePago() { return super.getIdMetodoDePago(); }
+    public void setIdMetodoDePago(String idMetodoDePago) { super.setIdMetodoDePago(idMetodoDePago); }
 }

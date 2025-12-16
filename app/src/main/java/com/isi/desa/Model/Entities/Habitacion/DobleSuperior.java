@@ -3,8 +3,8 @@ package com.isi.desa.Model.Entities.Habitacion;
 import jakarta.persistence.*;
 
 @Entity
-@DiscriminatorValue("Doble Superior")
-public class DobleSuperior extends HabitacionEntity {
+@DiscriminatorValue("DOBLE_SUPERIOR")
+public class DobleSuperior extends Habitacion {
 
     @Column(name = "qcamindividual")
     private Integer cantidadCamasIndividual;

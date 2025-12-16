@@ -3,8 +3,8 @@ package com.isi.desa.Model.Entities.Habitacion;
 import jakarta.persistence.*;
 
 @Entity
-@DiscriminatorValue("Superior Family Plan") // Valor que se guardará en la columna 'tipo_habitacion'
-public class SuperiorFamilyPlan extends HabitacionEntity {
+@DiscriminatorValue("SUPERIOR_FAMILY_PLAN") // Valor que se guardará en la columna 'tipo_habitacion'
+public class SuperiorFamilyPlan extends Habitacion {
 
     @Column(name = "qcamindividual")
     private Integer cantidadCamasIndividual;

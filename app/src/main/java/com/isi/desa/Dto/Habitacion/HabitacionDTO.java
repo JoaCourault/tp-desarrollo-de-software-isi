@@ -1,19 +1,21 @@
 package com.isi.desa.Dto.Habitacion;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.isi.desa.Model.Enums.EstadoHabitacion;
+import java.math.BigDecimal;
 
 public class HabitacionDTO {
-
-    @JsonProperty("id_habitacion")
     public String idHabitacion;
-    public Float precio;
+    public BigDecimal precio; // BigDecimal
     public Integer numero;
     public Integer piso;
-    public EstadoHabitacion estado;
     public Integer capacidad;
     public String detalles;
+    public EstadoHabitacion estado;
+
+    // Este campo es CRÍTICO para saber qué clase hija crear
     public String tipoHabitacion;
-    public Integer cantidadCamasIndividual;
-    public Integer cantidadCamasDobles;
-    public Integer cantidadCamasKingSize;
+
+    public Integer qCamDobles;
+    public Integer qCamIndividual;
+    public Integer qCamKingSize;
 }

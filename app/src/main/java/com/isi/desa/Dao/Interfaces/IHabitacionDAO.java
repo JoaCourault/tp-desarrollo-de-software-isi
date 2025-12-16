@@ -1,19 +1,19 @@
 package com.isi.desa.Dao.Interfaces;
 
 import com.isi.desa.Dto.Habitacion.HabitacionDTO;
-import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
+import com.isi.desa.Model.Entities.Habitacion.Habitacion;
 
 import java.util.List;
 
 public interface IHabitacionDAO {
 
-    HabitacionEntity modificar(HabitacionDTO dto);
+    Habitacion modificar(HabitacionDTO dto);
 
-        HabitacionEntity save(HabitacionEntity entity);
+        Habitacion save(Habitacion entity);
 
-    HabitacionEntity obtener(String id);
+    Habitacion obtener(String id);
 
-    List<HabitacionEntity> listar();
+    List<Habitacion> listar();
 
     void eliminar(String id);
 

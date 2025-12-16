@@ -3,8 +3,8 @@ package com.isi.desa.Model.Entities.Habitacion;
 import jakarta.persistence.*;
 
 @Entity
-@DiscriminatorValue("Doble Estandar") // Este valor debe coincidir con el case del Mapper
-public class DobleEstandar extends HabitacionEntity {
+@DiscriminatorValue("DOBLE_ESTANDAR") // Este valor debe coincidir con el case del Mapper
+public class DobleEstandar extends Habitacion {
 
     @Column(name = "qcamindividual")
     private Integer cantidadCamasIndividual;

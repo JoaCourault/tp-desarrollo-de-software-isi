@@ -3,6 +3,7 @@ package com.isi.desa.Service.Implementations.Validators;
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Service.Interfaces.Validators.IEstadiaValidator;
 import org.springframework.stereotype.Component;
+import java.math.BigDecimal;
 
 @Component
 public class EstadiaValidator implements IEstadiaValidator {
@@ -24,22 +25,19 @@ public class EstadiaValidator implements IEstadiaValidator {
             return new RuntimeException("La fecha de Check-Out no puede ser anterior al Check-In.");
         }
 
-        // Verificamos que no sea nulo y que no sea negativo
-        if (dto.valorTotalEstadia != null && dto.valorTotalEstadia < 0) {
+        // 4. Validar Costo (BigDecimal comparison)
+        if (dto.valorTotalEstadia != null && dto.valorTotalEstadia.compareTo(BigDecimal.ZERO) < 0) {
             return new RuntimeException("El valor total de la estadía no puede ser negativo.");
         }
-
 
         return null;
     }
 
     @Override
     public RuntimeException validateUpdate(EstadiaDTO dto) {
-        // Para actualizar, el ID es fundamental
         if (dto.idEstadia == null || dto.idEstadia.trim().isEmpty()) {
             return new RuntimeException("Debe indicar el ID de la estadía para modificarla.");
         }
-
         return null;
     }
 }
