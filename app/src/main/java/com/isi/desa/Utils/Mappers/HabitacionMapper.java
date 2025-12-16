@@ -18,14 +18,7 @@ public class HabitacionMapper {
         dto.qCamDobles = entity.getCantidadCamasDobles();
         dto.qCamIndividual = entity.getCantidadCamasIndividual();
         dto.qCamKingSize = entity.getCantidadCamasKingSize();
-
-        // Recuperamos el DiscriminatorValue implícitamente si queremos,
-        // o lo inferimos de la clase:
-        if (entity instanceof DobleEstandar) dto.tipoHabitacion = "DOBLE_ESTANDAR";
-        else if (entity instanceof DobleSuperior) dto.tipoHabitacion = "DOBLE_SUPERIOR";
-        else if (entity instanceof IndividualEstandar) dto.tipoHabitacion = "INDIVIDUAL_ESTANDAR";
-        else if (entity instanceof SuiteDoble) dto.tipoHabitacion = "SUITE_DOBLE";
-        else if (entity instanceof SuperiorFamilyPlan) dto.tipoHabitacion = "SUPERIOR_FAMILY_PLAN";
+        dto.tipoHabitacion = entity.getTipoHabitacionString();
 
         return dto;
     }
