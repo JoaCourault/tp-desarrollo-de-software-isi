@@ -19,9 +19,9 @@ public class Huesped {
     private String idHuesped;
     @Column(name = "num_doc", nullable = false)
     private String numDoc;
-    @Column(name = "nombre")
+    @Column(name = "nombre", columnDefinition = "VARCHAR(255)")
     private String nombre;
-    @Column(name = "apellido")
+    @Column(name = "apellido", columnDefinition = "VARCHAR(255)")
     private String apellido;
     @ManyToOne
     @JoinColumn(name = "tipo_doc", referencedColumnName = "tipoDocumento", nullable = false)

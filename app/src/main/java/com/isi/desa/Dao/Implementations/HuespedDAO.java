@@ -83,6 +83,30 @@ public class HuespedDAO implements IHuespedDAO {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Huesped> buscarHuesped(HuespedDTO filtro) {
+        String nombre = (filtro.nombre != null && !filtro.nombre.isBlank())
+                ? "%" + filtro.nombre + "%"
+                : null;
+
+        String apellido = (filtro.apellido != null && !filtro.apellido.isBlank())
+                ? "%" + filtro.apellido + "%"
+                : null;
+
+        String numDoc = (filtro.numDoc != null && !filtro.numDoc.isBlank())
+                ? "%" + filtro.numDoc + "%"
+                : null;
+
+        // El tipo de documento es exacto, no lleva %
+        String tipoDoc = null;
+        if (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null && !filtro.tipoDoc.tipoDocumento.isBlank()) {
+            tipoDoc = filtro.tipoDoc.tipoDocumento;
+        }
+
+        return repository.buscarConFiltros(nombre, apellido, numDoc, tipoDoc);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Huesped obtenerHuesped(String DNI) {
         return repository.findAll().stream()
                 .filter(h -> !h.isEliminado())

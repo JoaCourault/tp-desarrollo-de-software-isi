@@ -58,7 +58,7 @@ public class HuespedController {
 
     // --- CU09: Alta de Huésped ---
     @PostMapping("/Alta")
-    public AltaHuespedResultDTO altaHuesped(@RequestBody AltaHuesperRequestDTO requestDTO) {
+    public AltaHuespedResultDTO altaHuesped(@RequestBody AltaHuespedRequestDTO requestDTO) {
         AltaHuespedResultDTO res = new AltaHuespedResultDTO();
         res.resultado = new Resultado();
 

@@ -16,14 +16,13 @@ public class CrearEstadiaRequestDTO {
 
     public CrearEstadiaRequestDTO() {}
 
-    // Getters y Setters (Asegúrate de cambiar los tipos aquí también)
+    // Getters y Setters
     public LocalDate getCheckIn() { return checkIn; }
     public void setCheckIn(LocalDate checkIn) { this.checkIn = checkIn; }
 
     public LocalDate getCheckOut() { return checkOut; }
     public void setCheckOut(LocalDate checkOut) { this.checkOut = checkOut; }
 
-    // ... resto igual ...
     public Integer getCantNoches() { return cantNoches; }
     public void setCantNoches(Integer cantNoches) { this.cantNoches = cantNoches; }
     public String getIdReserva() { return idReserva; }

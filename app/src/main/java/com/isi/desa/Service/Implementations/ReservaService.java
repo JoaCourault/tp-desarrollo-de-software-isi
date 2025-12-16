@@ -90,7 +90,7 @@ public class ReservaService implements IReservaService {
     }
 
     @Override
-    public List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDate desde, LocalDate hasta) {
+    public List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDate desde, LocalDate hasta, String tipoHabitacion) {
 
         List<HabitacionDisponibilidadDTO> resultado = new ArrayList<>();
 
@@ -111,7 +111,13 @@ public class ReservaService implements IReservaService {
         LocalDate hoy = LocalDate.now();
 
         for (HabitacionResumen h : habitacionesRaw) {
-
+            // Si viene un tipoHabitacion y no coincide con el de esta habitación, la saltamos (continue)
+            if (tipoHabitacion != null && !tipoHabitacion.isBlank()) {
+                String tipoActual = (h.getDetalles() != null) ? h.getDetalles().toUpperCase() : "";
+                if (!tipoActual.equals(tipoHabitacion.toUpperCase())) {
+                    continue; // Salta al siguiente ciclo del for
+                }
+            }
             HabitacionDisponibilidadDTO disponibilidadDTO = new HabitacionDisponibilidadDTO();
             HabitacionDTO habDTO = new HabitacionDTO();
 

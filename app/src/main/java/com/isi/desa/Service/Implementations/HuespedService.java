@@ -2,6 +2,7 @@ package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Implementations.DireccionDAO;
 import com.isi.desa.Dao.Interfaces.IHuespedDAO;
+import com.isi.desa.Dao.Repositories.HuespedRepository;
 import com.isi.desa.Dto.Huesped.*;
 import com.isi.desa.Dto.Resultado;
 import com.isi.desa.Exceptions.Huesped.CannotCreateHuespedException;
@@ -38,37 +39,33 @@ public class HuespedService implements IHuespedService {
     @Autowired
     private HuespedMapper huespedMapper;
 
+    @Autowired
+    private HuespedRepository repository;
+
     @Override
     @Transactional
     public HuespedDTO crear(HuespedDTO huespedDTO, Boolean aceptarIgualmente) throws HuespedDuplicadoException {
-        // 1. Validación
+        // 1. Validación de campos obligatorios
         CannotCreateHuespedException validation = this.validator.validateCreate(huespedDTO);
         if (validation != null) {
             throw validation;
         }
-
         // 2. Validación duplicados
         if (aceptarIgualmente == null || !aceptarIgualmente) {
-            boolean duplicado = dao.leerHuespedes().stream()
-                    .filter(h -> h != null && !h.isEliminado())
-                    .anyMatch(h ->
-                            h.getTipoDoc() != null &&
-                                    huespedDTO.tipoDoc != null &&
-                                    huespedDTO.tipoDoc.tipoDocumento != null &&
-                                    h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(huespedDTO.tipoDoc.tipoDocumento) &&
-                                    h.getNumDoc() != null &&
-                                    h.getNumDoc().equalsIgnoreCase(huespedDTO.numDoc)
-                    );
+            boolean existe = repository.existsByNumDocAndTipoDoc_TipoDocumento(
+                    huespedDTO.numDoc,
+                    huespedDTO.tipoDoc.tipoDocumento
+            );
 
-            if (duplicado) {
-                throw new HuespedDuplicadoException("Ya existe un huésped con ese documento.");
+            if (existe) {
+                throw new HuespedDuplicadoException("¡CUIDADO! El tipo y numero de documento ya existen en el sistema");
             }
         }
 
-        // 3. Persistencia de Dirección
         if (huespedDTO.direccion != null) {
             Direccion dirGuardada = direccionDAO.crear(huespedDTO.direccion);
             if (dirGuardada != null) {
+                // Vinculamos el ID generado al DTO para que Hibernate sepa que ya existe
                 huespedDTO.direccion.id = dirGuardada.getIdDireccion();
             }
         }
@@ -76,7 +73,6 @@ public class HuespedService implements IHuespedService {
         // 4. Persistencia del huésped
         Huesped creado = dao.crear(huespedDTO);
 
-        // 2. USO DE INSTANCIA INYECTADA (this.huespedMapper)
         return this.huespedMapper.entityToDTO(creado);
     }
 
@@ -118,60 +114,27 @@ public class HuespedService implements IHuespedService {
         res.huespedesEncontrados = new ArrayList<>();
 
         HuespedDTO filtro = (req == null) ? null : req.huesped;
-        List<Huesped> todos = this.dao.leerHuespedes();
 
-        if (filtro == null) {
-            // Convertimos la lista completa a DTOs
-            res.huespedesEncontrados = convertirLista(todos);
-            res.resultado.id = 0;
-            res.resultado.mensaje = "OK";
-            return res;
+        // Validamos si hay algún filtro cargado
+        boolean hayFiltros = false;
+        if (filtro != null) {
+            hayFiltros = (filtro.nombre != null && !filtro.nombre.isBlank()) ||
+                    (filtro.apellido != null && !filtro.apellido.isBlank()) ||
+                    (filtro.numDoc != null && !filtro.numDoc.isBlank()) ||
+                    (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null && !filtro.tipoDoc.tipoDocumento.isBlank());
         }
 
-        boolean algunCampo =
-                (filtro.nombre != null && !filtro.nombre.isEmpty()) ||
-                        (filtro.apellido != null && !filtro.apellido.isEmpty()) ||
-                        (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null) ||
-                        (filtro.numDoc != null && !filtro.numDoc.isEmpty());
+        List<Huesped> resultadosEntidad;
 
-        if (!algunCampo) {
-            res.huespedesEncontrados = convertirLista(todos);
-            res.resultado.id = 0;
-            res.resultado.mensaje = "OK";
-            return res;
+        if (!hayFiltros) {
+            // buscarTodosLosHuesped()
+            resultadosEntidad = this.dao.leerHuespedes();
+        } else {
+            resultadosEntidad = this.dao.buscarHuesped(filtro);
         }
 
-        // Filtrado
-        for (Huesped h : todos) {
-            boolean coincide = true;
-
-            if (filtro.nombre != null && !filtro.nombre.isEmpty()) {
-                if (h.getNombre() == null) { coincide = false; }
-                else { coincide &= h.getNombre().toLowerCase().contains(filtro.nombre.toLowerCase()); }
-            }
-
-            if (filtro.apellido != null && !filtro.apellido.isEmpty()) {
-                if (h.getApellido() == null) { coincide = false; }
-                else { coincide &= h.getApellido().toLowerCase().contains(filtro.apellido.toLowerCase()); }
-            }
-
-            if (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null && !filtro.tipoDoc.tipoDocumento.isEmpty()) {
-                coincide &= (
-                        h.getTipoDoc() != null &&
-                                h.getTipoDoc().getTipoDocumento().equalsIgnoreCase(filtro.tipoDoc.tipoDocumento)
-                );
-            }
-
-            if (filtro.numDoc != null && !filtro.numDoc.isEmpty()) {
-                if (h.getNumDoc() == null) { coincide = false; }
-                else { coincide &= h.getNumDoc().equalsIgnoreCase(filtro.numDoc); }
-            }
-
-            if (coincide) {
-                // 3. CONVERSIÓN: Entidad -> DTO antes de agregar a la lista de respuesta
-                res.huespedesEncontrados.add(this.huespedMapper.entityToDTO(h));
-            }
-        }
+        // Convertimos Entidades a DTOs
+        res.huespedesEncontrados = convertirLista(resultadosEntidad);
 
         res.resultado.id = 0;
         res.resultado.mensaje = "OK";

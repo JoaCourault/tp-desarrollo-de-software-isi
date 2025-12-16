@@ -10,7 +10,7 @@ import java.util.List;
 public interface IReservaService {
     void realizarReserva(CrearReservaRequestDTO request);
 
-    List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDate desde, LocalDate hasta);
+    List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDate desde, LocalDate hasta, String tipoHabitacion);
 
     List<ReservaListadoDTO> buscarParaCancelar(String apellido, String nombre);
     void cancelarReservas(List<String> idsReservas);

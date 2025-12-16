@@ -43,13 +43,14 @@ public class ReservaController {
     @GetMapping("/Disponibilidad")
     public ResponseEntity<List<HabitacionDisponibilidadDTO>> obtenerDisponibilidad(
             @RequestParam("desde") String desdeStr,
-            @RequestParam("hasta") String hastaStr) {
+            @RequestParam("hasta") String hastaStr,
+            @RequestParam(value = "tipo", required = false) String tipo){
 
         try {
             LocalDate desde = LocalDate.parse(desdeStr);
             LocalDate hasta = LocalDate.parse(hastaStr);
 
-            List<HabitacionDisponibilidadDTO> disponibilidad = reservaService.consultarDisponibilidad(desde, hasta);
+            List<HabitacionDisponibilidadDTO> disponibilidad = reservaService.consultarDisponibilidad(desde, hasta, tipo);
             return ResponseEntity.ok(disponibilidad);
 
         } catch (Exception e) {
