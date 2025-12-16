@@ -39,6 +39,10 @@ public abstract class Habitacion {
     @Column(name = "estado", nullable = false)
     private EstadoHabitacion estado;
 
+    // 🔥 FIX: Campo de solo lectura para leer el discriminador exacto de la BD
+    @Column(name = "tipo_habitacion", insertable = false, updatable = false)
+    private String tipoHabitacionString;
+
     // Campos específicos para camas
     @Column(name = "q_cam_individual")
     private Integer cantidadCamasIndividual;
@@ -53,7 +57,6 @@ public abstract class Habitacion {
     @JsonIgnore
     private List<Reserva> reservas = new ArrayList<>();
 
-    // 🔥 FIX: el mappedBy debe coincidir con el nombre del atributo en Estadia
     @ManyToMany(mappedBy = "listaHabitaciones")
     @JsonIgnore
     private List<Estadia> estadias = new ArrayList<>();
@@ -82,14 +85,17 @@ public abstract class Habitacion {
     public EstadoHabitacion getEstado() { return estado; }
     public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
 
-    public Integer getqCamDobles() { return cantidadCamasDobles; }
-    public void setqCamDobles(Integer qCamDobles) { this.cantidadCamasDobles = qCamDobles; }
+    // Getter para el tipo (lectura)
+    public String getTipoHabitacionString() { return tipoHabitacionString; }
 
-    public Integer getqCamIndividual() { return cantidadCamasIndividual; }
-    public void setqCamIndividual(Integer qCamIndividual) { this.cantidadCamasIndividual = qCamIndividual; }
+    public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
+    public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
 
-    public Integer getqCamKingSize() { return cantidadCamasKingSize; }
-    public void setqCamKingSize(Integer qCamKingSize) { this.cantidadCamasKingSize = qCamKingSize; }
+    public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }
+    public void setCantidadCamasDobles(Integer cantidadCamasDobles) { this.cantidadCamasDobles = cantidadCamasDobles; }
+
+    public Integer getCantidadCamasKingSize() { return cantidadCamasKingSize; }
+    public void setCantidadCamasKingSize(Integer cantidadCamasKingSize) { this.cantidadCamasKingSize = cantidadCamasKingSize; }
 
     public List<Reserva> getReservas() { return reservas; }
     public void setReservas(List<Reserva> reservas) { this.reservas = reservas; }

@@ -15,9 +15,9 @@ public class HabitacionMapper {
         dto.capacidad = entity.getCapacidad();
         dto.detalles = entity.getDetalles();
         dto.estado = entity.getEstado();
-        dto.qCamDobles = entity.getqCamDobles();
-        dto.qCamIndividual = entity.getqCamIndividual();
-        dto.qCamKingSize = entity.getqCamKingSize();
+        dto.qCamDobles = entity.getCantidadCamasDobles();
+        dto.qCamIndividual = entity.getCantidadCamasIndividual();
+        dto.qCamKingSize = entity.getCantidadCamasKingSize();
 
         // Recuperamos el DiscriminatorValue implícitamente si queremos,
         // o lo inferimos de la clase:
@@ -57,9 +57,9 @@ public class HabitacionMapper {
         entity.setCapacidad(dto.capacidad);
         entity.setDetalles(dto.detalles);
         entity.setEstado(dto.estado);
-        entity.setqCamDobles(dto.qCamDobles);
-        entity.setqCamIndividual(dto.qCamIndividual);
-        entity.setqCamKingSize(dto.qCamKingSize);
+        entity.setCantidadCamasDobles(dto.qCamDobles);
+        entity.setCantidadCamasIndividual(dto.qCamIndividual);
+        entity.setCantidadCamasKingSize(dto.qCamKingSize);
 
         return entity;
     }

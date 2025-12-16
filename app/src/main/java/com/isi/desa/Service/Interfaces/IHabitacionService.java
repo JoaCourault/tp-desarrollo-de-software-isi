@@ -10,5 +10,4 @@ public interface IHabitacionService {
     HabitacionDTO crear(HabitacionDTO dto);
     HabitacionDTO modificar(HabitacionDTO dto);
     List<HabitacionDTO> listar();
-    List<HabitacionDisponibilidadDTO> obtenerDisponibilidad(LocalDate desde, LocalDate hasta);
 }
