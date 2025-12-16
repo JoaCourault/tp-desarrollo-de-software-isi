@@ -3,9 +3,9 @@ package com.isi.desa.Dto.Reserva;
 import java.time.LocalDate;
 
 public class ReservaDetalleDTO {
-    private String idHabitacion;
-    private LocalDate fechaDesde;
-    private LocalDate fechaHasta;
+    public String idHabitacion;
+    public LocalDate fechaDesde;
+    public LocalDate fechaHasta;
 
     public ReservaDetalleDTO() {}
 

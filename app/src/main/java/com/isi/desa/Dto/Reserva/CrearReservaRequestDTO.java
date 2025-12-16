@@ -4,12 +4,12 @@ import java.util.List;
 
 public class CrearReservaRequestDTO {
     // Nombres ajustados al Frontend
-    private String nombreCliente;
-    private String apellidoCliente;
-    private String telefonoCliente;
+    public String nombreCliente;
+    public String apellidoCliente;
+    public String telefonoCliente;
 
     // Ahora recibe una lista de objetos, no de Strings
-    private List<ReservaDetalleDTO> reservas;
+    public List<ReservaDetalleDTO> reservas;
 
     public CrearReservaRequestDTO() {}
 
