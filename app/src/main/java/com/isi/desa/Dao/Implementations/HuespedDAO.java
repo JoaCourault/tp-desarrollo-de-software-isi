@@ -31,28 +31,9 @@ public class HuespedDAO implements IHuespedDAO {
 
     @Override
     @Transactional
-    public Huesped crear(HuespedDTO huespedDTO) {
-
-        // 1. Generar ID Huesped si es nulo (Formato HU-001)
-        if (huespedDTO.idHuesped == null || huespedDTO.idHuesped.isBlank()) {
-            long count = repository.count();
-            huespedDTO.idHuesped = String.format("HU-%03d", count + 1);
-        }
-
-        // 2. Generar ID Direccion si es nulo (Formato DIR-001)
-        if (huespedDTO.direccion != null && (huespedDTO.direccion.id == null || huespedDTO.direccion.id.isBlank())) {
-            long countDir = direccionRepository.count();
-            huespedDTO.direccion.id = String.format("DIR-%03d", countDir + 1);
-        }
-
-        // 3. Convertir y Guardar
-        Huesped nuevo = HuespedMapper.dtoToEntity(huespedDTO);
-        nuevo.setEliminado(false);
-
-        // Al tener CascadeType.ALL, guardar huesped guarda la dirección
-        return repository.save(nuevo);
+    public Huesped save(Huesped huesped) {
+        return repository.save(huesped);
     }
-
     @Override
     @Transactional
     public Huesped modificar(HuespedDTO dto) {
@@ -80,7 +61,6 @@ public class HuespedDAO implements IHuespedDAO {
     @Override
     @Transactional(readOnly = true)
     public List<Huesped> leerHuespedes() {
-        // Usamos el método que filtra por eliminado=false
         return repository.findByEliminadoFalse();
     }
     @Override @Transactional(readOnly = true) public Huesped obtenerHuesped(String DNI) { return null; }

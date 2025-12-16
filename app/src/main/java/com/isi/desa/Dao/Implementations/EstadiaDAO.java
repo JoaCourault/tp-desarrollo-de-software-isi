@@ -32,49 +32,6 @@ public class EstadiaDAO implements IEstadiaDAO {
 
     @Autowired
     private HabitacionRepository habitacionRepository;
-
-    @Override
-    @Transactional
-    public Estadia crear(EstadiaDTO dto) {
-
-        // Generar ID si no viene uno
-        if (dto.idEstadia == null || dto.idEstadia.isBlank()) {
-            long count = repository.count();
-            dto.idEstadia = String.format("EST-%03d", count + 1);
-        }
-
-        // Mapeo base (campos simples)
-        Estadia nuevaEstadia = EstadiaMapper.dtoToEntity(dto);
-
-        // 1. Reserva asociada (0..1)
-        if (dto.idReserva != null) {
-            Reserva reserva = reservaRepository.findById(dto.idReserva)
-                    .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + dto.idReserva));
-            nuevaEstadia.setReserva(reserva);
-        }
-
-        // 2. Huesped titular (ManyToOne -> columna id_huesped_titular en ESTADIA)
-        if (dto.idHuespedTitular != null) {
-            Huesped titular = huespedRepository.findById(dto.idHuespedTitular)
-                    .orElseThrow(() -> new RuntimeException("Titular no encontrado: " + dto.idHuespedTitular));
-            nuevaEstadia.setHuespedTitular(titular);
-        }
-
-        // 3. Lista de huéspedes (ManyToMany -> tabla huesped_estadia)
-        if (dto.idsOcupantes != null && !dto.idsOcupantes.isEmpty()) {
-            List<Huesped> ocupantes = huespedRepository.findAllById(dto.idsOcupantes);
-            nuevaEstadia.setListaHuespedes(ocupantes);
-        }
-
-        // 4. Lista de habitaciones (ManyToMany -> tabla habitacion_estadia)
-        if (dto.idsHabitaciones != null && !dto.idsHabitaciones.isEmpty()) {
-            List<HabitacionEntity> habitaciones = habitacionRepository.findAllById(dto.idsHabitaciones);
-            nuevaEstadia.setListaHabitaciones(habitaciones);
-        }
-
-        return repository.save(nuevaEstadia);
-    }
-
     // Métodos estándar
 
     @Override
@@ -106,9 +63,6 @@ public class EstadiaDAO implements IEstadiaDAO {
     @Transactional
     public Estadia modificar(EstadiaDTO dto) {
         Estadia entity = EstadiaMapper.dtoToEntity(dto);
-
-        // Opcional: repetir lógica de relaciones como en crear(...)
-        // si necesitás que modificar también actualice reserva, titular, ocupantes, etc.
 
         return repository.save(entity);
     }

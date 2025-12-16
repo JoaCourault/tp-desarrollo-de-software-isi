@@ -21,7 +21,7 @@ public class ReservaController {
     private IHabitacionService habitacionService;
 
     @Autowired
-    private IReservaService reservaService; // <--- Inyectamos la Interfaz, no la clase
+    private IReservaService reservaService;
 
     @GetMapping("/Disponibilidad")
     public List<HabitacionDisponibilidadDTO> consultarDisponibilidad(

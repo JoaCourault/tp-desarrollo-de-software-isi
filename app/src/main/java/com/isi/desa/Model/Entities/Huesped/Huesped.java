@@ -3,6 +3,7 @@ package com.isi.desa.Model.Entities.Huesped;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isi.desa.Model.Entities.Direccion.Direccion;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
+import com.isi.desa.Model.Entities.Tipodocumento.TipoDocumento;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,16 +17,20 @@ public class Huesped {
     @Column(name = "id_huesped", nullable = false)
     private String idHuesped;
 
-    // --- RELACIÓN ONE-TO-ONE (Dueño de la FK) ---
+    // --- RELACIÓN ONE-TO-ONE (Dirección) ---
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_direccion", referencedColumnName = "id_direccion", nullable = false)
     private Direccion direccion;
 
-    // ... Resto de atributos ...
+    // --- RELACIÓN ONE-TO-ONE (Tipo Documento) ---
+    // CORRECCIÓN: Usamos @OneToOne según tu pedido
+    @OneToOne
+    @JoinColumn(name = "tipo_doc", nullable = false)
+    private TipoDocumento tipoDoc;
+
     @Column(name = "num_doc", nullable = false) private String numDoc;
     @Column(name = "nombre") private String nombre;
     @Column(name = "apellido") private String apellido;
-    @Column(name = "tipo_doc") private String tipoDoc;
     @Column(name = "posicion_iva") private String posicionIva;
     @Column(name = "cuit") private String cuit;
     @Column(name = "fecha_nac") private LocalDate fechaNac;
@@ -41,10 +46,9 @@ public class Huesped {
 
     public Huesped() {}
 
-    // --- MÉTODO HELPER DE VINCULACIÓN ---
+    // Helper de vinculación
     public void setDireccion(Direccion direccion) {
         this.direccion = direccion;
-        // Si la dirección no es nula, le asignamos este huésped (vinculación inversa)
         if (direccion != null) {
             direccion.setHuesped(this);
         }
@@ -52,7 +56,7 @@ public class Huesped {
 
     public Direccion getDireccion() { return direccion; }
 
-    // Getters y Setters Estándar
+    // Getters y Setters
     public String getIdHuesped() { return idHuesped; }
     public void setIdHuesped(String idHuesped) { this.idHuesped = idHuesped; }
     public String getNumDoc() { return numDoc; }
@@ -61,8 +65,11 @@ public class Huesped {
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getApellido() { return apellido; }
     public void setApellido(String apellido) { this.apellido = apellido; }
-    public String getTipoDocumento() { return tipoDoc; }
-    public void setTipoDocumento(String tipoDoc) { this.tipoDoc = tipoDoc; }
+
+    // CORRECCIÓN: Getter y Setter trabajan con el Objeto TipoDocumento
+    public TipoDocumento getTipoDocumento() { return tipoDoc; }
+    public void setTipoDocumento(TipoDocumento tipoDoc) { this.tipoDoc = tipoDoc; }
+
     public String getPosicionIva() { return posicionIva; }
     public void setPosicionIva(String posicionIva) { this.posicionIva = posicionIva; }
     public String getCuit() { return cuit; }

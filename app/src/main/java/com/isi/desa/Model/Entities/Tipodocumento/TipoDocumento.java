@@ -1,18 +1,23 @@
 package com.isi.desa.Model.Entities.Tipodocumento;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "tipo_documento")
-public class TipoDocumento {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TipoDocumento implements Serializable {
 
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "tipo_documento", nullable = false, length = 50)
+    @JsonProperty("tipoDocumento")              // cuando venga como "tipoDocumento"
+    @JsonAlias({"id", "tipo_documento"})        // cuando venga como "id" o "tipo_documento"
     private String tipoDocumento;
 
     public TipoDocumento() {}
@@ -21,21 +26,11 @@ public class TipoDocumento {
         this.tipoDocumento = tipoDocumento;
     }
 
-    // === GETTERS ===
-    public String getTipoDocumento() { return tipoDocumento; }
-
-    // === SETTERS ===
-    public void setTipoDocumento(String tipoDocumento) { this.tipoDocumento = tipoDocumento; }
-
-    // Soporta el JSON de tipoDocumento.json -> campo "id"
-    @JsonProperty("id")
-    public void setIdFromJson(String id) {
-        this.tipoDocumento = id;
+    public String getTipoDocumento() {
+        return tipoDocumento;
     }
 
-    // Soporta el JSON de huesped.json -> campo "tipoDocumento"
-    @JsonProperty("tipoDocumento")
-    public void setTipoDocumentoFromJson(String id) {
-        this.tipoDocumento = id;
+    public void setTipoDocumento(String tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
     }
 }

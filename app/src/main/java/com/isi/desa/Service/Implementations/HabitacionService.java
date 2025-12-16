@@ -7,10 +7,10 @@ import com.isi.desa.Dto.Habitacion.DisponibilidadDiaDTO;
 import com.isi.desa.Dto.Habitacion.HabitacionDTO;
 import com.isi.desa.Dto.Habitacion.HabitacionDisponibilidadDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
-import com.isi.desa.Model.Entities.Habitacion.HabitacionEntity;
 import com.isi.desa.Model.Entities.Reserva.Reserva;
 import com.isi.desa.Model.Enums.EstadoHabitacion;
 import com.isi.desa.Service.Interfaces.IHabitacionService;
+import com.isi.desa.Service.Interfaces.Validators.IHabitacionValidator;
 import com.isi.desa.Utils.Mappers.HabitacionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +28,9 @@ public class HabitacionService implements IHabitacionService {
 
     @Autowired
     private IHabitacionDAO dao;
+
+    @Autowired
+    private IHabitacionValidator validator;
 
     @Autowired
     private ReservaRepository reservaRepo;
@@ -40,17 +41,68 @@ public class HabitacionService implements IHabitacionService {
     @Override
     @Transactional
     public HabitacionDTO crear(HabitacionDTO dto) {
-        // Delegamos al DAO que sabe instanciar la subclase correcta (Suite, Standard...)
-        HabitacionEntity creado = dao.crear(dto);
-        return HabitacionMapper.entityToDTO(creado);
+
+        // 1) Validación
+        RuntimeException err = validator.validateCreate(dto);
+        if (err != null) throw err;
+
+        // 2) (Opcional recomendado) Evitar duplicados por numero+piso
+        boolean duplicada = dao.listar().stream().anyMatch(h ->
+                h.getNumero() != null && dto.numero != null &&
+                        h.getPiso() != null && dto.piso != null &&
+                        h.getNumero().equals(dto.numero) &&
+                        h.getPiso().equals(dto.piso)
+        );
+        if (duplicada) {
+            throw new RuntimeException("Ya existe una habitación con ese número y piso.");
+        }
+
+        // 3) Generación de ID (FORMATO CORTO)
+        if (dto.idHabitacion == null || dto.idHabitacion.isBlank()) {
+            String uuidRaw = UUID.randomUUID().toString().replace("-", "");
+            dto.idHabitacion = "HA_" + uuidRaw.substring(0, 15);
+        } else if (dao.existsById(dto.idHabitacion)) {
+            throw new RuntimeException("Ya existe una habitación con el ID: " + dto.idHabitacion);
+        }
+
+        // 4) Mapper + save
+        var entity = HabitacionMapper.dtoToEntity(dto);
+        var saved = dao.save(entity);
+
+        return HabitacionMapper.entityToDTO(saved);
     }
 
     @Override
     @Transactional
     public HabitacionDTO modificar(HabitacionDTO dto) {
-        // Delegamos al DAO la modificación
-        HabitacionEntity modificado = dao.modificar(dto);
-        return HabitacionMapper.entityToDTO(modificado);
+
+        // 1) Validación update
+        RuntimeException err = validator.validateUpdate(dto);
+        if (err != null) throw err;
+
+        // 2) Debe existir
+        if (!dao.existsById(dto.idHabitacion)) {
+            throw new RuntimeException("No se encontró habitación con ID: " + dto.idHabitacion);
+        }
+
+        // 3) Evitar duplicados numero+piso (excluyendo a sí misma)
+        boolean duplicada = dao.listar().stream().anyMatch(h ->
+                h.getIdHabitacion() != null &&
+                        !h.getIdHabitacion().equalsIgnoreCase(dto.idHabitacion) &&
+                        h.getNumero() != null && dto.numero != null &&
+                        h.getPiso() != null && dto.piso != null &&
+                        h.getNumero().equals(dto.numero) &&
+                        h.getPiso().equals(dto.piso)
+        );
+        if (duplicada) {
+            throw new RuntimeException("Ya existe otra habitación con ese número y piso.");
+        }
+
+        // 4) Mapper + save
+        var entity = HabitacionMapper.dtoToEntity(dto);
+        var saved = dao.save(entity);
+
+        return HabitacionMapper.entityToDTO(saved);
     }
 
     @Override
@@ -64,19 +116,18 @@ public class HabitacionService implements IHabitacionService {
     @Override
     @Transactional(readOnly = true)
     public List<HabitacionDisponibilidadDTO> obtenerDisponibilidad(LocalDate desde, LocalDate hasta) {
-        // 1. Obtener todas las habitaciones
+
         List<HabitacionDTO> todas = this.listar();
 
-        // 2. FILTRAR DUPLICADOS (Solución al error del Frontend)
-        // Usamos un Map para asegurar que cada ID aparezca una sola vez.
+
         Map<String, HabitacionDTO> mapaUnico = todas.stream()
+                .filter(h -> h != null && h.idHabitacion != null)
                 .collect(Collectors.toMap(
-                        h -> h.idHabitacion,  //ID de habitación
-                        h -> h,               // El DTO
-                        (existente, nuevo) -> existente // Si se repite, nos quedamos con el primero
+                        h -> h.idHabitacion,
+                        h -> h,
+                        (existente, nuevo) -> existente
                 ));
 
-        // Convertimos de nuevo a lista y ordenamos por número
         List<HabitacionDTO> habitacionesUnicas = new ArrayList<>(mapaUnico.values());
         habitacionesUnicas.sort((h1, h2) -> {
             if (h1.numero != null && h2.numero != null) return h1.numero.compareTo(h2.numero);
@@ -89,58 +140,47 @@ public class HabitacionService implements IHabitacionService {
         LocalDateTime desdeTime = desde.atStartOfDay();
         LocalDateTime hastaTime = hasta.atTime(LocalTime.MAX);
 
-        // 3. Iterar sobre la lista depurada
         for (HabitacionDTO h : habitacionesUnicas) {
             HabitacionDisponibilidadDTO fila = new HabitacionDisponibilidadDTO();
             fila.habitacion = h;
             fila.disponibilidad = new ArrayList<>();
 
-            // Buscamos Reservas y Estadías asociadas
             List<Reserva> reservasEnRango = reservaRepo.findReservasEnRango(h.idHabitacion, desde, hasta);
             List<Estadia> estadiasEnRango = estadiaRepo.findEstadiasEnRango(h.idHabitacion, desdeTime, hastaTime);
 
-            // Generar celdas por día
             for (int i = 0; i < dias; i++) {
                 DisponibilidadDiaDTO dia = new DisponibilidadDiaDTO();
                 LocalDate fechaActual = desde.plusDays(i);
                 dia.fecha = fechaActual;
 
-                // --- LÓGICA DE PRIORIDAD DE ESTADOS ---
-
-                // PRIORIDAD 1: Bloqueo Global (Mantenimiento)
                 if (h.estado == EstadoHabitacion.MANTENIMIENTO || h.estado == EstadoHabitacion.FUERA_DE_SERVICIO) {
                     dia.estado = h.estado.name();
                 } else {
-                    // PRIORIDAD 2: Estadía (Check-In activo) -> "OCUPADA"
                     boolean hayEstadia = estadiasEnRango.stream().anyMatch(estadia -> {
                         LocalDate checkIn = estadia.getCheckIn().toLocalDate();
                         LocalDate checkOut = estadia.getCheckOut().toLocalDate();
-                        // El día está ocupado si cae entre checkIn (inclusive) y checkOut (exclusive o inclusive según regla)
                         return !fechaActual.isBefore(checkIn) && !fechaActual.isAfter(checkOut);
                     });
 
                     if (hayEstadia) {
                         dia.estado = "OCUPADA";
                     } else {
-                        // PRIORIDAD 3: Reserva -> "RESERVADA"
                         boolean hayReserva = reservasEnRango.stream().anyMatch(reserva ->
-                                (fechaActual.isEqual(reserva.getFechaDesde()) || fechaActual.isAfter(reserva.getFechaDesde())) &&
-                                        (fechaActual.isEqual(reserva.getFechaHasta()) || fechaActual.isBefore(reserva.getFechaHasta())) &&
+                                !fechaActual.isBefore(reserva.getFechaDesde()) &&
+                                        !fechaActual.isAfter(reserva.getFechaHasta()) &&
                                         "RESERVADA".equalsIgnoreCase(reserva.getEstado())
                         );
 
-                        if (hayReserva) {
-                            dia.estado = "RESERVADA";
-                        } else {
-                            // PRIORIDAD 4: Libre
-                            dia.estado = "DISPONIBLE";
-                        }
+                        dia.estado = hayReserva ? "RESERVADA" : "DISPONIBLE";
                     }
                 }
+
                 fila.disponibilidad.add(dia);
             }
+
             resultado.add(fila);
         }
+
         return resultado;
     }
 }

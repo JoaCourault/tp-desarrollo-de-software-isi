@@ -46,12 +46,11 @@ public class HuespedMapper {
         dto.nacionalidad = h.getNacionalidad();
         dto.eliminado = h.isEliminado();
 
+        // CORRECCIÓN: Extraemos el String del objeto TipoDocumento
         if (h.getTipoDocumento() != null) {
-            TipoDocumento tdEntity = staticTipoDocumentoDAO.obtener(h.getTipoDocumento());
-            if (tdEntity != null) {
-                dto.tipoDocumento = new TipoDocumentoDTO();
-                dto.tipoDocumento.tipoDocumento = tdEntity.getTipoDocumento();
-            }
+            dto.tipoDocumento = new TipoDocumentoDTO();
+            // Asumimos que la entidad TipoDocumento tiene un método getTipoDocumento() que devuelve el String (ej: "DNI")
+            dto.tipoDocumento.tipoDocumento = h.getTipoDocumento().getTipoDocumento();
         }
 
         if (h.getDireccion() != null) {
@@ -71,7 +70,7 @@ public class HuespedMapper {
         if (dto == null) return null;
 
         Huesped h = new Huesped();
-        h.setIdHuesped(dto.idHuesped); // El ID se setea en el DAO si es null
+        h.setIdHuesped(dto.idHuesped);
         h.setNombre(dto.nombre);
         h.setApellido(dto.apellido);
         h.setNumDoc(dto.numDoc);
@@ -84,8 +83,10 @@ public class HuespedMapper {
         h.setNacionalidad(dto.nacionalidad);
         h.setEliminado(dto.eliminado);
 
+        // CORRECCIÓN: Buscamos la entidad TipoDocumento usando el DAO
         if (dto.tipoDocumento != null && dto.tipoDocumento.tipoDocumento != null) {
-            h.setTipoDocumento(dto.tipoDocumento.tipoDocumento);
+            TipoDocumento td = staticTipoDocumentoDAO.obtener(dto.tipoDocumento.tipoDocumento);
+            h.setTipoDocumento(td);
         }
 
         if (dto.direccion != null) {

@@ -10,7 +10,6 @@ import java.util.Optional;
 
 public interface IEstadiaDAO {
 
-    Estadia crear(EstadiaDTO estadia);
 
     Estadia modificar(EstadiaDTO estadia);
 

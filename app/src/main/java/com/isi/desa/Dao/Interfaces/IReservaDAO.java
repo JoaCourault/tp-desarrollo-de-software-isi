@@ -11,9 +11,6 @@ public interface IReservaDAO {
     // Obtener entidad por ID
     Reserva getById(String id);
 
-    // Crear a partir de DTO (genera ID, resuelve relaciones, etc.)
-    Reserva crear(ReservaDTO dto);
-
     // Actualizar a partir de DTO
     Reserva update(ReservaDTO dto);
 

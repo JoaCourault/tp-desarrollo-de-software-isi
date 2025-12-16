@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IHuespedDAO {
 
-    Huesped crear(HuespedDTO huesped) ;
+     Huesped save(Huesped huesped);
 
     Huesped modificar(HuespedDTO huesped);
 

@@ -31,36 +31,8 @@ public class ReservaDAO implements IReservaDAO {
         return reservaRepo.findById(id).orElse(null);
     }
 
-    // ===============================================================
-    // CREAR RESERVA A PARTIR DE DTO
-    // ===============================================================
-    @Override
-    @Transactional
-    public Reserva crear(ReservaDTO dto) {
-        System.out.println(">>> INICIANDO CREACION DE RESERVA"); // DEBUG
 
-        Reserva reserva = ReservaMapper.dtoToEntity(dto);
 
-        if (reserva.getIdReserva() == null || reserva.getIdReserva().isBlank()) {
-            long count = reservaRepo.count();
-            reserva.setIdReserva(String.format("RES-%03d", count + 1));
-        }
-
-        HabitacionEntity hab = habitacionRepo.findById(dto.idHabitacion)
-                .orElseThrow(() -> new RuntimeException("Habitación no encontrada: " + dto.idHabitacion));
-
-        reserva.setHabitacion(hab);
-
-        System.out.println(">>> INTENTANDO GUARDAR EN REPO..."); // DEBUG
-        Reserva saved = reservaRepo.save(reserva);
-        System.out.println(">>> GUARDADO EXITOSO."); // DEBUG
-
-        return saved;
-    }
-
-    // ===============================================================
-    // UPDATE
-    // ===============================================================
     @Override
     @Transactional
     public Reserva update(ReservaDTO dto) {
@@ -72,41 +44,29 @@ public class ReservaDAO implements IReservaDAO {
         return reservaRepo.save(actualizado);
     }
 
-    // ===============================================================
-    // SAVE (entity directa)
-    // ===============================================================
     @Override
     public Reserva save(Reserva r) {
         return reservaRepo.save(r);
     }
 
-    // ===============================================================
-    // DELETE
-    // ===============================================================
+
     @Override
     public void deleteById(String id) {
         reservaRepo.deleteById(id);
     }
 
-    // ===============================================================
-    // BUSCAR RESERVAS SOLAPADAS
-    // ===============================================================
+
     @Override
     public List<Reserva> buscarReservasSolapadas(String idHabitacion, LocalDate desde, LocalDate hasta) {
         return reservaRepo.findReservasEnRango(idHabitacion, desde, hasta);
     }
 
-    // ===============================================================
-    // FIND ALL (DTO)
-    // ===============================================================
     @Override
     public List<ReservaDTO> findAllDTO() {
         return ReservaMapper.entityListToDTOList(reservaRepo.findAll());
     }
 
-    // ===============================================================
-    // FIND BY ID (DTO)
-    // ===============================================================
+
     @Override
     public ReservaDTO findByIdDTO(String id) {
         Reserva r = reservaRepo.findById(id).orElse(null);
