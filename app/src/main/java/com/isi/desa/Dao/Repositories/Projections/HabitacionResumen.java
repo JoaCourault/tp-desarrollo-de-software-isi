@@ -8,5 +8,5 @@ public interface HabitacionResumen {
     String getDetalles();
     Integer getCapacidad();
     String getEstado();
-
+    String getTipoHabitacionStr();
 }

@@ -111,13 +111,16 @@ public class ReservaService implements IReservaService {
         LocalDate hoy = LocalDate.now();
 
         for (HabitacionResumen h : habitacionesRaw) {
-            // Si viene un tipoHabitacion y no coincide con el de esta habitación, la saltamos (continue)
+
+            String tipoActualBD = (h.getTipoHabitacionStr() != null) ? h.getTipoHabitacionStr().toUpperCase() : "";
+
+            // Filtro: Si viene un tipoHabitacion del front y no coincide con la BD, saltamos
             if (tipoHabitacion != null && !tipoHabitacion.isBlank()) {
-                String tipoActual = (h.getDetalles() != null) ? h.getDetalles().toUpperCase() : "";
-                if (!tipoActual.equals(tipoHabitacion.toUpperCase())) {
+                if (!tipoActualBD.equals(tipoHabitacion.toUpperCase())) {
                     continue; // Salta al siguiente ciclo del for
                 }
             }
+
             HabitacionDisponibilidadDTO disponibilidadDTO = new HabitacionDisponibilidadDTO();
             HabitacionDTO habDTO = new HabitacionDTO();
 
@@ -126,18 +129,21 @@ public class ReservaService implements IReservaService {
             habDTO.setNumero(h.getNumero());
             habDTO.setPrecio(h.getPrecio());
             habDTO.setCapacidad(h.getCapacidad());
+
+            // --- Mapeamos el Enum usando el valor real de la BD ---
             try {
-                if (h.getDetalles() != null) {
-                    habDTO.setTipoHabitacion(TipoHabitacion.valueOf(h.getDetalles().toUpperCase()));
+                if (!tipoActualBD.isEmpty()) {
+                    habDTO.setTipoHabitacion(TipoHabitacion.valueOf(tipoActualBD));
                 } else {
                     habDTO.setTipoHabitacion(null);
                 }
             } catch (Exception e) {
+                // Si el string en BD no coincide con el ENUM, ponemos null para no romper
                 habDTO.setTipoHabitacion(null);
             }
+
             disponibilidadDTO.setHabitacion(habDTO);
 
-            // Lógica día por día
             List<DisponibilidadDiaDTO> dias = new ArrayList<>();
             LocalDate fechaActual = desde;
 
