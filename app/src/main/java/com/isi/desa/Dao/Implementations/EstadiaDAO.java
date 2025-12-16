@@ -15,14 +15,19 @@ import java.util.Optional;
 
 @Service
 public class EstadiaDAO implements IEstadiaDAO {
+
     @Autowired
     private EstadiaRepository estadiaRepository;
 
+    // 1. INYECTAMOS EL MAPPER
+    @Autowired
+    private EstadiaMapper estadiaMapper;
 
     @Override
     @Transactional
     public EstadiaDTO save(Estadia estadia) {
-        return EstadiaMapper.entityToDto(estadiaRepository.save(estadia));
+
+        return estadiaMapper.entityToDto(estadiaRepository.save(estadia));
     }
 
     @Override
@@ -44,11 +49,7 @@ public class EstadiaDAO implements IEstadiaDAO {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Estadia> findByIdHabitacionAndMoment(
-            String idHabitacion,
-            LocalDateTime moment
-    ) {
+    public List<Estadia> findByIdHabitacionAndMoment(String idHabitacion, LocalDateTime moment) {
         return estadiaRepository.findByHabitacionAndMoment(idHabitacion, moment);
     }
 }

@@ -14,13 +14,13 @@ public class HabitacionValidator implements IHabitacionValidator {
 
     @Override
     public Boolean validateExistById(String idHabitacion) {
-        Habitacion habitacion = habitacionRepository.findById(idHabitacion).orElse(null);
+        Habitacion habitacion = habitacionRepository.findById(String.valueOf(Long.valueOf(idHabitacion))).orElse(null);
         return habitacion != null;
     }
 
     @Override
     public Boolean validateHabitacionDisponibleById(String idHabitacion) {
-        Habitacion habitacion = habitacionRepository.findById(idHabitacion).orElse(null);
+        Habitacion habitacion = habitacionRepository.findById(String.valueOf(Long.valueOf(idHabitacion))).orElse(null);
         if (habitacion == null) {
             return false;
         }

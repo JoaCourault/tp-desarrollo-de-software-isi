@@ -18,6 +18,8 @@ public interface IHuespedDAO {
 
     Huesped obtenerHuesped(String DNI);
 
+    List<Huesped> buscarHuesped(HuespedDTO filtro);
+
     List<Huesped> leerHuespedes();
 
     Huesped getById(String id);

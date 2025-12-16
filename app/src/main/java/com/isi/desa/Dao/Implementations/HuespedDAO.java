@@ -22,7 +22,6 @@ import java.util.List;
 @Service
 public class HuespedDAO implements IHuespedDAO {
 
-    @Autowired
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -32,6 +31,8 @@ public class HuespedDAO implements IHuespedDAO {
     @Autowired
     private EstadiaRepository estadiaRepository;
 
+    @Autowired
+    private HuespedMapper huespedMapper;
 
     @Override
     @Transactional
@@ -44,7 +45,9 @@ public class HuespedDAO implements IHuespedDAO {
             long count = repository.count();
             huesped.idHuesped = String.format("HU-%03d", count + 1);
         }
-        Huesped nuevo = HuespedMapper.dtoToEntity(huesped);
+
+        // 2. USO DE INSTANCIA (NO STATIC)
+        Huesped nuevo = huespedMapper.dtoToEntity(huesped);
         nuevo.setEliminado(false);
         return repository.save(nuevo);
     }
@@ -54,8 +57,13 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped modificar(HuespedDTO dto) {
         Huesped existente = repository.findById(dto.idHuesped)
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
-        Huesped actualizado = HuespedMapper.dtoToEntity(dto);
+
+        // 2. USO DE INSTANCIA (NO STATIC)
+        Huesped actualizado = huespedMapper.dtoToEntity(dto);
+
+        // Preservar estado de eliminado del original
         actualizado.setEliminado(existente.isEliminado());
+
         return repository.save(actualizado);
     }
 
@@ -64,11 +72,37 @@ public class HuespedDAO implements IHuespedDAO {
     public Huesped eliminar(String idHuesped) {
         Huesped existente = repository.findById(idHuesped)
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontro huesped con ID: " + idHuesped));
+
         if (!obtenerEstadiasDeHuesped(idHuesped).isEmpty()) {
             throw new HuespedConEstadiaAsociadasException("El huesped tiene estadias asociadas y no puede eliminarse.");
         }
+
         existente.setEliminado(true);
         return repository.save(existente);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Huesped> buscarHuesped(HuespedDTO filtro) {
+        String nombre = (filtro.nombre != null && !filtro.nombre.isBlank())
+                ? "%" + filtro.nombre + "%"
+                : null;
+
+        String apellido = (filtro.apellido != null && !filtro.apellido.isBlank())
+                ? "%" + filtro.apellido + "%"
+                : null;
+
+        String numDoc = (filtro.numDoc != null && !filtro.numDoc.isBlank())
+                ? "%" + filtro.numDoc + "%"
+                : null;
+
+        // El tipo de documento es exacto, no lleva %
+        String tipoDoc = null;
+        if (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null && !filtro.tipoDoc.tipoDocumento.isBlank()) {
+            tipoDoc = filtro.tipoDoc.tipoDocumento;
+        }
+
+        return repository.buscarConFiltros(nombre, apellido, numDoc, tipoDoc);
     }
 
     @Override
@@ -84,7 +118,9 @@ public class HuespedDAO implements IHuespedDAO {
     @Override
     @Transactional(readOnly = true)
     public List<Huesped> leerHuespedes() {
-        return repository.findAll().stream().filter(h -> !h.isEliminado()).toList();
+        return repository.findAll().stream()
+                .filter(h -> !h.isEliminado())
+                .toList();
     }
 
     @Override
@@ -107,10 +143,11 @@ public class HuespedDAO implements IHuespedDAO {
 
     @Override
     @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
     public List<Estadia> obtenerEstadiasDeHuesped(String idHuesped) {
         String sql = "SELECT e.* FROM estadia e " +
-                     "INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia " +
-                     "WHERE he.id_huesped = :idHuesped";
+                "INNER JOIN huesped_estadia he ON e.id_estadia = he.id_estadia " +
+                "WHERE he.id_huesped = :idHuesped";
         Query query = entityManager.createNativeQuery(sql, Estadia.class);
         query.setParameter("idHuesped", idHuesped);
         return query.getResultList();

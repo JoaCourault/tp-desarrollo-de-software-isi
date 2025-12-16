@@ -13,37 +13,61 @@ import java.util.Optional;
 
 @Service
 public class DireccionDAO implements IDireccionDAO {
+
     @Autowired
     private DireccionRepository repository;
 
+    @Autowired
+    private DireccionMapper direccionMapper;
+
     @Override
     @Transactional
-    public Direccion crear(DireccionDTO direccion) {
-        if (direccion.idDireccion == null || direccion.idDireccion.isBlank()) {
-            direccion.idDireccion = java.util.UUID.randomUUID().toString();
+    public Direccion crear(DireccionDTO direccionDto) {
+        // Validamos si viene con un ID pre-cargado que ya exista (para evitar sobrescrituras accidentales en Crear)
+        if (direccionDto.id != null && !direccionDto.id.isBlank()) {
+            if (repository.existsById(direccionDto.id)) {
+                throw new RuntimeException("Ya existe una dirección con el ID: " + direccionDto.id);
+            }
         }
-        if (repository.existsById(direccion.idDireccion)) {
-            throw new RuntimeException("Ya existe una direccion con el ID: " + direccion.idDireccion);
-        }
-        Direccion nueva = DireccionMapper.dtoToEntity(direccion);
+
+        // Convertimos a Entidad. Si direccionDto.id es null, la entidad tendrá id null.
+        Direccion nueva = direccionMapper.dtoToEntity(direccionDto);
+
+        // Al hacer save(), Hibernate detecta @GeneratedValue y asigna el UUID automáticamente.
         return repository.save(nueva);
+    }
+
+    @Transactional
+    public void crear(DireccionDTO direccionDto, String nuevoIdHuesped) {
+        if (direccionDto == null) return;
+
+        if (direccionDto.id != null && !direccionDto.id.isBlank()) {
+            if (repository.existsById(direccionDto.id)) {
+                throw new RuntimeException("Ya existe una dirección con el ID: " + direccionDto.id);
+            }
+        }
+
+        Direccion entidad = direccionMapper.dtoToEntity(direccionDto);
+        repository.save(entidad);
     }
 
     @Override
     @Transactional
     public Direccion modificar(DireccionDTO direccion) {
-        if (!repository.existsById(direccion.idDireccion)) {
-            throw new RuntimeException("No se encontro la direccion con ID: " + direccion.idDireccion);
+        if (direccion.id == null || !repository.existsById(direccion.id)){
+            throw new RuntimeException("No se encontró la dirección con ID: " + direccion.id);
         }
-        Direccion actualizada = DireccionMapper.dtoToEntity(direccion);
+
+        // Aquí SÍ esperamos que el DTO traiga el ID para actualizar el registro correcto
+        Direccion actualizada = direccionMapper.dtoToEntity(direccion);
         return repository.save(actualizada);
     }
 
     @Override
     @Transactional
     public Direccion eliminar(DireccionDTO direccion) {
-        Direccion existente = repository.findById(direccion.idDireccion)
-                .orElseThrow(() -> new RuntimeException("No se encontro la direccion a eliminar: " + direccion.idDireccion));
+        Direccion existente = repository.findById(direccion.id)
+                .orElseThrow(() -> new RuntimeException("No se encontró la dirección a eliminar: " + direccion.id));
         repository.delete(existente);
         return existente;
     }
@@ -51,13 +75,19 @@ public class DireccionDAO implements IDireccionDAO {
     @Override
     @Transactional(readOnly = true)
     public Direccion obtener(DireccionDTO direccion) {
-        return repository.findById(direccion.idDireccion)
-                .orElseThrow(() -> new RuntimeException("No se encontro direccion con ID: " + direccion.idDireccion));
+        return repository.findById(direccion.id)
+                .orElseThrow(() -> new RuntimeException("No se encontró dirección con ID: " + direccion.id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public java.util.List<Direccion> obtenerTodas() {
         return repository.findAll();
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public Direccion getById(String id) {
+        if (id == null) return null;
+        return repository.findById(id).orElse(null);
     }
 }

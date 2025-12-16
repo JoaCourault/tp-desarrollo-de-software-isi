@@ -1,6 +1,7 @@
 package com.isi.desa.Dao.Interfaces;
+
 import com.isi.desa.Dto.Direccion.DireccionDTO;
-import com.isi.desa.Model.Entities.Direccion.*;
+import com.isi.desa.Model.Entities.Direccion.Direccion;
 
 public interface IDireccionDAO {
 
@@ -13,4 +14,6 @@ public interface IDireccionDAO {
     Direccion obtener(DireccionDTO direccion);
 
     java.util.List<Direccion> obtenerTodas();
+
+    Direccion getById(String id);
 }

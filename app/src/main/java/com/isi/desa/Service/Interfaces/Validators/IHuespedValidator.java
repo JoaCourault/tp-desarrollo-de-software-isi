@@ -8,7 +8,6 @@ import com.isi.desa.Model.Entities.Huesped.Huesped;
 import java.util.List;
 
 public interface IHuespedValidator {
-    Huesped create(HuespedDTO huespedDTO);
     CannotCreateHuespedException validateCreate(HuespedDTO huespedDTO);
     CannotModifyHuespedEsception validateUpdate (HuespedDTO huespedDTO);
     CannotDeleteHuespedException validateDelete (String idHuesped);

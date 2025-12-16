@@ -3,8 +3,9 @@ package com.isi.desa.Model.Entities.Reserva;
 import com.isi.desa.Model.Entities.Habitacion.Habitacion;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.isi.desa.Model.Enums.EstadoReserva;
 
 @Entity
 @Table(name = "Reserva")
@@ -18,12 +19,15 @@ public class Reserva {
     private LocalDateTime fechaIngreso;
     @Column(name = "fechaEgreso")
     private LocalDateTime fechaEgreso;
-    @Column(name = "nombre_huesped")
+    @Column(name = "nombre_huesped", columnDefinition = "VARCHAR(255)")
     private String nombreHuesped;
-    @Column(name = "apellido_huesped")
+    @Column(name = "apellido_huesped", columnDefinition = "VARCHAR(255)")
     private String apellidoHuesped;
     @Column(name = "telefono_huesped")
     private String telefonoHuesped;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = true)
+    private EstadoReserva estado;
     @ManyToOne
     @JoinColumn(name = "id_habitacion", referencedColumnName = "id_habitacion", nullable = false)
     private Habitacion habitacion;
@@ -47,4 +51,16 @@ public class Reserva {
     public void setTelefonoHuesped(String telefonoHuesped) { this.telefonoHuesped = telefonoHuesped; }
     public Habitacion getHabitacion() { return habitacion; }
     public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
+
+    public String getIdReserva() {
+        return idReserva;
+    }
+
+    public void setIdReserva(String idReserva) {
+        this.idReserva = idReserva;
+    }
+
+    public EstadoReserva getEstado() {return estado;  }
+
+    public void setEstado(EstadoReserva estado) {this.estado = estado;   }
 }

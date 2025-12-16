@@ -2,12 +2,17 @@ package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Component
 public class EstadiaMapper {
-    public static EstadiaDTO entityToDto(Estadia e) {
+
+    public EstadiaDTO entityToDto(Estadia e) {
+        if (e == null) return null;
         EstadiaDTO dto = new EstadiaDTO();
         dto.idEstadia = e.getIdEstadia();
         dto.valorTotalEstadia = e.getValorTotalEstadia();
@@ -18,7 +23,9 @@ public class EstadiaMapper {
         dto.habitaciones = HabitacionMapper.entityListToDtoList(e.getHabitaciones());
         return dto;
     }
-    public static Estadia dtoToEntity(EstadiaDTO dto) {
+
+    public Estadia dtoToEntity(EstadiaDTO dto) {
+        if (dto == null) return null;
         Estadia e = new Estadia();
         e.setIdEstadia(dto.idEstadia);
         e.setValorTotalEstadia(dto.valorTotalEstadia);
@@ -29,18 +36,14 @@ public class EstadiaMapper {
         e.setHabitaciones(HabitacionMapper.dtoLisToEntitiesList(dto.habitaciones));
         return e;
     }
-    public static List<Estadia> dtoLisToEntitiesList(List<EstadiaDTO> dto) {
-        List<Estadia> estadias = new ArrayList<>();
-        for (EstadiaDTO e : dto) {
-            estadias.add(dtoToEntity(e));
-        }
-        return estadias;
+
+    public List<Estadia> dtoLisToEntitiesList(List<EstadiaDTO> dto) {
+        if (dto == null) return new ArrayList<>();
+        return dto.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
-    public static List<EstadiaDTO> entityListToDtoList(List<Estadia> estadias) {
-        List<EstadiaDTO> dtoList = new ArrayList<>();
-        for (Estadia e : estadias) {
-            dtoList.add(entityToDto(e));
-        }
-        return dtoList;
+
+    public List<EstadiaDTO> entityListToDtoList(List<Estadia> estadias) {
+        if (estadias == null) return new ArrayList<>();
+        return estadias.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 }
