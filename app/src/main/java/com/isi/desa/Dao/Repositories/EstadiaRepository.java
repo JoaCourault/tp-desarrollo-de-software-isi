@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface EstadiaRepository extends JpaRepository<Estadia, String> {
+
     @Query("""
     SELECT e
         FROM Estadia e
@@ -23,9 +24,11 @@ public interface EstadiaRepository extends JpaRepository<Estadia, String> {
             @Param("idHabitacion") String idHabitacion,
             @Param("moment") LocalDateTime moment
     );
+
     @Query("SELECT e FROM Estadia e WHERE e.checkIn <= :hasta AND e.checkOut >= :desde")
     List<Estadia> findEstadiasEnRango(@Param("desde") LocalDateTime desde,
                                       @Param("hasta") LocalDateTime hasta);
+
     @Query("SELECT e FROM Estadia e JOIN e.habitaciones h WHERE " +
             "h.idHabitacion = :idHabitacion AND " +
             "(e.checkIn < :hasta AND e.checkOut > :desde)")
@@ -36,10 +39,12 @@ public interface EstadiaRepository extends JpaRepository<Estadia, String> {
     );
 
     Optional<Estadia> findTopByOrderByIdEstadiaDesc();
-    // Verifica si estuvo alojado (pisó el hotel)
+
     boolean existsByHuespedesHospedados_IdHuesped(String idHuesped);
 
-    // Verifica si fue titular (pagador/responsable)
     @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END FROM Estadia e WHERE e.huesped_titular.idHuesped = :idHuesped")
     boolean existsByTitularId(@Param("idHuesped") String idHuesped);
+
+    @Query("SELECT e FROM Estadia e JOIN e.habitaciones h WHERE h.numero = :numeroHabitacion AND (e.checkOut >= CURRENT_TIMESTAMP OR e.checkOut IS NULL)")
+    List<Estadia> findEstadiasActivasPorNumero(@Param("numeroHabitacion") Integer numeroHabitacion);
 }

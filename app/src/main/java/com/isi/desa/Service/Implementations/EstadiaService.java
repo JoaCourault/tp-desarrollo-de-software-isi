@@ -2,6 +2,7 @@ package com.isi.desa.Service.Implementations;
 
 import com.isi.desa.Dao.Implementations.EstadiaDAO;
 import com.isi.desa.Dao.Implementations.ReservaDAO;
+import com.isi.desa.Dao.Repositories.EstadiaRepository;
 import com.isi.desa.Dao.Repositories.HabitacionRepository;
 import com.isi.desa.Dao.Repositories.HuespedRepository;
 import com.isi.desa.Dao.Repositories.ReservaRepository;
@@ -19,12 +20,21 @@ import org.springframework.transaction.annotation.Transactional;
 import com.isi.desa.Model.Enums.EstadoReserva;
 import java.math.BigDecimal;
 import java.util.List;
+import java.time.LocalDateTime;
+import com.isi.desa.Dto.Estadia.EstadiaDetalleDTO;
+import com.isi.desa.Dto.Factura.ItemFacturableDTO;
+import com.isi.desa.Dto.ResponsableDePago.PayerDTO;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 @Service
 public class EstadiaService implements IEstadiaService {
 
     @Autowired
     private EstadiaDAO estadiaDAO;
+
+    @Autowired
+    private EstadiaRepository estadiaRepository;
 
     @Autowired
     private HabitacionRepository habitacionRepository;
@@ -110,5 +120,68 @@ public class EstadiaService implements IEstadiaService {
         estadia.setHuespedesHospedados(todosLosHuespedes);
 
         return estadiaDAO.save(estadia);
+    }
+
+    @Override // Asegurate de agregarlo a la interfaz IEstadiaService primero
+    public EstadiaDetalleDTO buscarDetallePorHabitacion(Integer numero) {
+        // 1. Buscar estadía activa usando el Repository
+        List<Estadia> estadias = estadiaRepository.findEstadiasActivasPorNumero(numero);
+
+        if (estadias.isEmpty()) {
+            throw new IllegalArgumentException("No se encontró una estadía activa para la habitación " + numero);
+        }
+
+        Estadia estadia = estadias.get(0);
+
+        // 2. Mapeo al DTO
+        EstadiaDetalleDTO dto = new EstadiaDetalleDTO();
+        dto.setIdEstadia(estadia.getIdEstadia());
+        dto.setNroHabitacion(String.valueOf(numero));
+
+        // 3. Crear Items
+        List<ItemFacturableDTO> items = new ArrayList<>();
+
+        // Calcular noches
+        LocalDateTime now = LocalDateTime.now();
+        long noches = ChronoUnit.DAYS.between(estadia.getCheckIn(), now);
+        if (noches < 1) noches = 1;
+
+        // Calcular precio unitario (tomamos el de la primera habitación vinculada)
+        BigDecimal precioNoche = BigDecimal.ZERO;
+        if (estadia.getHabitaciones() != null && !estadia.getHabitaciones().isEmpty()) {
+            precioNoche = estadia.getHabitaciones().get(0).getPrecio();
+        }
+
+        // Crear Item de Alojamiento
+        // NOTA: ItemFacturableDTO debe tener constructor o usar setters
+        ItemFacturableDTO itemAlojamiento = new ItemFacturableDTO();
+        itemAlojamiento.setId(estadia.getIdEstadia());
+        itemAlojamiento.setDescripcion("Alojamiento Habitación " + numero);
+        itemAlojamiento.setCantidad((int) noches);
+        itemAlojamiento.setPrecioUnitario(precioNoche);
+        itemAlojamiento.setSeleccionado(true);
+
+        items.add(itemAlojamiento);
+        dto.setItems(items);
+
+        // 4. Mapear Ocupantes a PayerDTO
+        List<PayerDTO> ocupantes = new ArrayList<>();
+        if (estadia.getHuespedesHospedados() != null) {
+            for (Huesped h : estadia.getHuespedesHospedados()) {
+                PayerDTO payer = new PayerDTO();
+                payer.setIdResponsable(h.getIdHuesped());
+                payer.setNombre(h.getNombre());
+                payer.setApellido(h.getApellido());
+                // Asumimos que numDoc es el DNI para persona física
+                payer.setDni(h.getNumDoc());
+                payer.setCuit(h.getCuit());
+                payer.setCondicionIva(h.getPosicionIva());
+                payer.setEsPersonaJuridica(false);
+                ocupantes.add(payer);
+            }
+        }
+        dto.setOcupantes(ocupantes);
+
+        return dto;
     }
 }

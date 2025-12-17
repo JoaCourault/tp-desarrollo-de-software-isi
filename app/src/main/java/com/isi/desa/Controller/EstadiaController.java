@@ -9,6 +9,7 @@ import com.isi.desa.Service.Implementations.EstadiaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.isi.desa.Dto.Estadia.EstadiaDetalleDTO;
 
 @RestController
 @RequestMapping("/Estadia")
@@ -27,6 +28,25 @@ public class EstadiaController {
             error.id = 1;
             error.mensaje = e.getMessage();
             return ResponseEntity.badRequest().body(error);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Resultado error = new Resultado();
+            error.id = 500;
+            error.mensaje = "Error interno: " + e.getMessage();
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
+    @GetMapping("/BuscarPorHabitacion")
+    public ResponseEntity<?> buscarPorHabitacion(@RequestParam("numero") Integer numero) {
+        try {
+            EstadiaDetalleDTO detalle = estadiaService.buscarDetallePorHabitacion(numero);
+            return ResponseEntity.ok(detalle);
+        } catch (IllegalArgumentException e) {
+            // Manejo de "No encontrado" o validaciones lógicas
+            Resultado error = new Resultado();
+            error.id = 1;
+            error.mensaje = e.getMessage();
+            return ResponseEntity.badRequest().body(error); // O 404 si prefieres
         } catch (Exception e) {
             e.printStackTrace();
             Resultado error = new Resultado();

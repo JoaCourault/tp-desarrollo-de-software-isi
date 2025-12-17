@@ -2,9 +2,11 @@ package com.isi.desa.Service.Interfaces;
 
 import com.isi.desa.Dto.Estadia.CrearEstadiaRequestDTO;
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
+import com.isi.desa.Dto.Estadia.EstadiaDetalleDTO;
 
 public interface IEstadiaService {
 
-    public EstadiaDTO ocuparHabitacion(CrearEstadiaRequestDTO request);
+    EstadiaDTO ocuparHabitacion(CrearEstadiaRequestDTO request);
+    EstadiaDetalleDTO buscarDetallePorHabitacion(Integer numero);
 
 }
