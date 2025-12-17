@@ -95,13 +95,14 @@ public class ReservaService implements IReservaService {
     public List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDateTime desde, LocalDateTime hasta, String tipoHabitacion) {
 
         // --- VALIDACIÓN PREVIA DE RANGO ---
-        if (!hasta.isAfter(desde)) {
-            throw new IllegalArgumentException("La fecha 'Hasta' debe ser posterior a la fecha 'Desde' (Mínimo 1 noche).");
+        // NOTA: Si quieres permitir consultas de 1 solo día (mismo día inicio y fin), cambia isAfter por isBefore en la validación
+        if (hasta.isBefore(desde)) {
+            throw new IllegalArgumentException("La fecha 'Hasta' no puede ser anterior a la fecha 'Desde'.");
         }
 
         List<HabitacionDisponibilidadDTO> resultado = new ArrayList<>();
 
-        // 1. Obtener Habitaciones
+        // 1. Obtener Habitaciones (Optimizando un poco la lógica original)
         List<Habitacion> habitaciones;
         if (tipoHabitacion != null && !tipoHabitacion.isEmpty()) {
             habitaciones = habitacionRepository.findAll().stream()
@@ -116,9 +117,10 @@ public class ReservaService implements IReservaService {
             dto.setHabitacion(habitacionMapper.toDTO(hab));
             List<DisponibilidadDiaDTO> dias = new ArrayList<>();
 
-            // --- ESCENARIO 1: HABITACIÓN ROTA ---
+            // --- ESCENARIO 1: HABITACIÓN FUERA DE SERVICIO ---
             if (hab.getEstado() == EstadoHabitacion.FUERA_DE_SERVICIO) {
                 LocalDateTime current = desde;
+                // El ciclo while (!current.isAfter(hasta)) ya es inclusivo (<=), iterará hasta el último día incluido.
                 while (!current.isAfter(hasta)) {
                     DisponibilidadDiaDTO diaDTO = new DisponibilidadDiaDTO();
                     diaDTO.setFecha(current.toLocalDate());
@@ -142,34 +144,38 @@ public class ReservaService implements IReservaService {
             List<Estadia> estadiasHab = estadiaRepository.findEstadiasPorHabitacionYFecha(hab.getIdHabitacion(), desde, hasta);
 
             LocalDateTime current = desde;
+
+            // Ciclo para recorrer día por día el rango solicitado por el usuario
             while (!current.isAfter(hasta)) {
                 DisponibilidadDiaDTO diaDTO = new DisponibilidadDiaDTO();
                 diaDTO.setFecha(current.toLocalDate());
 
-                final LocalDateTime fechaAnalizada = current;
-                LocalDate diaAnalizadoDate = fechaAnalizada.toLocalDate();
+                final LocalDate diaAnalizadoDate = current.toLocalDate();
 
-                // 1. PRIORIDAD ALTA: ESTADÍA (OCUPADA - ROJO)
+                // 1. PRIORIDAD ALTA: ESTADÍA (OCUPADA)
+                // CAMBIO CLAVE: Usamos !isBefore en lugar de isAfter para el CheckOut
+                // Esto significa: CheckIn <= DiaAnalizado <= CheckOut
                 java.util.Optional<Estadia> estadiaMatch = estadiasHab.stream().filter(e ->
-                        !e.getCheckIn().toLocalDate().isAfter(diaAnalizadoDate) &&
-                                e.getCheckOut().toLocalDate().isAfter(diaAnalizadoDate)
+                        !e.getCheckIn().toLocalDate().isAfter(diaAnalizadoDate) && // Fecha Inicio <= Dia
+                                !e.getCheckOut().toLocalDate().isBefore(diaAnalizadoDate)  // Fecha Fin >= Dia (Intervalo Cerrado)
                 ).findFirst();
 
                 if (estadiaMatch.isPresent()) {
                     diaDTO.setEstado("OCUPADA");
                 } else {
-                    // 2. PRIORIDAD MEDIA: RESERVA (RESERVADA - AMARILLO)
+                    // 2. PRIORIDAD MEDIA: RESERVA (RESERVADA)
+                    // CAMBIO CLAVE: Igual que arriba, cambiamos la lógica del Egreso
                     java.util.Optional<Reserva> reservaMatch = reservasHab.stream().filter(r ->
                             (r.getEstado() == null || r.getEstado() == EstadoReserva.RESERVADA) &&
-                                    !r.getFechaIngreso().toLocalDate().isAfter(diaAnalizadoDate) &&
-                                    r.getFechaEgreso().toLocalDate().isAfter(diaAnalizadoDate)
+                                    !r.getFechaIngreso().toLocalDate().isAfter(diaAnalizadoDate) && // Ingreso <= Dia
+                                    !r.getFechaEgreso().toLocalDate().isBefore(diaAnalizadoDate)    // Egreso >= Dia (Intervalo Cerrado)
                     ).findFirst();
 
                     if (reservaMatch.isPresent()) {
                         diaDTO.setEstado("RESERVADA");
                         diaDTO.setIdReserva(reservaMatch.get().getIdReserva());
                     } else {
-                        // 3. PRIORIDAD BAJA: LIBRE (DISPONIBLE - VERDE)
+                        // 3. PRIORIDAD BAJA: LIBRE
                         diaDTO.setEstado("DISPONIBLE");
                     }
                 }
