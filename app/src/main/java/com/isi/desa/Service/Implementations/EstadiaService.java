@@ -122,7 +122,7 @@ public class EstadiaService implements IEstadiaService {
         return estadiaDAO.save(estadia);
     }
 
-    @Override // Asegurate de agregarlo a la interfaz IEstadiaService primero
+    @Override
     public EstadiaDetalleDTO buscarDetallePorHabitacion(Integer numero) {
         // 1. Buscar estadía activa usando el Repository
         List<Estadia> estadias = estadiaRepository.findEstadiasActivasPorNumero(numero);
@@ -146,7 +146,7 @@ public class EstadiaService implements IEstadiaService {
         long noches = ChronoUnit.DAYS.between(estadia.getCheckIn(), now);
         if (noches < 1) noches = 1;
 
-        // Calcular precio unitario (tomamos el de la primera habitación vinculada)
+        // Calcular precio unitario
         BigDecimal precioNoche = BigDecimal.ZERO;
         if (estadia.getHabitaciones() != null && !estadia.getHabitaciones().isEmpty()) {
             precioNoche = estadia.getHabitaciones().get(0).getPrecio();

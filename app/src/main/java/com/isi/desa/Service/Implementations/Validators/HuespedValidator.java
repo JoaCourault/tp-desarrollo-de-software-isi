@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class HuespedValidator implements IHuespedValidator {
 
     @Autowired
-    private IHuespedDAO dao; // Spring inyectará el DAO con la conexión a la BD
+    private IHuespedDAO dao;
 
     @Autowired
     private ITipoDocumentoDAO tipoDocumentoDAO; // Usamos la interfaz

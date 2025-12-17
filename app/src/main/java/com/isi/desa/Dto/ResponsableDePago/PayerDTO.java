@@ -1,9 +1,6 @@
 package com.isi.desa.Dto.ResponsableDePago;
 
 public class PayerDTO {
-    // Usamos public para ahorrar getters/setters si prefieres,
-    // o private con getters/setters (recomendado en Java).
-    // Aquí uso private con getters/setters para seguir estándares.
 
     private String idResponsable;
     private String nombre;

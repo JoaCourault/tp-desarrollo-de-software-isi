@@ -95,14 +95,13 @@ public class ReservaService implements IReservaService {
     public List<HabitacionDisponibilidadDTO> consultarDisponibilidad(LocalDateTime desde, LocalDateTime hasta, String tipoHabitacion) {
 
         // --- VALIDACIÓN PREVIA DE RANGO ---
-        // NOTA: Si quieres permitir consultas de 1 solo día (mismo día inicio y fin), cambia isAfter por isBefore en la validación
         if (hasta.isBefore(desde)) {
             throw new IllegalArgumentException("La fecha 'Hasta' no puede ser anterior a la fecha 'Desde'.");
         }
 
         List<HabitacionDisponibilidadDTO> resultado = new ArrayList<>();
 
-        // 1. Obtener Habitaciones (Optimizando un poco la lógica original)
+        // 1. Obtener Habitaciones
         List<Habitacion> habitaciones;
         if (tipoHabitacion != null && !tipoHabitacion.isEmpty()) {
             habitaciones = habitacionRepository.findAll().stream()
@@ -120,7 +119,6 @@ public class ReservaService implements IReservaService {
             // --- ESCENARIO 1: HABITACIÓN FUERA DE SERVICIO ---
             if (hab.getEstado() == EstadoHabitacion.FUERA_DE_SERVICIO) {
                 LocalDateTime current = desde;
-                // El ciclo while (!current.isAfter(hasta)) ya es inclusivo (<=), iterará hasta el último día incluido.
                 while (!current.isAfter(hasta)) {
                     DisponibilidadDiaDTO diaDTO = new DisponibilidadDiaDTO();
                     diaDTO.setFecha(current.toLocalDate());

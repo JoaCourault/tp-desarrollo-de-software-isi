@@ -46,7 +46,7 @@ public class EstadiaController {
             Resultado error = new Resultado();
             error.id = 1;
             error.mensaje = e.getMessage();
-            return ResponseEntity.badRequest().body(error); // O 404 si prefieres
+            return ResponseEntity.badRequest().body(error);
         } catch (Exception e) {
             e.printStackTrace();
             Resultado error = new Resultado();

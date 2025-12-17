@@ -50,9 +50,9 @@ public class ReservaController {
         try {
             LocalDate fechaDesde = LocalDate.parse(desdeStr);
             LocalDate fechaHasta = LocalDate.parse(hastaStr);
-            // 2. Convertir a LocalDateTime, agregando la hora de referencia para el Service.
-            // Check-in se asume a las 14:00 (o 00:00 para rango de búsqueda)
-            // Usaremos atStartOfDay() para tomar el inicio del día:
+            // 2. Convertir a LocalDateTime
+            // Check-in se asume a las 14:00
+
             LocalDateTime desde = fechaDesde.atStartOfDay();
             LocalDateTime hasta = fechaHasta.atStartOfDay();
 
@@ -80,10 +80,10 @@ public class ReservaController {
             List<ReservaListadoDTO> resultado = reservaService.buscarParaCancelar(apellido, nombre);
             return ResponseEntity.ok(resultado);
         } catch (IllegalArgumentException e) {
-            // Errores de validación (campos vacíos, caracteres raros) -> 400 Bad Request
+            // Errores de validación (campos vacíos, caracteres raros)
             return ResponseEntity.badRequest().body(new Resultado(1, e.getMessage()));
         } catch (RuntimeException e) {
-            // Errores de lógica (no encontrado, etc) -> 409 Conflict o 404
+            // Errores de lógica (no encontrado, etc)
             return ResponseEntity.status(404).body(new Resultado(1, e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new Resultado(1, "Error interno del servidor"));

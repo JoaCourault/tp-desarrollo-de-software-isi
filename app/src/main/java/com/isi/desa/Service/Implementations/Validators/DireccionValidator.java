@@ -22,7 +22,7 @@ public class DireccionValidator implements IDireccionValidator {
             try {
                 pisoInt = Integer.parseInt(direccionDTO.piso);
             } catch (NumberFormatException e) {
-                // Esto no debería pasar si el validate() funciona bien, pero por seguridad:
+
                 throw new InvalidDirectionException("El formato del piso es inválido (debe ser numérico).");
             }
         }

@@ -18,7 +18,6 @@ public abstract class ResponsableDePago {
     @OneToMany(mappedBy = "responsableDePago")
     private List<Factura> facturas;
 
-    // Clase abstracta base para responsables de pago
 
     public String getIdResponsableDePago() {
         return idResponsableDePago;

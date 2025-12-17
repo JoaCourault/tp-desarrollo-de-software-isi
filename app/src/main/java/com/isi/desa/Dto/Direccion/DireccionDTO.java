@@ -1,23 +1,21 @@
 package com.isi.desa.Dto.Direccion;
 
 public class DireccionDTO {
-    // 1. Campos PRIVADOS (Buena práctica de encapsulamiento)
+
     public String id;
     public String pais;
     public String provincia;
     public String localidad;
 
-    // El front envía "codigoPostal", este nombre debe coincidir EXACTO
+
     public String codigoPostal;
 
     public String calle;
     public String numero;
     public String departamento;
-    public String piso; // String es mejor para evitar errores de conversión
+    public String piso;
 
     public DireccionDTO() {}
-
-    // --- 2. GETTERS Y SETTERS (Obligatorios para que Spring funcione bien) ---
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }

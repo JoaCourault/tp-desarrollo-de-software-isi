@@ -95,7 +95,7 @@ public class HuespedService implements IHuespedService {
         }
         Huesped huespedTarget = opHuesped.get();
 
-        // 3. VALIDACIÓN DE NEGOCIO: ¿Tiene historial en el hotel?
+        // 3. VALIDACIÓN DE NEGOCIO:
         // Verificamos si durmió allí (huespedesHospedados) O si fue titular de alguna estadía (huesped)
         boolean tieneEstadias = estadiaRepository.existsByHuespedesHospedados_IdHuesped(requestDTO.idHuesped)
                 || estadiaRepository.existsByTitularId(requestDTO.idHuesped);

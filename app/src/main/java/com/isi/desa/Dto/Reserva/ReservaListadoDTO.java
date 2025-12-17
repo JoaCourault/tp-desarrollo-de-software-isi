@@ -8,11 +8,11 @@ public class ReservaListadoDTO {
     public String apellidoHuesped;
     public String nombreHuesped;
     public Integer numeroHabitacion;
-    public String tipoHabitacion; // "Detalles" en tu entidad Habitacion
+    public String tipoHabitacion;
     public LocalDateTime fechaIngreso;
     public LocalDateTime fechaEgreso;
 
-    // Constructor vacío
+
     public ReservaListadoDTO() {}
 
     // Constructor con campos para facilitar el mapeo

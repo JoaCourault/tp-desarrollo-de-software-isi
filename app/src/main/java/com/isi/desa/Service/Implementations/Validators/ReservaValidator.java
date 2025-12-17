@@ -13,7 +13,6 @@ public class ReservaValidator implements IReservaValidator {
     @Autowired
     private IReservaDAO reservaDAO;
 
-    // Mismo Regex que en HuespedValidator
     private static final String TEXT_ONLY_REGEX = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$";
     private static final Pattern TEXT_PATTERN = Pattern.compile(TEXT_ONLY_REGEX);
 

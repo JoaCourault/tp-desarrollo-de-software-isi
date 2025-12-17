@@ -23,7 +23,7 @@ public class DireccionDAO implements IDireccionDAO {
     @Override
     @Transactional
     public Direccion crear(DireccionDTO direccionDto) {
-        // Validamos si viene con un ID pre-cargado que ya exista (para evitar sobrescrituras accidentales en Crear)
+        // Validamos si viene con un ID pre-cargado que ya exista (para evitar sobrescrituras accidentales)
         if (direccionDto.id != null && !direccionDto.id.isBlank()) {
             if (repository.existsById(direccionDto.id)) {
                 throw new RuntimeException("Ya existe una dirección con el ID: " + direccionDto.id);
@@ -33,7 +33,6 @@ public class DireccionDAO implements IDireccionDAO {
         // Convertimos a Entidad. Si direccionDto.id es null, la entidad tendrá id null.
         Direccion nueva = direccionMapper.dtoToEntity(direccionDto);
 
-        // Al hacer save(), Hibernate detecta @GeneratedValue y asigna el UUID automáticamente.
         return repository.save(nueva);
     }
 
@@ -58,7 +57,7 @@ public class DireccionDAO implements IDireccionDAO {
             throw new RuntimeException("No se encontró la dirección con ID: " + direccion.id);
         }
 
-        // Aquí SÍ esperamos que el DTO traiga el ID para actualizar el registro correcto
+        // aca SÍ esperamos que el DTO traiga el ID para actualizar el registro correcto
         Direccion actualizada = direccionMapper.dtoToEntity(direccion);
         return repository.save(actualizada);
     }

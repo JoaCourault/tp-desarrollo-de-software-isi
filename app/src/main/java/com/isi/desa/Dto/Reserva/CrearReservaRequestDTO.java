@@ -3,12 +3,12 @@ package com.isi.desa.Dto.Reserva;
 import java.util.List;
 
 public class CrearReservaRequestDTO {
-    // Nombres ajustados al Frontend
+    // Nombres ajustados al Front
     public String nombreCliente;
     public String apellidoCliente;
     public String telefonoCliente;
 
-    // Ahora recibe una lista de objetos, no de Strings
+    // Ahora recibe una lista de objetos
     public List<ReservaDetalleDTO> reservas;
 
     public CrearReservaRequestDTO() {}

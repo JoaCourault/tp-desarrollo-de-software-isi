@@ -40,13 +40,13 @@ public class HuespedDAO implements IHuespedDAO {
         if (huesped.idHuesped != null && repository.existsById(huesped.idHuesped)) {
             throw new HuespedDuplicadoException("Ya existe un huesped con el ID: " + huesped.idHuesped);
         }
-        // Generar ID incremental si no viene (HU-###)
+
         if (huesped.idHuesped == null || huesped.idHuesped.isBlank()) {
             long count = repository.count();
             huesped.idHuesped = String.format("HU-%03d", count + 1);
         }
 
-        // 2. USO DE INSTANCIA (NO STATIC)
+
         Huesped nuevo = huespedMapper.dtoToEntity(huesped);
         nuevo.setEliminado(false);
         return repository.save(nuevo);
@@ -58,7 +58,7 @@ public class HuespedDAO implements IHuespedDAO {
         Huesped existente = repository.findById(dto.idHuesped)
                 .orElseThrow(() -> new HuespedNotFoundException("No se encontró huésped con ID: " + dto.idHuesped));
 
-        // 2. USO DE INSTANCIA (NO STATIC)
+
         Huesped actualizado = huespedMapper.dtoToEntity(dto);
 
         // Preservar estado de eliminado del original
@@ -96,7 +96,7 @@ public class HuespedDAO implements IHuespedDAO {
                 ? "%" + filtro.numDoc + "%"
                 : null;
 
-        // El tipo de documento es exacto, no lleva %
+        // El tipo de documento es exacto
         String tipoDoc = null;
         if (filtro.tipoDoc != null && filtro.tipoDoc.tipoDocumento != null && !filtro.tipoDoc.tipoDocumento.isBlank()) {
             tipoDoc = filtro.tipoDoc.tipoDocumento;

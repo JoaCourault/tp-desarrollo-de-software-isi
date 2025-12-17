@@ -23,7 +23,7 @@ public class HuespedController {
     private ILogger logger;
 
     @Autowired
-    private HuespedMapper huespedMapper; // <--- 1. INYECTAMOS EL MAPPER
+    private HuespedMapper huespedMapper; // 1.INYECTAMOS EL MAPPER
 
     // --- CU02 Pasos 1-4: Buscar con filtros ---
     @PostMapping("/Buscar")
@@ -48,7 +48,7 @@ public class HuespedController {
             if (huesped == null) {
                 return ResponseEntity.notFound().build();
             }
-            // 2. USAMOS LA INSTANCIA (huespedMapper), NO LA CLASE
+            // 2. USAMOS LA INSTANCIA (huespedMapper)
             return ResponseEntity.ok(huespedMapper.entityToDTO(huesped));
         } catch (Exception e) {
             this.logger.error("Error al obtener huesped por ID: " + e.getMessage(), e);
