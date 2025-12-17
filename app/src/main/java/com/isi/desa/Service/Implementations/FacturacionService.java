@@ -10,6 +10,7 @@ import com.isi.desa.Model.Entities.Estadia.Estadia;
 import com.isi.desa.Model.Entities.Factura.Factura;
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import com.isi.desa.Model.Entities.ResponsableDePago.ResponsableDePago;
+import com.isi.desa.Model.Entities.ResponsableDePago.PersonaFisica;
 import com.isi.desa.Model.Entities.Servicio.Servicio;
 import com.isi.desa.Service.Implementations.Validators.HabitacionValidator;
 import com.isi.desa.Service.Interfaces.IFaucturacionService;
@@ -299,51 +300,60 @@ public class FacturacionService implements IFaucturacionService {
         Estadia estadia = estadiaRepository.findById(request.idEstadia)
                 .orElseThrow(() -> new IllegalArgumentException("La estadía no existe."));
 
-        // 2. Buscar Responsable de Pago
-        // Intentamos buscarlo directo como Responsable
-        ResponsableDePago responsable = responsableDePagoRepository.findById(request.idResponsable)
-                .orElse(null);
+        // 2. BUSQUEDA INTELIGENTE DE RESPONSABLE
+        ResponsableDePago responsable = null;
 
-        // Si no lo encontramos por ID directo (porque quizás viene el ID de Huesped desde el front),
-        // buscamos si ese Huesped tiene un Responsable asociado.
-        if (responsable == null) {
+        // A) Intentar por ID directo (si ya era responsable)
+        Optional<ResponsableDePago> opResponsable = responsableDePagoRepository.findById(request.idResponsable);
+        if (opResponsable.isPresent()) {
+            responsable = opResponsable.get();
+        } else {
+            // B) Intentar buscar si existe como Persona Física vinculada a ese ID de Huésped
             responsable = responsableDePagoRepository.findPersonaFisicaByIdHuesped(request.idResponsable);
         }
 
-        // Si sigue siendo nulo, es un error (o deberíamos crearlo al vuelo, pero asumimos que existe)
+        // C) AUTO-ALTA: Si no existe como responsable, pero es un Huésped, lo creamos ahora mismo.
         if (responsable == null) {
-            // Intento final: ¿Es un huesped que aún no es responsable? Lo creamos rápido para poder facturar.
-            // Esto es opcional, depende de tu lógica estricta.
-            throw new IllegalArgumentException("No se encontró el responsable de pago con ID: " + request.idResponsable);
+            Optional<Huesped> opHuesped = huespedRepository.findById(request.idResponsable);
+            if (opHuesped.isPresent()) {
+                Huesped huesped = opHuesped.get();
+
+                // Creamos la entidad PersonaFisica que envuelve al Huesped
+                PersonaFisica nuevoResponsable = new PersonaFisica();
+                nuevoResponsable.setHuesped(huesped);
+                // Aquí podrías setear otros datos si PersonaFisica tiene campos propios obligatorios
+
+                // Guardamos para generar el ID de Responsable
+                responsable = responsableDePagoRepository.save(nuevoResponsable);
+            } else {
+                throw new IllegalArgumentException("No se encontró el responsable de pago ni el huésped con ID: " + request.idResponsable);
+            }
         }
 
         // 3. Crear Entidad Factura
         Factura factura = new Factura();
         factura.setFecha(LocalDateTime.now());
-        factura.setTipo(request.tipoFactura); // "A" o "B"
+        factura.setTipo(request.tipoFactura);
         factura.setTotal(request.total);
         factura.setResponsableDePago(responsable);
 
-        // Vincular Estadia
         List<Estadia> estadias = new ArrayList<>();
         estadias.add(estadia);
         factura.setEstadias(estadias);
 
-        // Detalle en texto (Opcional, para debug)
-        factura.setDetalle("Check-out Habitación " + estadia.getHabitaciones().get(0).getNumero());
+        factura.setDetalle("Check-out Habitación " + (estadia.getHabitaciones().isEmpty() ? "?" : estadia.getHabitaciones().get(0).getNumero()));
+        factura.setNombre("Factura " + request.tipoFactura + " - CheckOut");
 
         // Guardar Factura
         factura = facturaRepository.save(factura);
 
         // 4. CHECK-OUT (Liberar Habitación)
-        // Al poner fecha de fin "ahora", la habitación deja de estar ocupada para el futuro
-        // y la estadía deja de salir en búsquedas de "activas".
         estadia.setCheckOut(LocalDateTime.now());
         estadiaRepository.save(estadia);
 
-        // 5. Retornar número para el PDF
-        // Si no tienes lógica de numeración compleja, devolvemos el ID o un random
-        String nroComprobante = "0001-" + String.format("%08d", factura.getIdFactura() != null ? factura.getIdFactura().hashCode() : System.currentTimeMillis());
+        // 5. Retornar número
+        // Usamos un hash positivo simple para simular un número secuencial
+        String nroComprobante = "0001-" + String.format("%08d", factura.getIdFactura() != null ? (factura.getIdFactura().hashCode() & 0x7FFFFFFF) : System.currentTimeMillis());
 
         return new GenerarFacturaResultDTO(nroComprobante);
     }
