@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DireccionMapper {
 
+    public static DireccionDTO entityToDto(Direccion direccionFinal) {
+        if (direccionFinal == null) return null;
+        DireccionMapper mapper = new DireccionMapper();
+        return mapper.entityToDTO(direccionFinal);
+    }
+
     public DireccionDTO entityToDTO(Direccion d) {
         if (d == null) return null;
         DireccionDTO dto = new DireccionDTO();

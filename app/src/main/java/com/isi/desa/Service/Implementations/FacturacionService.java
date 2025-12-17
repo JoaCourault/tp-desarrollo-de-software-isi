@@ -279,7 +279,7 @@ public class FacturacionService implements IFaucturacionService {
             resultado.mensaje = "La habitacion no existe";
             return resultado;
         }
-        
+
         Boolean habitacionDisponible = habitacionValidator.validateExistById(idHabitacion);
         if (habitacionDisponible) {
             resultado.id = 1;

@@ -23,6 +23,8 @@ public class ResponsableDePagoService implements IResponsableDePagoService {
     ResponsableDePagoRepository responsableDePagoRepository;
     @Autowired
     private IDireccionDAO direccionDAO;
+    @Autowired
+    ResponsableDePagoMapper responsableDePagoMapper;
 
     @Override
     public List<String> obtenerRazonesSocialesResponsablesDePago() {
@@ -51,7 +53,7 @@ public class ResponsableDePagoService implements IResponsableDePagoService {
                 responsablesSet.addAll(responsableDePagoRepository.findByRazonSocialContainingIgnoreCase(request.razonSocial));
             }
         }
-        result.responsableDePagos.addAll(ResponsableDePagoMapper.entitiesToDtos(new java.util.ArrayList<>(responsablesSet)));
+        result.responsableDePagos.addAll(responsableDePagoMapper.entitiesToDtos(new java.util.ArrayList<>(responsablesSet)));
 
         if (result.responsableDePagos.isEmpty()) {
             result.resultado.id = 1;
@@ -69,8 +71,8 @@ public class ResponsableDePagoService implements IResponsableDePagoService {
                 cuitList.addAll(responsableDePagoRepository.findPersonaFisicaByCuit(pjDto.cuit));
                 boolean existeCuit = !cuitList.isEmpty();
                 boolean existeRazon = !responsableDePagoRepository.findByRazonSocialContainingIgnoreCase(pjDto.razonSocial).isEmpty();
-                boolean existeDireccion = pjDto.direccion != null && pjDto.direccion.idDireccion != null &&
-                    !responsableDePagoRepository.findPersonaJuridicaByDireccion(pjDto.direccion.idDireccion).isEmpty();
+                boolean existeDireccion = pjDto.direccion != null && pjDto.direccion.id != null &&
+                    !responsableDePagoRepository.findPersonaJuridicaByDireccion(pjDto.direccion.id).isEmpty();
                 if (existeCuit || existeRazon || existeDireccion) {
                     result.resultado.id = 1;
                     if (existeDireccion) {
@@ -82,9 +84,9 @@ public class ResponsableDePagoService implements IResponsableDePagoService {
                 }
             }
             request.responsableDePagoDTO.idResponsableDePago = null; // Asegurar que el ID sea nulo para una nueva entidad
-            ResponsableDePago nuevoResponsableDePago = ResponsableDePagoMapper.dtoToEntity(request.responsableDePagoDTO);
+            ResponsableDePago nuevoResponsableDePago = responsableDePagoMapper.dtoToEntity(request.responsableDePagoDTO);
             ResponsableDePago responsableDePagoGuardado = responsableDePagoRepository.save(nuevoResponsableDePago);
-            result.responsableDePagoGenerado = ResponsableDePagoMapper.entityToDto(responsableDePagoGuardado);
+            result.responsableDePagoGenerado = responsableDePagoMapper.entityToDto(responsableDePagoGuardado);
             result.resultado.id = 0;
             result.resultado.mensaje = "Responsable de pago creado exitosamente.";
         } catch (Exception e) {
@@ -124,8 +126,8 @@ public class ResponsableDePagoService implements IResponsableDePagoService {
                     result.resultado.mensaje = "Ya existe otro responsable de pago con el mismo CUIT.";
                     return result;
                 }
-                boolean existeDireccion = pjDto.direccion != null && pjDto.direccion.idDireccion != null &&
-                    responsableDePagoRepository.findPersonaJuridicaByDireccion(pjDto.direccion.idDireccion).stream()
+                boolean existeDireccion = pjDto.direccion != null && pjDto.direccion.id != null &&
+                    responsableDePagoRepository.findPersonaJuridicaByDireccion(pjDto.direccion.id).stream()
                         .anyMatch(r -> !r.getIdResponsableDePago().equals(idActual));
                 if (existeDireccion) {
                     result.resultado.id = 2;
@@ -143,7 +145,7 @@ public class ResponsableDePagoService implements IResponsableDePagoService {
                         && dir.getNumero().equalsIgnoreCase(nuevaDir.numero)
                         && ((dir.getPiso() == null && nuevaDir.piso == null) || (dir.getPiso() != null && dir.getPiso().equals(nuevaDir.piso)))
                         && ((dir.getDepartamento() == null && nuevaDir.departamento == null) || (dir.getDepartamento() != null && dir.getDepartamento().equalsIgnoreCase(nuevaDir.departamento)))
-                        && dir.getCp().equalsIgnoreCase(nuevaDir.cp)
+                        && dir.getCp().equalsIgnoreCase(nuevaDir.codigoPostal)
                         && dir.getLocalidad().equalsIgnoreCase(nuevaDir.localidad)
                         && dir.getProvincia().equalsIgnoreCase(nuevaDir.provincia)
                         && dir.getPais().equalsIgnoreCase(nuevaDir.pais)
@@ -169,9 +171,9 @@ public class ResponsableDePagoService implements IResponsableDePagoService {
                     return result;
                 }
             }
-            ResponsableDePago responsableDePagoExistente = ResponsableDePagoMapper.dtoToEntity(request.responsableDePagoAModificar);
+            ResponsableDePago responsableDePagoExistente = responsableDePagoMapper.dtoToEntity(request.responsableDePagoAModificar);
             ResponsableDePago responsableDePagoActualizado = responsableDePagoRepository.save(responsableDePagoExistente);
-            result.responsableDePagoModificado = ResponsableDePagoMapper.entityToDto(responsableDePagoActualizado);
+            result.responsableDePagoModificado = responsableDePagoMapper.entityToDto(responsableDePagoActualizado);
             result.resultado.id = 0;
             result.resultado.mensaje = "Responsable de pago modificado exitosamente.";
         } catch (Exception e) {
