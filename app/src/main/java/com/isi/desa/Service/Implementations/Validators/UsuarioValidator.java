@@ -1,6 +1,5 @@
 package com.isi.desa.Service.Implementations.Validators;
 
-import com.isi.desa.Dao.Implementations.UsuarioDAO;
 import com.isi.desa.Dao.Interfaces.IUsuarioDAO;
 import com.isi.desa.Dto.Usuario.UsuarioDTO;
 import com.isi.desa.Model.Entities.Usuario.Usuario;
@@ -48,7 +47,26 @@ public class UsuarioValidator implements IUsuarioValidator {
     }
     public String validateContrasenia(String contrasenia) {
         if (contrasenia == null || contrasenia.trim().isEmpty()) return "La contrasenia es obligatoria";
-        if (contrasenia.length() < 6) return "La contrasenia debe tener al menos 6 caracteres";
+        // Al menos 5 letras
+        long letras = contrasenia.chars().filter(Character::isLetter).count();
+        if (letras < 5) return "La contraseña debe tener al menos 5 letras";
+
+        // Al menos 3 números
+        List<Integer> numeros = contrasenia.chars()
+                .filter(Character::isDigit)
+                .map(Character::getNumericValue)
+                .boxed().toList();
+
+        if (numeros.size() < 3) return "La contraseña debe tener al menos 3 números";
+
+        // Validar que los números no sean iguales ni consecutivos
+        for (int i = 0; i < numeros.size() - 1; i++) {
+            int actual = numeros.get(i);
+            int siguiente = numeros.get(i + 1);
+
+            if (actual == siguiente) return "Los números no pueden ser iguales";
+            if (Math.abs(actual - siguiente) == 1) return "Los números no pueden ser consecutivos";
+        }
         return null;
     }
     public String validateNombre(String nombre) {
@@ -59,4 +77,5 @@ public class UsuarioValidator implements IUsuarioValidator {
         if (apellido == null || apellido.trim().isEmpty()) return "El apellido es obligatorio";
         return null;
     }
+
 }
