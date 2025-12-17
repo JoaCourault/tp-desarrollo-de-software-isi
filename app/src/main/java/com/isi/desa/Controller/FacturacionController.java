@@ -11,7 +11,7 @@ import com.isi.desa.Dto.Resultado;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/Facturacion")
+@RequestMapping("/Factura")
 public class FacturacionController {
 
     @Autowired
@@ -125,5 +125,19 @@ public class FacturacionController {
         return ResponseEntity
                 .badRequest()
                 .body(error);
+    }
+    @PostMapping("/Generar")
+    public ResponseEntity<?> generarFacturaReal(@RequestBody GenerarFacturaRequestDTO request) {
+        try {
+            GenerarFacturaResultDTO resultado = facturacionService.generarFacturaYCheckOut(request);
+            return ResponseEntity.ok(resultado);
+        } catch (IllegalArgumentException e) {
+            Resultado error = new Resultado(1, e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Resultado error = new Resultado(500, "Error interno al facturar: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
+        }
     }
 }

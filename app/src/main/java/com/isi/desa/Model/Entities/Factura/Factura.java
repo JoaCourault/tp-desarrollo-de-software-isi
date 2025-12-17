@@ -1,6 +1,7 @@
 package com.isi.desa.Model.Entities.Factura;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime; // <--- IMPORTANTE: Importar LocalDateTime
 import java.util.List;
 
 import com.isi.desa.Model.Entities.Estadia.Estadia;
@@ -19,12 +20,21 @@ public class Factura {
     @GenericGenerator(name = "id_factura", strategy = "uuid2")
     @Column(name = "id_factura", nullable = false, updatable = false)
     private String idFactura;
+
     @Column(name = "detalle")
     private String detalle;
+
     @Column(name = "total")
     private BigDecimal total;
+
     @Column(name = "nombre")
     private String nombre;
+
+    @Column(name = "fecha")
+    private LocalDateTime fecha;
+
+    @Column(name = "tipo_factura") // "A", "B", "C"
+    private String tipo;
 
     @ManyToOne
     @JoinColumn(name = "id_responsable")
@@ -39,17 +49,17 @@ public class Factura {
 
     @ManyToMany
     @JoinTable(
-        name = "FacturacionEstadia",
-        joinColumns = @JoinColumn(name = "id_factura"),
-        inverseJoinColumns = @JoinColumn(name = "id_estadia")
+            name = "FacturacionEstadia",
+            joinColumns = @JoinColumn(name = "id_factura"),
+            inverseJoinColumns = @JoinColumn(name = "id_estadia")
     )
     private List<Estadia> estadias;
 
     @ManyToMany
     @JoinTable(
-        name = "FacturacionServicio",
-        joinColumns = @JoinColumn(name = "id_factura"),
-        inverseJoinColumns = @JoinColumn(name = "id_servicio")
+            name = "FacturacionServicio",
+            joinColumns = @JoinColumn(name = "id_factura"),
+            inverseJoinColumns = @JoinColumn(name = "id_servicio")
     )
     private List<Servicio> servicios;
 
@@ -62,6 +72,8 @@ public class Factura {
         this.pago = pago;
     }
 
+    // --- GETTERS Y SETTERS ---
+
     public String getDetalle() { return detalle; }
     public void setDetalle(String detalle) { this.detalle = detalle; }
 
@@ -70,6 +82,12 @@ public class Factura {
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
 
     public ResponsableDePago getResponsableDePago() { return responsableDePago; }
     public void setResponsableDePago(ResponsableDePago responsableDePago) { this.responsableDePago = responsableDePago; }

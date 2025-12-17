@@ -18,7 +18,8 @@ import com.isi.desa.Utils.Mappers.ResponsableDePagoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.isi.desa.Dto.Factura.GenerarFacturaRequestDTO;
+import com.isi.desa.Dto.Factura.GenerarFacturaResultDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -40,6 +41,8 @@ public class FacturacionService implements IFaucturacionService {
     EstadiaRepository estadiaRepository;
     @Autowired
     FacturaRepository facturaRepository;
+    @Autowired
+    private HuespedRepository huespedRepository;
 
     // 1. Inyección de Mappers
     @Autowired
@@ -288,5 +291,60 @@ public class FacturacionService implements IFaucturacionService {
         }
 
         return resultado;
+    }
+    @Transactional
+    public GenerarFacturaResultDTO generarFacturaYCheckOut(GenerarFacturaRequestDTO request) {
+
+        // 1. Buscar Estadía
+        Estadia estadia = estadiaRepository.findById(request.idEstadia)
+                .orElseThrow(() -> new IllegalArgumentException("La estadía no existe."));
+
+        // 2. Buscar Responsable de Pago
+        // Intentamos buscarlo directo como Responsable
+        ResponsableDePago responsable = responsableDePagoRepository.findById(request.idResponsable)
+                .orElse(null);
+
+        // Si no lo encontramos por ID directo (porque quizás viene el ID de Huesped desde el front),
+        // buscamos si ese Huesped tiene un Responsable asociado.
+        if (responsable == null) {
+            responsable = responsableDePagoRepository.findPersonaFisicaByIdHuesped(request.idResponsable);
+        }
+
+        // Si sigue siendo nulo, es un error (o deberíamos crearlo al vuelo, pero asumimos que existe)
+        if (responsable == null) {
+            // Intento final: ¿Es un huesped que aún no es responsable? Lo creamos rápido para poder facturar.
+            // Esto es opcional, depende de tu lógica estricta.
+            throw new IllegalArgumentException("No se encontró el responsable de pago con ID: " + request.idResponsable);
+        }
+
+        // 3. Crear Entidad Factura
+        Factura factura = new Factura();
+        factura.setFecha(LocalDateTime.now());
+        factura.setTipo(request.tipoFactura); // "A" o "B"
+        factura.setTotal(request.total);
+        factura.setResponsableDePago(responsable);
+
+        // Vincular Estadia
+        List<Estadia> estadias = new ArrayList<>();
+        estadias.add(estadia);
+        factura.setEstadias(estadias);
+
+        // Detalle en texto (Opcional, para debug)
+        factura.setDetalle("Check-out Habitación " + estadia.getHabitaciones().get(0).getNumero());
+
+        // Guardar Factura
+        factura = facturaRepository.save(factura);
+
+        // 4. CHECK-OUT (Liberar Habitación)
+        // Al poner fecha de fin "ahora", la habitación deja de estar ocupada para el futuro
+        // y la estadía deja de salir en búsquedas de "activas".
+        estadia.setCheckOut(LocalDateTime.now());
+        estadiaRepository.save(estadia);
+
+        // 5. Retornar número para el PDF
+        // Si no tienes lógica de numeración compleja, devolvemos el ID o un random
+        String nroComprobante = "0001-" + String.format("%08d", factura.getIdFactura() != null ? factura.getIdFactura().hashCode() : System.currentTimeMillis());
+
+        return new GenerarFacturaResultDTO(nroComprobante);
     }
 }
