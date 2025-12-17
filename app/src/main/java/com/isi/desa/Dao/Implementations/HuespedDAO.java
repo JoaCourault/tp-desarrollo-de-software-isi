@@ -32,7 +32,7 @@ public class HuespedDAO implements IHuespedDAO {
     private EstadiaRepository estadiaRepository;
 
     @Autowired
-    private HuespedMapper huespedMapper; // <--- 1. INYECCIÓN DEL MAPPER
+    private HuespedMapper huespedMapper;
 
     @Override
     @Transactional

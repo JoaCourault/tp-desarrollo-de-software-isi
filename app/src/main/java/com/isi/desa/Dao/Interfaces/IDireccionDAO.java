@@ -13,5 +13,7 @@ public interface IDireccionDAO {
 
     Direccion obtener(DireccionDTO direccion);
 
+    java.util.List<Direccion> obtenerTodas();
+
     Direccion getById(String id);
 }

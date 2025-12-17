@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class HuespedMapper {
 
@@ -27,6 +29,26 @@ public class HuespedMapper {
 
     @Autowired
     private DireccionMapper direccionMapper;
+
+    public static List<HuespedDTO> entityListToDtoList(List<Huesped> huespedesHospedados) {
+        if (huespedesHospedados == null) return null;
+        return huespedesHospedados.stream()
+                .map(huesped -> {
+                    HuespedMapper mapper = new HuespedMapper();
+                    return mapper.entityToDTO(huesped);
+                })
+                .toList();
+    }
+
+    public static List<Huesped> dtoListToEntitiesList(List<HuespedDTO> huespedesHospedados) {
+        if (huespedesHospedados == null) return null;
+        return huespedesHospedados.stream()
+                .map(dto -> {
+                    HuespedMapper mapper = new HuespedMapper();
+                    return mapper.dtoToEntity(dto);
+                })
+                .toList();
+    }
 
     public Huesped dtoToEntity(HuespedDTO dto) {
         if (dto == null) return null;

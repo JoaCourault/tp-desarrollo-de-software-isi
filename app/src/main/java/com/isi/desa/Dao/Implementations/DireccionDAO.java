@@ -81,6 +81,11 @@ public class DireccionDAO implements IDireccionDAO {
 
     @Override
     @Transactional(readOnly = true)
+    public java.util.List<Direccion> obtenerTodas() {
+        return repository.findAll();
+    }
+    @Override
+    @Transactional(readOnly = true)
     public Direccion getById(String id) {
         if (id == null) return null;
         return repository.findById(id).orElse(null);

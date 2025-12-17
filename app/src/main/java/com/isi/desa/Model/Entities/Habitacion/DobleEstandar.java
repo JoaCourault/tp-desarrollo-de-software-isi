@@ -7,11 +7,7 @@ import jakarta.persistence.Entity;
 @Entity
 @DiscriminatorValue("DOBLE_ESTANDAR")
 public class DobleEstandar extends Habitacion {
-
     public DobleEstandar() {
-        super();
-
         this.setTipoHabitacion(TipoHabitacion.DOBLE_ESTANDAR);
     }
-
 }

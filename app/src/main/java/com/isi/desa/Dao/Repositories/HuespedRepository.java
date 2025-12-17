@@ -2,9 +2,9 @@ package com.isi.desa.Dao.Repositories;
 
 import com.isi.desa.Model.Entities.Huesped.Huesped;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
@@ -27,5 +27,4 @@ public interface HuespedRepository extends JpaRepository<Huesped, String> {
     boolean existsByNumDocAndTipoDoc_TipoDocumento(String numDoc, String tipoDocumento);
 
     boolean existsByNumDocAndTipoDoc_TipoDocumentoAndIdHuespedNot(String numDoc, String tipoDocumento, String idHuesped);
-
 }

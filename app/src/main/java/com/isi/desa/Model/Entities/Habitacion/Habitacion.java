@@ -83,6 +83,7 @@ public abstract class Habitacion {
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
     public String getDetalles() { return detalles; }
     public void setDetalles(String detalles) { this.detalles = detalles; }
+
     public Integer getCantidadCamasIndividual() { return cantidadCamasIndividual; }
     public void setCantidadCamasIndividual(Integer cantidadCamasIndividual) { this.cantidadCamasIndividual = cantidadCamasIndividual; }
     public Integer getCantidadCamasDobles() { return cantidadCamasDobles; }

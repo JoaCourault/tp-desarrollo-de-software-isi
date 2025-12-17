@@ -13,6 +13,9 @@ import java.util.List;
 
 @Component
 public class ResponsableDePagoMapper {
+    @Autowired
+    private HuespedMapper HuespedMapper;
+
 
     @Autowired
     private HuespedMapper huespedMapper;
@@ -25,6 +28,7 @@ public class ResponsableDePagoMapper {
         ResponsableDePagoDTO dto;
         if (responsableDePago instanceof PersonaFisica pf) {
             PersonaFisicaDTO pfDto = new PersonaFisicaDTO();
+
             pfDto.huesped = huespedMapper.entityToDTO(pf.getHuesped());
             pfDto.idResponsableDePago = pf.getIdResponsableDePago();
             dto = pfDto;
@@ -42,6 +46,7 @@ public class ResponsableDePagoMapper {
         dto.idResponsableDePago = responsableDePago.getIdResponsableDePago();
         return dto;
     }
+
 
     public ResponsableDePago dtoToEntity (ResponsableDePagoDTO responsableDePagoDTO) {
         if (responsableDePagoDTO == null) return null;

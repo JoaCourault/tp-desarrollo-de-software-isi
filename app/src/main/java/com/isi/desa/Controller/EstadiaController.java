@@ -1,5 +1,7 @@
 package com.isi.desa.Controller;
 
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.isi.desa.Dto.Estadia.CrearEstadiaRequestDTO;
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Dto.Resultado;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/Estadia")
 public class EstadiaController {
-
     @Autowired
     private EstadiaService estadiaService;
 

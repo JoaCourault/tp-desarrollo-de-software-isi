@@ -12,5 +12,4 @@ public class IndividualEstandar extends Habitacion {
         super();
         this.setTipoHabitacion(TipoHabitacion.INDIVIDUAL_ESTANDAR);
     }
-
 }

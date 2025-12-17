@@ -84,30 +84,16 @@ public class Estadia {
     public List<Factura> getFacturas() { return facturas; }
     public void setFacturas(List<Factura> facturas) { this.facturas = facturas; }
 
-    public List<Habitacion> getHabitaciones() {
-        return habitaciones;
-    }
+    public Reserva getReserva() { return reserva; }
+    public void setReserva(Reserva reserva) { this.reserva = reserva; }
 
-    public void setHabitaciones(List<Habitacion> habitaciones) {
-        this.habitaciones = habitaciones;
-    }
+    public List<Habitacion> getHabitaciones() { return habitaciones; }
+    public void setHabitaciones(List<Habitacion> habitaciones) { this.habitaciones = habitaciones; }
 
-    public Reserva getReserva() {
-        return reserva;
-    }
+    public List<Huesped> getHuespedes() { return huespedesHospedados; }
+    public void setHuespedes(List<Huesped> huespedes) { this.huespedesHospedados = huespedes; }
+    public void addHuesped(Huesped huesped) { this.huespedesHospedados.add(huesped); }
 
-    public void setReserva(Reserva reserva) {
-        this.reserva = reserva;
-    }
-
-    public void setHuespedes(List<Huesped> huespedes) {
-
-    }
-    public Huesped getHuesped() {
-        return huesped_titular;
-    }
-
-    public void setHuesped(Huesped huesped) {
-        this.huesped_titular = huesped;
-    }
+    public Huesped getHuesped() { return huesped_titular; }
+    public void setHuesped(Huesped huesped) { this.huesped_titular = huesped; }
 }
