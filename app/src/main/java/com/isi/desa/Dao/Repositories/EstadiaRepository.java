@@ -45,6 +45,6 @@ public interface EstadiaRepository extends JpaRepository<Estadia, String> {
     @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END FROM Estadia e WHERE e.huesped_titular.idHuesped = :idHuesped")
     boolean existsByTitularId(@Param("idHuesped") String idHuesped);
 
-    @Query("SELECT e FROM Estadia e JOIN e.habitaciones h WHERE h.numero = :numeroHabitacion AND (e.checkOut >= CURRENT_TIMESTAMP OR e.checkOut IS NULL)")
+    @Query("SELECT e FROM Estadia e JOIN e.habitaciones h WHERE h.numero = :numeroHabitacion AND (e.checkOut IS NULL OR e.checkOut >= CURRENT_TIMESTAMP)")
     List<Estadia> findEstadiasActivasPorNumero(@Param("numeroHabitacion") Integer numeroHabitacion);
 }

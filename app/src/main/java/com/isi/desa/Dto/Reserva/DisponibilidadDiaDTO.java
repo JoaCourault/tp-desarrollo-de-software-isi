@@ -6,10 +6,13 @@ public class DisponibilidadDiaDTO {
     public LocalDate fecha;
     public String estado; // "DISPONIBLE", "OCUPADA", "RESERVADA", "MANTENIMIENTO"
     private String idReserva;
+    private boolean esSalida;
+    private String tipoSalida;
 
     public DisponibilidadDiaDTO(LocalDate fecha, String estado) {
         this.fecha = fecha;
         this.estado = estado;
+        this.esSalida = false;
     }
 
     public DisponibilidadDiaDTO() {}
@@ -31,4 +34,8 @@ public class DisponibilidadDiaDTO {
     }
     public String getIdReserva() { return idReserva; }
     public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
+    public boolean isEsSalida() { return esSalida; }
+    public void setEsSalida(boolean esSalida) { this.esSalida = esSalida; }
+    public String getTipoSalida() { return tipoSalida; }
+    public void setTipoSalida(String tipoSalida) { this.tipoSalida = tipoSalida; }
 }

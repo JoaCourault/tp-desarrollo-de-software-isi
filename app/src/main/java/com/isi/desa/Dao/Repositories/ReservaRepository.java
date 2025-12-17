@@ -19,10 +19,13 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
     List<Reserva> buscarPorHuesped(@Param("apellido") String apellido,
                                    @Param("nombre") String nombre);
 
+    // --- MEJORA AQUÍ: Excluir también EFECTIVIZADA ---
     @Query("SELECT r FROM Reserva r WHERE " +
             "(r.fechaIngreso < :hasta AND r.fechaEgreso > :desde) AND " +
             "(r.estado IS NULL OR " +
-            "(r.estado != com.isi.desa.Model.Enums.EstadoReserva.CANCELADA AND r.estado != com.isi.desa.Model.Enums.EstadoReserva.FINALIZADA))")
+            "(r.estado != com.isi.desa.Model.Enums.EstadoReserva.CANCELADA " +
+            "AND r.estado != com.isi.desa.Model.Enums.EstadoReserva.FINALIZADA " +
+            "AND r.estado != com.isi.desa.Model.Enums.EstadoReserva.EFECTIVIZADA))") // <--- Agregado
     List<Reserva> findReservasEnRango(@Param("desde") LocalDateTime desde,
                                       @Param("hasta") LocalDateTime hasta);
 
@@ -35,16 +38,23 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
 
     // --- CONSULTA PARA CANCELAR ---
     @Query("SELECT r FROM Reserva r WHERE " +
-            // 1. Apellido (Obligatorio)
             "LOWER(r.apellidoHuesped) LIKE LOWER(CONCAT('%', :apellido, '%')) " +
             "AND " +
-            // 2. Nombre (Opcional - Maneja vacío y null)
             "(:nombre IS NULL OR :nombre = '' OR LOWER(r.nombreHuesped) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
             "AND " +
-            // 3. Estado (Solo RESERVADA o viejas NULL)
             "(r.estado IS NULL OR r.estado = com.isi.desa.Model.Enums.EstadoReserva.RESERVADA)")
     List<Reserva> buscarParaCancelar(
             @Param("apellido") String apellido,
             @Param("nombre") String nombre
+    );
+    @Query("SELECT r FROM Reserva r WHERE " +
+            "r.habitacion.idHabitacion = :idHabitacion " +
+            "AND r.fechaIngreso < :fechaEgreso " +
+            "AND r.fechaEgreso > :fechaIngreso " +
+            "AND (r.estado IS NULL OR r.estado = com.isi.desa.Model.Enums.EstadoReserva.RESERVADA)")
+    List<Reserva> findReservasConflictivas(
+            @Param("idHabitacion") String idHabitacion,
+            @Param("fechaIngreso") LocalDateTime fechaIngreso,
+            @Param("fechaEgreso") LocalDateTime fechaEgreso
     );
 }
