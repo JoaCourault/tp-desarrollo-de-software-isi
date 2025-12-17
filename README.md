@@ -1,5 +1,4 @@
 # tp-desarrollo-de-software-isi
-# tp-desarrollo-de-software-isi
 Sistema de Gestión Hotelera – Guía de Uso
 
 Este proyecto corresponde a un Sistema de Gestión Hotelera, desarrollado como trabajo práctico, que permite administrar huéspedes, habitaciones, reservas, estadías y facturación mediante una arquitectura backend + frontend.
