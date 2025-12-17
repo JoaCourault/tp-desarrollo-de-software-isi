@@ -36,4 +36,10 @@ public interface EstadiaRepository extends JpaRepository<Estadia, String> {
     );
 
     Optional<Estadia> findTopByOrderByIdEstadiaDesc();
+    // Verifica si estuvo alojado (pisó el hotel)
+    boolean existsByHuespedesHospedados_IdHuesped(String idHuesped);
+
+    // Verifica si fue titular (pagador/responsable)
+    @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END FROM Estadia e WHERE e.huesped_titular.idHuesped = :idHuesped")
+    boolean existsByTitularId(@Param("idHuesped") String idHuesped);
 }
