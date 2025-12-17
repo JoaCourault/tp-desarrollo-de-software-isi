@@ -13,7 +13,7 @@ public class PersonaJuridica extends ResponsableDePago {
     @Column(name = "razon_social", nullable = false)
     private String razonSocial;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_direccion", referencedColumnName = "id_direccion")
     private Direccion direccion;
 
