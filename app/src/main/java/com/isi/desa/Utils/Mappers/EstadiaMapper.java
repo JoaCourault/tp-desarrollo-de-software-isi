@@ -2,14 +2,19 @@ package com.isi.desa.Utils.Mappers;
 
 import com.isi.desa.Dto.Estadia.EstadiaDTO;
 import com.isi.desa.Model.Entities.Estadia.Estadia;
+import com.isi.desa.Model.Entities.Huesped.Huesped;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import com.isi.desa.Utils.Mappers.HuespedMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class EstadiaMapper {
+
+    @Autowired
+    private HuespedMapper huespedMapper;
 
     public EstadiaDTO entityToDto(Estadia e) {
         if (e == null) return null;
@@ -19,7 +24,7 @@ public class EstadiaMapper {
         dto.checkIn = e.getCheckIn();
         dto.checkOut = e.getCheckOut();
         dto.cantNoches = e.getCantNoches();
-        dto.huespedesHospedados = HuespedMapper.entityListToDtoList(e.getHuespedesHospedados());
+        dto.huespedesHospedados = huespedMapper.entityListToDtoList(e.getHuespedesHospedados());
         dto.habitaciones = HabitacionMapper.entityListToDtoList(e.getHabitaciones());
         return dto;
     }
@@ -32,7 +37,7 @@ public class EstadiaMapper {
         e.setCheckIn(dto.checkIn);
         e.setCheckOut(dto.checkOut);
         e.setCantNoches(dto.cantNoches);
-        e.setHuespedesHospedados(HuespedMapper.dtoListToEntitiesList(dto.huespedesHospedados));
+        e.setHuespedesHospedados(huespedMapper.dtoListToEntitiesList(dto.huespedesHospedados));
         e.setHabitaciones(HabitacionMapper.dtoLisToEntitiesList(dto.habitaciones));
         return e;
     }

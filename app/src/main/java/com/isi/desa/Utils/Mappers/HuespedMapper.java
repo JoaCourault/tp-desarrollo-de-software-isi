@@ -30,23 +30,17 @@ public class HuespedMapper {
     @Autowired
     private DireccionMapper direccionMapper;
 
-    public static List<HuespedDTO> entityListToDtoList(List<Huesped> huespedesHospedados) {
+    public List<HuespedDTO> entityListToDtoList(List<Huesped> huespedesHospedados) {
         if (huespedesHospedados == null) return null;
         return huespedesHospedados.stream()
-                .map(huesped -> {
-                    HuespedMapper mapper = new HuespedMapper();
-                    return mapper.entityToDTO(huesped);
-                })
+                .map(this::entityToDTO) // Usamos la instancia actual (this)
                 .toList();
     }
 
-    public static List<Huesped> dtoListToEntitiesList(List<HuespedDTO> huespedesHospedados) {
+    public List<Huesped> dtoListToEntitiesList(List<HuespedDTO> huespedesHospedados) {
         if (huespedesHospedados == null) return null;
         return huespedesHospedados.stream()
-                .map(dto -> {
-                    HuespedMapper mapper = new HuespedMapper();
-                    return mapper.dtoToEntity(dto);
-                })
+                .map(this::dtoToEntity) // Usamos la instancia actual (this)
                 .toList();
     }
 
