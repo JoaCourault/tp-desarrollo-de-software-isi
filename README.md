@@ -8,9 +8,9 @@ Este proyecto corresponde a un Sistema de Gestión Hotelera, desarrollado como t
 El sistema está compuesto por dos partes principales:
 
 Backend: desarrollado en Java con Spring Boot
-
+(guardar el application.properties dentro de la carpeta del back)
 Frontend: desarrollado con JavaScript utilizando un framework frontend (ejecutado con npm)
-
+(guardar el env.local dentro de la carpeta del front)
 Ambas partes se ejecutan de forma independiente pero se comunican entre sí.
 
 🚀 Cómo ejecutar el sistema
