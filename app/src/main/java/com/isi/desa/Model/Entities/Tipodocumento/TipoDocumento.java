@@ -19,9 +19,7 @@ public class TipoDocumento {
         this.tipoDocumento = tipoDocumento;
     }
 
-    // === GETTERS ===
     public String getTipoDocumento() { return tipoDocumento; }
 
-    // === SETTERS ===
     public void setTipoDocumento(String tipoDocumento) { this.tipoDocumento = tipoDocumento; }
 }

@@ -19,7 +19,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
     List<Reserva> buscarPorHuesped(@Param("apellido") String apellido,
                                    @Param("nombre") String nombre);
 
-    // --- MEJORA AQUÍ: Excluir también EFECTIVIZADA ---
     @Query("SELECT r FROM Reserva r WHERE " +
             "(r.fechaIngreso < :hasta AND r.fechaEgreso > :desde) AND " +
             "(r.estado IS NULL OR " +

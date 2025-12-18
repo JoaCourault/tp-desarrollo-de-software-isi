@@ -50,7 +50,7 @@ public class ReservaController {
         try {
             LocalDate fechaDesde = LocalDate.parse(desdeStr);
             LocalDate fechaHasta = LocalDate.parse(hastaStr);
-            // 2. Convertir a LocalDateTime
+            // Convertir a LocalDateTime
             // Check-in se asume a las 14:00
 
             LocalDateTime desde = fechaDesde.atStartOfDay();

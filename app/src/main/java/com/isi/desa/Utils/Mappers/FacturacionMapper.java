@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FacturacionMapper {
 
-    // 2. Inyección de dependencias
+    // Inyección de dependencias
     @Autowired
     private ResponsableDePagoMapper responsableDePagoMapper;
 

@@ -25,7 +25,7 @@ public class HuespedController {
     @Autowired
     private HuespedMapper huespedMapper; // 1.INYECTAMOS EL MAPPER
 
-    // --- CU02 Pasos 1-4: Buscar con filtros ---
+    // --- Buscar con filtros ---
     @PostMapping("/Buscar")
     public BuscarHuespedResultDTO buscar(@RequestBody BuscarHuespedRequestDTO requestDTO) {
         try {
@@ -40,7 +40,7 @@ public class HuespedController {
         }
     }
 
-    // --- CU02 Paso 5: Traer Huésped seleccionado ---
+    // --- Traer Huésped seleccionado ---
     @GetMapping("/{id}")
     public ResponseEntity<HuespedDTO> obtenerPorId(@PathVariable String id) {
         try {
@@ -48,7 +48,7 @@ public class HuespedController {
             if (huesped == null) {
                 return ResponseEntity.notFound().build();
             }
-            // 2. USAMOS LA INSTANCIA (huespedMapper)
+            // USAMOS LA INSTANCIA (huespedMapper)
             return ResponseEntity.ok(huespedMapper.entityToDTO(huesped));
         } catch (Exception e) {
             this.logger.error("Error al obtener huesped por ID: " + e.getMessage(), e);
@@ -56,7 +56,7 @@ public class HuespedController {
         }
     }
 
-    // --- CU09: Alta de Huésped ---
+    // --- Alta de Huésped ---
     @PostMapping("/Alta")
     public AltaHuespedResultDTO altaHuesped(@RequestBody AltaHuespedRequestDTO requestDTO) {
         AltaHuespedResultDTO res = new AltaHuespedResultDTO();
@@ -95,7 +95,7 @@ public class HuespedController {
 
         return res;
     }
-    // --- CU10: Modificar Huésped ---
+    // --- Modificar Huésped ---
     @PostMapping("/Modificar")
     public ModificarHuespedResultDTO modificarHuesped(@RequestBody ModificarHuespedRequestDTO requestDTO) {
         try {
@@ -110,7 +110,7 @@ public class HuespedController {
         }
     }
 
-    // --- CU11: Baja Huésped ---
+    // --- Baja Huésped ---
     @PostMapping("/Baja")
     public BajaHuespedResultDTO bajaHuesped(@RequestBody BajaHuespedRequestDTO requestDTO) {
         try {

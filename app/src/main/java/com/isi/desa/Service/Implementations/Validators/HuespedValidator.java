@@ -70,26 +70,26 @@ public class HuespedValidator implements IHuespedValidator {
     public CannotCreateHuespedException validateCreate(HuespedDTO huespedDTO) {
         List<RuntimeException> errores = new ArrayList<>();
 
-        // 1. Validar Nombre
+        // Validar Nombre
         if (isBlank(huespedDTO.nombre)) {
             errores.add(new IllegalArgumentException("El nombre es obligatorio"));
         } else if (!isValidText(huespedDTO.nombre)) {
             errores.add(new IllegalArgumentException("El nombre contiene caracteres inválidos (solo letras y espacios)"));
         }
 
-        // 2. Validar Apellido
+        // Validar Apellido
         if (isBlank(huespedDTO.apellido)) {
             errores.add(new IllegalArgumentException("El apellido es obligatorio"));
         } else if (!isValidText(huespedDTO.apellido)) {
             errores.add(new IllegalArgumentException("El apellido contiene caracteres inválidos"));
         }
 
-        // 3. Validar Nacionalidad
+        // Validar Nacionalidad
         if (!isBlank(huespedDTO.nacionalidad) && !isValidText(huespedDTO.nacionalidad)) {
             errores.add(new IllegalArgumentException("La nacionalidad contiene caracteres inválidos"));
         }
 
-        // 4. Validar Ocupación
+        // Validar Ocupación
         if (!isBlank(huespedDTO.ocupacion) && !isValidText(huespedDTO.ocupacion)) {
             errores.add(new IllegalArgumentException("La ocupación contiene caracteres inválidos"));
         }
@@ -142,13 +142,13 @@ public class HuespedValidator implements IHuespedValidator {
             return new CannotDeleteHuespedException(huespedNoExistente.getMessage());
         }
 
-        // 2. Validar existencia real en BD usando el DAO inyectado
+        // Validar existencia real en BD usando el DAO inyectado
         Huesped huespedAEliminar = this.dao.getById(idHuesped);
         if (huespedAEliminar == null) {
             return new CannotDeleteHuespedException("No existe un huesped con el ID proporcionado.");
         }
 
-        // 3. Validar reglas de negocio (Estadías)
+        // Validar reglas de negocio (Estadías)
         if (!this.dao.obtenerEstadiasDeHuesped(huespedAEliminar.getIdHuesped()).isEmpty()) {
             return new CannotDeleteHuespedException("No se puede eliminar el huesped porque tiene estadias asociadas.");
         }

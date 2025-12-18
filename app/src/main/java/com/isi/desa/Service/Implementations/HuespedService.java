@@ -78,7 +78,7 @@ public class HuespedService implements IHuespedService {
         BajaHuespedResultDTO res = new BajaHuespedResultDTO();
         res.resultado = new Resultado();
 
-        // 1. Validar ID
+        // Validar ID
         RuntimeException validation = this.validator.validateDelete(requestDTO.idHuesped);
         if (validation != null) {
             res.resultado.id = 2;
@@ -86,7 +86,7 @@ public class HuespedService implements IHuespedService {
             return res;
         }
 
-        // 2. Buscar si existe en la BDD
+        // Buscar si existe en la BDD
         Optional<Huesped> opHuesped = repository.findById(requestDTO.idHuesped);
         if (opHuesped.isEmpty()) {
             res.resultado.id = 1;
@@ -95,7 +95,7 @@ public class HuespedService implements IHuespedService {
         }
         Huesped huespedTarget = opHuesped.get();
 
-        // 3. VALIDACIÓN DE NEGOCIO:
+        // VALIDACIÓN DE NEGOCIO:
         // Verificamos si durmió allí (huespedesHospedados) O si fue titular de alguna estadía (huesped)
         boolean tieneEstadias = estadiaRepository.existsByHuespedesHospedados_IdHuesped(requestDTO.idHuesped)
                 || estadiaRepository.existsByTitularId(requestDTO.idHuesped);
@@ -107,12 +107,12 @@ public class HuespedService implements IHuespedService {
             return res;
         }
 
-        // 4. BAJA LÓGICA (Update eliminado = true)
+        // BAJA LÓGICA (Update eliminado = true)
         // No borramos físicamente, solo marcamos la bandera.
         huespedTarget.setEliminado(true);
         Huesped huespedGuardado = repository.save(huespedTarget);
 
-        // 5. Retorno Exitoso
+        // Retorno Exitoso
         res.resultado.id = 0;
         res.resultado.mensaje = "Huesped dado de baja exitosamente.";
         res.huesped = this.huespedMapper.entityToDTO(huespedGuardado);

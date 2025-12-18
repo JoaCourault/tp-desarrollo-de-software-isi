@@ -81,7 +81,6 @@ public class ReservaService implements IReservaService {
             if (!conflictos.isEmpty()) {
                 throw new IllegalArgumentException("La habitación " + habitacion.getNumero() + " ya tiene una reserva en las fechas seleccionadas.");
             }
-            // ------------------------------------------------
 
             Reserva nuevaReserva = new Reserva();
             nuevaReserva.setEstado(EstadoReserva.RESERVADA);
@@ -131,7 +130,7 @@ public class ReservaService implements IReservaService {
                 final LocalDate diaAnalizadoDate = current.toLocalDate();
 
                 // Lógica de Estado Principal (Ocupada / Reservada / Disponible)
-                // 1. ESTADIA (OCUPADA)
+                // ESTADIA (OCUPADA)
                 java.util.Optional<Estadia> estadiaMatch = estadiasHab.stream().filter(e -> {
                     if (e.getCheckIn().toLocalDate().isAfter(diaAnalizadoDate)) return false;
                     if (e.getCheckOut() == null) return true;
@@ -141,7 +140,7 @@ public class ReservaService implements IReservaService {
                 if (estadiaMatch.isPresent()) {
                     diaDTO.setEstado("OCUPADA");
                 } else {
-                    // 2. RESERVA (RESERVADA)
+                    // RESERVA (RESERVADA)
                     java.util.Optional<Reserva> reservaMatch = reservasHab.stream().filter(r ->
                             (r.getEstado() == null || r.getEstado() == EstadoReserva.RESERVADA) &&
                                     !r.getFechaIngreso().toLocalDate().isAfter(diaAnalizadoDate) &&
@@ -161,7 +160,7 @@ public class ReservaService implements IReservaService {
                         e.getCheckOut() != null && e.getCheckOut().toLocalDate().isEqual(diaAnalizadoDate)
                 );
 
-                // 2. Verificamos si es Fin de RESERVA (Sin CheckIn aún)
+                // Verificamos si es Fin de RESERVA (Sin CheckIn aún)
                 boolean haySalidaReserva = reservasHab.stream().anyMatch(r ->
                         (r.getEstado() == null || r.getEstado() == EstadoReserva.RESERVADA) &&
                                 r.getFechaEgreso().toLocalDate().isEqual(diaAnalizadoDate)

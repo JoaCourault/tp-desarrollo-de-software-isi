@@ -20,9 +20,7 @@ public class FacturacionController {
     @Autowired
     private ILogger logger;
 
-    // =========================================================
-    // 1. Obtener responsables de pago
-    // =========================================================
+    // Obtener responsables de pago
     @PostMapping("/ObtenerResponsablesDePagoParaFacturacion")
     public ResponseEntity<ObtenerResponsablesDePagoParaFacturacionResult>
     obtenerResponsablesDePagoParaFacturacion(
@@ -48,9 +46,9 @@ public class FacturacionController {
         }
     }
 
-    // =========================================================
-    // 2. Generar facturación (simulación)
-    // =========================================================
+
+    // Generar facturación
+
     @PostMapping("/GenerarFacturacionHabitacion")
     public ResponseEntity<GenerarFacturacionHabitacionResult>
     generarFacturacionHabitacion(
@@ -76,9 +74,8 @@ public class FacturacionController {
         }
     }
 
-    // =========================================================
-    // 3. Confirmar facturación
-    // =========================================================
+    // Confirmar facturación
+
     @PostMapping("/ConfirmarFacturacion")
     public ResponseEntity<ConfirmarFacturacionResult>
     confirmarFacturacion(
@@ -104,9 +101,9 @@ public class FacturacionController {
         }
     }
 
-    // =========================================================
+
     // MANEJO DE JSON INVÁLIDO
-    // =========================================================
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ConfirmarFacturacionResult>
     handleJsonParseError(HttpMessageNotReadableException ex) {

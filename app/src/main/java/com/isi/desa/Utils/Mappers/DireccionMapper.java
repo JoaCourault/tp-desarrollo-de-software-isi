@@ -25,7 +25,7 @@ public class DireccionMapper {
         dto.numero = d.getNumero();
         dto.departamento = d.getDepartamento();
 
-        // CORRECCIÓN AQUÍ: Validar si es null antes de convertir
+        // Validar si es null antes de convertir
         if (d.getPiso() != null) {
             dto.piso = String.valueOf(d.getPiso());
         } else {
@@ -47,7 +47,7 @@ public class DireccionMapper {
         d.setNumero(dto.numero);
         d.setDepartamento(dto.departamento);
 
-        // CORRECCIÓN AQUÍ: Validar si viene texto antes de parsear a Integer
+        // Validar si viene texto antes de parsear a Integer
         if (dto.piso != null && !dto.piso.isBlank()) {
             try {
                 d.setPiso(Integer.parseInt(dto.piso));

@@ -45,7 +45,7 @@ public class FacturacionService implements IFaucturacionService {
     @Autowired
     private HuespedRepository huespedRepository;
 
-    // 1. Inyección de Mappers
+    // Inyección de Mappers
     @Autowired
     private FacturacionMapper facturacionMapper;
 
@@ -90,7 +90,7 @@ public class FacturacionService implements IFaucturacionService {
             }
         }
 
-        // 2. Uso de instancia inyectada
+        // Uso de instancia inyectada
         result.responsablesDePago = responsableDePagoMapper.entitiesToDtos(new ArrayList<>(responsablesDePago));
         result.resultado.mensaje = "Responsables de pago obtenidos correctamente";
 
@@ -183,7 +183,7 @@ public class FacturacionService implements IFaucturacionService {
         }
         factura.setTotal(total);
 
-        // 3. Uso de instancia inyectada
+        // Uso de instancia inyectada
         result.facturaGenerada = facturacionMapper.factura_entityToDto(factura);
 
         return result;
@@ -260,7 +260,7 @@ public class FacturacionService implements IFaucturacionService {
 
         Factura facturaPersistida = facturaRepository.save(factura);
 
-        // 4. Uso de instancia inyectada
+        // Uso de instancia inyectada
         result.facturaConfirmada = facturacionMapper.factura_entityToDto(facturaPersistida);
 
         return result;
@@ -296,23 +296,23 @@ public class FacturacionService implements IFaucturacionService {
     @Transactional
     public GenerarFacturaResultDTO generarFacturaYCheckOut(GenerarFacturaRequestDTO request) {
 
-        // 1. Buscar Estadía
+        // Buscar Estadía
         Estadia estadia = estadiaRepository.findById(request.idEstadia)
                 .orElseThrow(() -> new IllegalArgumentException("La estadía no existe."));
 
-        // 2. BUSQUEDA INTELIGENTE DE RESPONSABLE
+        // BUSQUEDA DE RESPONSABLE
         ResponsableDePago responsable = null;
 
-        // A) Intentar por ID directo (si ya era responsable)
+        // Intentar por ID directo (si ya era responsable)
         Optional<ResponsableDePago> opResponsable = responsableDePagoRepository.findById(request.idResponsable);
         if (opResponsable.isPresent()) {
             responsable = opResponsable.get();
         } else {
-            // B) Intentar buscar si existe como Persona Física vinculada a ese ID de Huésped
+            // Intentar buscar si existe como Persona Física vinculada a ese ID de Huésped
             responsable = responsableDePagoRepository.findPersonaFisicaByIdHuesped(request.idResponsable);
         }
 
-        // C) AUTO-ALTA: Si no existe como responsable, pero es un Huésped, lo creamos ahora mismo.
+        // Si no existe como responsable, pero es un Huésped, lo creamos ahora mismo.
         if (responsable == null) {
             Optional<Huesped> opHuesped = huespedRepository.findById(request.idResponsable);
             if (opHuesped.isPresent()) {
@@ -321,7 +321,6 @@ public class FacturacionService implements IFaucturacionService {
                 // Creamos la entidad PersonaFisica que envuelve al Huesped
                 PersonaFisica nuevoResponsable = new PersonaFisica();
                 nuevoResponsable.setHuesped(huesped);
-                // Aquí podrías setear otros datos si PersonaFisica tiene campos propios obligatorios
 
                 // Guardamos para generar el ID de Responsable
                 responsable = responsableDePagoRepository.save(nuevoResponsable);
@@ -330,7 +329,7 @@ public class FacturacionService implements IFaucturacionService {
             }
         }
 
-        // 3. Crear Entidad Factura
+        // Crear Entidad Factura
         Factura factura = new Factura();
         factura.setFecha(LocalDateTime.now());
         factura.setTipo(request.tipoFactura);
@@ -347,11 +346,11 @@ public class FacturacionService implements IFaucturacionService {
         // Guardar Factura
         factura = facturaRepository.save(factura);
 
-        // 4. CHECK-OUT (Liberar Habitación)
+        // CHECK-OUT (Liberar Habitación)
         estadia.setCheckOut(LocalDateTime.now());
         estadiaRepository.save(estadia);
 
-        // 5. Retornar número
+        // Retornar número
         // Usamos un hash positivo simple para simular un número secuencial
         String nroComprobante = "0001-" + String.format("%08d", factura.getIdFactura() != null ? (factura.getIdFactura().hashCode() & 0x7FFFFFFF) : System.currentTimeMillis());
 

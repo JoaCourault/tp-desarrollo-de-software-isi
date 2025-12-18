@@ -20,8 +20,6 @@ public class PagoMapper {
     public Pago dtoToEntity (PagoDTO pagoDTO) {
         if (pagoDTO == null) return null;
         Pago pago = new Pago();
-        // Generalmente el ID no se setea al crear la entidad (es autogenerado),
-        // así que tu lógica de solo setear valor y fecha está bien.
         pago.setValor(pagoDTO.valor);
         pago.setFecha(pagoDTO.fecha);
 

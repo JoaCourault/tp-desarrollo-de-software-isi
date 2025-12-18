@@ -51,7 +51,7 @@ public class EstadiaService implements IEstadiaService {
     @Override
     @Transactional
     public EstadiaDTO ocuparHabitacion(CrearEstadiaRequestDTO request) {
-        // 1. VALIDACIONES
+        // VALIDACIONES
         if (request.getIdsHabitaciones() == null || request.getIdsHabitaciones().isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos una habitación.");
         }
@@ -59,7 +59,7 @@ public class EstadiaService implements IEstadiaService {
             throw new IllegalArgumentException("Es obligatorio designar un Titular para la estadía.");
         }
 
-        // 2. RECUPERAR ENTIDADES
+        // RECUPERAR ENTIDADES
         List<Habitacion> habitaciones = habitacionRepository.findAllById(request.getIdsHabitaciones());
         List<Huesped> todosLosHuespedes = huespedRepository.findAllById(request.getIdsHuespedes());
 
@@ -71,14 +71,14 @@ public class EstadiaService implements IEstadiaService {
             throw new IllegalArgumentException("Alguna de las habitaciones solicitadas no existe.");
         }
 
-        // 3. CAMBIAR ESTADO HABITACIONES
+        // ESTADO HABITACIONES
         for (Habitacion hab : habitaciones) {
-            // VALIDACIÓN: Solo verificamos que no esté rota.
+            // Solo verificamos que no esté rota.
             if (hab.getEstado() == EstadoHabitacion.FUERA_DE_SERVICIO) {
                 throw new IllegalArgumentException("La habitación " + hab.getNumero() + " está fuera de servicio.");
             }
         }
-        // 4. CREAR ESTADÍA
+        // CREAR ESTADÍA
         Estadia estadia = new Estadia();
 
         // (ID generado automáticamente por JPA)
@@ -90,13 +90,13 @@ public class EstadiaService implements IEstadiaService {
         // Vinculamos Titular (columna id_huesped_titular)
         estadia.setHuesped(titularEntity);
 
-        // 5. GESTIÓN DE RESERVA
+        // GESTIÓN DE RESERVA
         if (request.getIdReserva() != null && !request.getIdReserva().isEmpty()) {
             // CASO A: Viene de una Reserva Existente -> La vinculamos
             Reserva reservaVinculada = reservaRepository.findById(request.getIdReserva())
                     .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + request.getIdReserva()));
 
-            // ACTUALIZAMOS EL ESTADO: De REALIZADA a COMPLETADA
+            // ACTUALIZAMOS EL ESTADO: De RESERVADA a EFECTIVIZADA
             reservaVinculada.setEstado(EstadoReserva.EFECTIVIZADA);
             reservaDAO.guardar(reservaVinculada); // Guardamos el cambio de estado
             estadia.setReserva(reservaVinculada);
@@ -105,7 +105,7 @@ public class EstadiaService implements IEstadiaService {
             estadia.setReserva(null);
         }
 
-        // 6. VALOR TOTAL
+        // VALOR TOTAL
         BigDecimal total = BigDecimal.ZERO;
         for (Habitacion h : habitaciones) {
             if (h.getPrecio() != null) {
@@ -115,7 +115,7 @@ public class EstadiaService implements IEstadiaService {
         total = total.multiply(new BigDecimal(request.getCantNoches()));
         estadia.setValorTotalEstadia(total);
 
-        // 7. RELACIONES
+        // RELACIONES
         estadia.setHabitaciones(habitaciones);
         estadia.setHuespedesHospedados(todosLosHuespedes);
 
@@ -124,7 +124,7 @@ public class EstadiaService implements IEstadiaService {
 
     @Override
     public EstadiaDetalleDTO buscarDetallePorHabitacion(Integer numero) {
-        // 1. Buscar estadía activa usando el Repository
+        // Buscar estadía activa usando el Repository
         List<Estadia> estadias = estadiaRepository.findEstadiasActivasPorNumero(numero);
 
         if (estadias.isEmpty()) {
@@ -133,12 +133,12 @@ public class EstadiaService implements IEstadiaService {
 
         Estadia estadia = estadias.get(0);
 
-        // 2. Mapeo al DTO
+        // Mapeo al DTO
         EstadiaDetalleDTO dto = new EstadiaDetalleDTO();
         dto.setIdEstadia(estadia.getIdEstadia());
         dto.setNroHabitacion(String.valueOf(numero));
 
-        // 3. Crear Items
+        // Crear Items
         List<ItemFacturableDTO> items = new ArrayList<>();
 
         // Calcular noches
@@ -153,7 +153,6 @@ public class EstadiaService implements IEstadiaService {
         }
 
         // Crear Item de Alojamiento
-        // NOTA: ItemFacturableDTO debe tener constructor o usar setters
         ItemFacturableDTO itemAlojamiento = new ItemFacturableDTO();
         itemAlojamiento.setId(estadia.getIdEstadia());
         itemAlojamiento.setDescripcion("Alojamiento Habitación " + numero);
@@ -164,7 +163,7 @@ public class EstadiaService implements IEstadiaService {
         items.add(itemAlojamiento);
         dto.setItems(items);
 
-        // 4. Mapear Ocupantes a PayerDTO
+        // Mapear Ocupantes a PayerDTO
         List<PayerDTO> ocupantes = new ArrayList<>();
         if (estadia.getHuespedesHospedados() != null) {
             for (Huesped h : estadia.getHuespedesHospedados()) {
@@ -172,7 +171,6 @@ public class EstadiaService implements IEstadiaService {
                 payer.setIdResponsable(h.getIdHuesped());
                 payer.setNombre(h.getNombre());
                 payer.setApellido(h.getApellido());
-                // Asumimos que numDoc es el DNI para persona física
                 payer.setDni(h.getNumDoc());
                 payer.setCuit(h.getCuit());
                 payer.setCondicionIva(h.getPosicionIva());

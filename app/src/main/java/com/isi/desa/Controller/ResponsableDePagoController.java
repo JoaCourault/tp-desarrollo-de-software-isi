@@ -25,9 +25,8 @@ public class ResponsableDePagoController {
     @Autowired
     private ILogger logger;
 
-    // =========================================================
-    // 1. Obtener responsables de pago
-    // =========================================================
+
+    // Obtener responsables de pago
     @PostMapping("/ObtenerResponsablesDePago")
     public ResponseEntity<BuscarResponsableDePagoResult>
     buscarResponsableDePago(@RequestBody BuscarResponsableDePagoRequest request) {
@@ -50,9 +49,9 @@ public class ResponsableDePagoController {
                     .body(error);
         }
     }
-    // =========================================================
-    // 2. Alta de responsable de pago
-    // =========================================================
+
+    // Alta de responsable de pago
+
     @PostMapping("/AltaResponsableDePago")
     public ResponseEntity<AltaResponsableDePagoResult> AltaResponsableDePago(
             @RequestBody AltaResponsableDePagoRequest request
@@ -77,9 +76,9 @@ public class ResponsableDePagoController {
         }
     }
 
-    // =========================================================
-    // 3. Modificar responsable de pago
-    // =========================================================
+
+    // Modificar responsable de pago
+
     @PostMapping("/ModificarResponsableDePago")
     public ResponseEntity<ModificarResponsableDePagoResult> modificarResponsableDePago(
             @RequestBody ModificarResponsableDePagoRequest request
@@ -102,9 +101,9 @@ public class ResponsableDePagoController {
                     .body(error);
         }
     }
-    // =========================================================
-    // 4. Obtener las distintas razones sociales
-    // =========================================================
+
+    // Obtener las distintas razones sociales
+
     @GetMapping("/ObtenerRazonesSociales")
     public ResponseEntity<List<String>> obtenerRazonesSociales() {
         try {
